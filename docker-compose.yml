@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: foka_vote
+      POSTGRES_USER: foka
+      POSTGRES_PASSWORD: foka
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: npm run dev:api
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://foka:foka@db:5432/foka_vote?schema=public
+    volumes:
+      - .:/app
+      - api_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: npm run dev:web
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:3000
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  db_data:
+  api_node_modules:
+  web_node_modules:

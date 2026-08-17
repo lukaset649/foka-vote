@@ -1,0 +1,26 @@
+{
+  "name": "foka-vote",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "build:shared": "npm run build -w packages/shared",
+    "build:api": "npm run build -w apps/api",
+    "build:web": "npm run build -w apps/web",
+    "build": "npm run build:shared && npm run build:api && npm run build:web",
+    "typecheck:shared": "npm run typecheck -w packages/shared",
+    "typecheck:api": "npm run typecheck -w apps/api",
+    "typecheck:web": "npm run typecheck -w apps/web",
+    "typecheck": "npm run typecheck:shared && npm run typecheck:api && npm run typecheck:web"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
