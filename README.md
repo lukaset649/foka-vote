@@ -1,18 +1,18 @@
 # FOKA Vote
-## Start lokalny z Dockerem
+## Local start with Docker
 
 ```bash
 docker compose up --build
 ```
 
-Po starcie:
+After startup:
 
 - web: http://localhost:5173
 - api: http://localhost:3000/api/health
-- baza: localhost:5432
+- database: localhost:5432
 
-## Struktura
+## Structure
 
 - `apps/web` - React + Vite
 - `apps/api` - Express + TypeScript + Prisma
-- `packages/shared` - współdzielone typy
+- `packages/shared` - shared types
