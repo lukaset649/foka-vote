@@ -1,15 +1,15 @@
-import cors from "cors";
-import express from "express";
+import cors from 'cors';
+import express, { json } from 'express';
 
 export function createApp() {
   const app = express();
 
-  app.disable("x-powered-by");
+  app.disable('x-powered-by');
   app.use(cors());
-  app.use(express.json());
+  app.use(json());
 
-  app.get("/api/health", (_request, response) => {
-    response.json({ ok: true, service: "api" });
+  app.get('/api/health', (_request, response) => {
+    response.json({ ok: true, service: 'api' });
   });
 
   return app;
