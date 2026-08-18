@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: foka
       POSTGRES_PASSWORD: foka
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -24,7 +24,7 @@ services:
       - .:/app
       - api_node_modules:/app/node_modules
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - db
 
@@ -37,12 +37,12 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_URL: http://localhost:3000
-      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_USEPOLLING: 'true'
     volumes:
       - .:/app
       - web_node_modules:/app/node_modules
     ports:
-      - "5173:5173"
+      - '5173:5173'
     depends_on:
       - api
 
