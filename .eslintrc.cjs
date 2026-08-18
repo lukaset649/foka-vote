@@ -5,12 +5,12 @@ module.exports = {
     ecmaVersion: 2022,
     sourceType: 'module',
     project: ['./apps/*/tsconfig.json', './packages/*/tsconfig.json'],
-    tsconfigRootDir: __dirname
+    tsconfigRootDir: __dirname,
   },
   env: {
     node: true,
     browser: true,
-    es2022: true
+    es2022: true,
   },
   plugins: ['@typescript-eslint', 'prettier', 'react', 'react-hooks', 'import'],
   extends: [
@@ -22,13 +22,13 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
-    'prettier'
+    'prettier',
   ],
   settings: {
     react: { version: 'detect' },
-    'import/resolver': { typescript: {} }
+    'import/resolver': { typescript: {} },
   },
   rules: {
-    'prettier/prettier': 'error'
+    'prettier/prettier': 'error',
   }
 };
