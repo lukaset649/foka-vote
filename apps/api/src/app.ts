@@ -1,16 +1,36 @@
 import cors from 'cors';
-import express, { json } from 'express';
+import express, { json, urlencoded } from 'express';
+import type { Express } from 'express';
+import helmet from 'helmet';
+import { env, isProduction } from './config/env.js';
+import { errorHandler } from './middleware/error-handler.middleware.js';
+import { notFoundHandler } from './middleware/not-found.middleware.js';
+import { requestId } from './middleware/request-id.middleware.js';
+import { requestLogger } from './middleware/request-logger.middleware.js';
+import { apiRouter } from './routes.js';
 
-export function createApp() {
+export function createApp(): Express {
   const app = express();
 
+  app.set('trust proxy', 'loopback');
   app.disable('x-powered-by');
-  app.use(cors());
-  app.use(json());
+  app.use(helmet());
 
-  app.get('/api/health', (_request, response) => {
-    response.json({ ok: true, service: 'api' });
-  });
+  // Production serves web and api from the same origin behind nginx, so CORS is unnecessary there.
+  if (!isProduction) {
+    app.use(cors({ origin: env.WEB_ORIGIN }));
+  }
+
+  app.use(json({ limit: '1mb' }));
+  app.use(urlencoded({ extended: false }));
+
+  app.use(requestId);
+  app.use(requestLogger);
+
+  app.use('/api', apiRouter);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   return app;
 }
