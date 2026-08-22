@@ -7,6 +7,7 @@ interface Env {
   readonly HOST: string;
   readonly WEB_ORIGIN: string;
   readonly LOG_LEVEL: LogLevel;
+  readonly DATABASE_URL: string;
 }
 
 function readEnum<T extends string>(name: string, allowed: readonly T[], defaultValue: T): T {
@@ -44,6 +45,14 @@ function readString(name: string, defaultValue: string): string {
   return raw;
 }
 
+function readRequiredString(name: string): string {
+  const raw = process.env[name];
+  if (raw === undefined || raw === '') {
+    throw new Error(`Missing required environment variable: ${name}.`);
+  }
+  return raw;
+}
+
 const NODE_ENV = readEnum<NodeEnv>(
   'NODE_ENV',
   ['development', 'production', 'test'],
@@ -56,6 +65,7 @@ export const env: Env = Object.freeze({
   HOST: readString('HOST', '127.0.0.1'),
   WEB_ORIGIN: readString('WEB_ORIGIN', 'http://localhost:5173'),
   LOG_LEVEL: readEnum<LogLevel>('LOG_LEVEL', ['debug', 'info', 'warn', 'error'], 'info'),
+  DATABASE_URL: readRequiredString('DATABASE_URL'),
 });
 
 export const isProduction = env.NODE_ENV === 'production';

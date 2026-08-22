@@ -6,3 +6,93 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum ContestStatus {
+  DRAFT
+  SUBMISSIONS
+  VOTING
+  CLOSED
+}
+
+model Contest {
+  id                       String        @id @default(cuid())
+  slug                     String        @unique
+  title                    String
+  description              String?
+  submissionStart          DateTime
+  submissionDeadline       DateTime
+  votingStart              DateTime
+  votingEnd                DateTime
+  maxArtworksPerSubmission Int           @default(3)
+  accessCode               String?
+  status                   ContestStatus @default(DRAFT)
+  createdAt                DateTime      @default(now())
+
+  submissions Submission[]
+  voteCards   VoteCard[]
+}
+
+model Submission {
+  id          String   @id @default(cuid())
+  contestId   String
+  firstName   String
+  lastName    String
+  alias       String
+  description String?
+  createdAt   DateTime @default(now())
+
+  contest  Contest    @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  artworks Artwork[]
+  votes    VoteItem[]
+
+  @@unique([contestId, alias])
+  @@index([contestId, lastName, firstName])
+}
+
+model Artwork {
+  id           String @id @default(cuid())
+  submissionId String
+  title        String?
+  description  String?
+  filePath     String
+  previewPath  String
+  thumbPath    String
+  width        Int?
+  height       Int?
+  sortOrder    Int    @default(0)
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId, sortOrder])
+}
+
+model VoteCard {
+  id         String   @id @default(cuid())
+  contestId  String
+  isVoid     Boolean  @default(false)
+  voidReason String?
+  createdAt  DateTime @default(now())
+
+  contest Contest    @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  items   VoteItem[]
+
+  @@index([contestId, createdAt])
+}
+
+model VoteItem {
+  id           String @id @default(cuid())
+  voteCardId   String
+  submissionId String
+  points       Int
+
+  voteCard   VoteCard   @relation(fields: [voteCardId], references: [id], onDelete: Cascade)
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([voteCardId, points])
+  @@unique([voteCardId, submissionId])
+}
+
+model Alias {
+  id   String @id @default(cuid())
+  nick String @unique
+}
