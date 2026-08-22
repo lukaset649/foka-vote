@@ -1,12 +1,24 @@
 import type { HealthStatus } from '@foka-vote/shared';
 import { env } from '../../config/env.js';
+import { prisma } from '../../lib/prisma.js';
 
-// Database connectivity joins this check once Prisma is introduced (stage 7).
-export function getHealthStatus(): HealthStatus {
+async function checkDatabase(): Promise<'ok' | 'error'> {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return 'ok';
+  } catch {
+    return 'error';
+  }
+}
+
+export async function getHealthStatus(): Promise<HealthStatus> {
+  const database = await checkDatabase();
+
   return {
-    status: 'ok',
+    status: database === 'ok' ? 'ok' : 'error',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     environment: env.NODE_ENV,
+    database,
   };
 }
