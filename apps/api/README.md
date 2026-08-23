@@ -11,7 +11,7 @@ src/
 ├─ modules/<domain>/     routes.ts, controller.ts, service.ts — one domain, one folder
 ├─ routes.ts             aggregator, mounts each module under /api/<domain>
 ├─ middleware/           request-id, request-logger, not-found, error-handler
-├─ errors/               error-code.ts, app-error.ts
+├─ errors/               app-error.ts — AppError + factory helpers, ErrorCode/ErrorResponseBody come from @foka-vote/shared
 ├─ config/               env.ts — only place that reads process.env
 ├─ lib/                  logger.ts, prisma.ts — shared PrismaClient singleton
 ├─ types/                express.d.ts — extends Request with requestId
