@@ -1,17 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
+import { ErrorCode, type ErrorResponseBody } from '@foka-vote/shared';
 import { AppError } from '../errors/app-error.js';
-import { ErrorCode } from '../errors/error-code.js';
 import { logger } from '../lib/logger.js';
-
-// This response shape moves to packages/shared as a shared type once that package exists (stage 6).
-interface ErrorResponseBody {
-  error: {
-    code: ErrorCode;
-    message: string;
-    details: unknown;
-    requestId: string;
-  };
-}
 
 export function errorHandler(
   error: unknown,
