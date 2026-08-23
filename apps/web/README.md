@@ -12,7 +12,6 @@ src/
 └─ main.tsx          React DOM bootstrap
 ```
 
-
 ## Commands
 
 - `npm run dev` — `vite --host 0.0.0.0`

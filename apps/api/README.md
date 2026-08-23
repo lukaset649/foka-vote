@@ -1,6 +1,5 @@
 # API — application skeleton
 
-
 ## Structure
 
 ```
