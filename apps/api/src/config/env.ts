@@ -8,6 +8,8 @@ interface Env {
   readonly WEB_ORIGIN: string;
   readonly LOG_LEVEL: LogLevel;
   readonly DATABASE_URL: string;
+  readonly ADMIN_PASSWORD_HASH: string;
+  readonly COOKIE_SECRET: string;
 }
 
 function readEnum<T extends string>(name: string, allowed: readonly T[], defaultValue: T): T {
@@ -45,10 +47,15 @@ function readString(name: string, defaultValue: string): string {
   return raw;
 }
 
-function readRequiredString(name: string): string {
+function readRequiredString(name: string, minLength = 0): string {
   const raw = process.env[name];
   if (raw === undefined || raw === '') {
     throw new Error(`Missing required environment variable: ${name}.`);
+  }
+  if (raw.length < minLength) {
+    throw new Error(
+      `Invalid value for environment variable ${name}: must be at least ${minLength} characters long.`,
+    );
   }
   return raw;
 }
@@ -66,6 +73,8 @@ export const env: Env = Object.freeze({
   WEB_ORIGIN: readString('WEB_ORIGIN', 'http://localhost:5173'),
   LOG_LEVEL: readEnum<LogLevel>('LOG_LEVEL', ['debug', 'info', 'warn', 'error'], 'info'),
   DATABASE_URL: readRequiredString('DATABASE_URL'),
+  ADMIN_PASSWORD_HASH: readRequiredString('ADMIN_PASSWORD_HASH'),
+  COOKIE_SECRET: readRequiredString('COOKIE_SECRET', 32),
 });
 
 export const isProduction = env.NODE_ENV === 'production';

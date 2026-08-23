@@ -21,6 +21,8 @@ services:
       PORT: 3000
       HOST: 0.0.0.0
       DATABASE_URL: postgresql://foka:foka@db:5432/foka_vote?schema=public
+      ADMIN_PASSWORD_HASH: placeholder-replace-after-step-13.2
+      COOKIE_SECRET: 1849ff17de31b93f209ff9fa639e5df12fd367cda3e7778e346ebf2bea7319f2
     volumes:
       - .:/app
       - api_node_modules:/app/node_modules
