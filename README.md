@@ -1,5 +1,7 @@
 # FOKA Vote
 
+Internal tool for a photography club's contests: anonymous submissions, weighted 3/2/1 voting, public results. Easy access without accounts or login.
+
 ## Local start with Docker
 
 ```bash
@@ -12,11 +14,30 @@ After startup:
 - api: http://localhost:3000/api/health
 - database: localhost:5432
 
+## Local start without Docker
+
+```bash
+npm install
+docker compose up -d db   # or point DATABASE_URL at your own Postgres
+npm run dev:api           # terminal 1
+npm run dev:web           # terminal 2
+```
+
+## Commands
+
+- `npm run dev:api` / `npm run dev:web` — start a single app in dev mode
+- `npm run build` — build all workspaces (`shared` → `api` → `web`)
+- `npm run typecheck` — typecheck all workspaces
+- `npm run lint` / `npm run lint:fix` — ESLint over the whole repo
+- `npm run format` / `npm run format:check` — Prettier over the whole repo
+
 ## Structure
 
-- `apps/web` - React + Vite
-- `apps/api` - Express + TypeScript + Prisma
-- `packages/shared` - shared types
+npm workspaces monorepo:
+
+- `apps/web` - React + Vite ([details](apps/web/README.md))
+- `apps/api` - Express + TypeScript + Prisma ([details](apps/api/README.md))
+- `packages/shared` - types shared between `web` and `api`
 
 ## Environment variables
 
