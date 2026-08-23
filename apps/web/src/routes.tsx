@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 
 import Layout from './components/Layout';
+import RequireAdmin from './components/RequireAdmin';
 import ContestsListPage from './pages/public/ContestsListPage';
 import ContestPage from './pages/public/ContestPage';
 import AccessGatePage from './pages/public/AccessGatePage';
@@ -33,13 +34,18 @@ export const router = createBrowserRouter([
       { path: '/contest/:slug/results', element: <ResultsPage /> },
       { path: '/admin', element: <AdminLoginPage /> },
       { path: '/admin/login', element: <AdminLoginPage /> },
-      { path: '/admin/contests', element: <AdminContestsListPage /> },
-      { path: '/admin/contests/new', element: <AdminContestFormPage /> },
-      { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
-      { path: '/admin/contests/:id/submissions', element: <AdminSubmissionsPage /> },
       {
-        path: '/admin/contests/:id/submissions/:submissionId',
-        element: <AdminSubmissionEditPage />,
+        element: <RequireAdmin />,
+        children: [
+          { path: '/admin/contests', element: <AdminContestsListPage /> },
+          { path: '/admin/contests/new', element: <AdminContestFormPage /> },
+          { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
+          { path: '/admin/contests/:id/submissions', element: <AdminSubmissionsPage /> },
+          {
+            path: '/admin/contests/:id/submissions/:submissionId',
+            element: <AdminSubmissionEditPage />,
+          },
+        ],
       },
     ],
   },
