@@ -1,9 +1,7 @@
+import { RouterProvider } from 'react-router';
+
+import { router } from './routes';
+
 export function App() {
-  return (
-    <main>
-      <section>
-        <p>FOKA Vote</p>
-      </section>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }
