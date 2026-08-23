@@ -27,11 +27,11 @@ module.exports = {
   settings: {
     react: { version: 'detect' },
     'import/parsers': { '@typescript-eslint/parser': ['.ts', '.tsx'] },
-    'import/resolver': { typescript: { alwaysTryTypes: true } }
+    'import/resolver': { typescript: { alwaysTryTypes: true } },
   },
   rules: {
     'prettier/prettier': 'error',
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
   },
   overrides: [
     {
