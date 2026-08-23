@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { json, urlencoded } from 'express';
 import type { Express } from 'express';
@@ -18,11 +19,12 @@ export function createApp(): Express {
 
   // Production serves web and api from the same origin behind nginx, so CORS is unnecessary there.
   if (!isProduction) {
-    app.use(cors({ origin: env.WEB_ORIGIN }));
+    app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
   }
 
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: false }));
+  app.use(cookieParser(env.COOKIE_SECRET));
 
   app.use(requestId);
   app.use(requestLogger);

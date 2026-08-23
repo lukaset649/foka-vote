@@ -51,4 +51,6 @@ Copy `.env.example` to `.env` and adjust as needed. `.env` is git-ignored.
 | `WEB_ORIGIN`   | no       | `http://localhost:5173` | Allowed CORS origin for the web app     |
 | `LOG_LEVEL`    | no       | `info`                  | `debug` \| `info` \| `warn` \| `error`  |
 | `DATABASE_URL` | **yes**  | —                       | PostgreSQL connection string            |
+| `ADMIN_PASSWORD_HASH` | **yes** | —               | Admin password hash — generate with `npm run admin:hash-password -w apps/api -- '<password>'` |
+| `COOKIE_SECRET` | **yes** | —                     | Secret for signing session cookies, min. 32 characters |
 | `VITE_API_URL` | no       | `http://localhost:3000` | API base URL used by the web app        |
