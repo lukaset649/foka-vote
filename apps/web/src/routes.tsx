@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 
+import Layout from './components/Layout';
 import ContestsListPage from './pages/public/ContestsListPage';
 import ContestPage from './pages/public/ContestPage';
 import AccessGatePage from './pages/public/AccessGatePage';
@@ -17,21 +18,29 @@ import AdminSubmissionsPage from './pages/admin/AdminSubmissionsPage';
 import AdminSubmissionEditPage from './pages/admin/AdminSubmissionEditPage';
 
 export const router = createBrowserRouter([
-  { path: '/', element: <ContestsListPage /> },
-  { path: '/konkurs/:slug', element: <ContestPage /> },
-  { path: '/konkurs/:slug/brama', element: <AccessGatePage /> },
-  { path: '/konkurs/:slug/zgloszenie', element: <SubmissionFormPage /> },
-  { path: '/konkurs/:slug/zgloszenie/podglad', element: <SubmissionPreviewPage /> },
-  { path: '/konkurs/:slug/zgloszenie/potwierdzenie', element: <SubmissionConfirmationPage /> },
-  { path: '/konkurs/:slug/galeria', element: <GalleryPage /> },
-  { path: '/konkurs/:slug/glosowanie', element: <VoteCardPage /> },
-  { path: '/konkurs/:slug/glosowanie/potwierdzenie', element: <VoteConfirmationPage /> },
-  { path: '/konkurs/:slug/wyniki', element: <ResultsPage /> },
-  { path: '/admin', element: <AdminLoginPage /> },
-  { path: '/admin/logowanie', element: <AdminLoginPage /> },
-  { path: '/admin/konkursy', element: <AdminContestsListPage /> },
-  { path: '/admin/konkursy/nowy', element: <AdminContestFormPage /> },
-  { path: '/admin/konkursy/:id', element: <AdminContestFormPage /> },
-  { path: '/admin/konkursy/:id/zgloszenia', element: <AdminSubmissionsPage /> },
-  { path: '/admin/konkursy/:id/zgloszenia/:submissionId', element: <AdminSubmissionEditPage /> },
+  {
+    element: <Layout />,
+    children: [
+      { path: '/', element: <ContestsListPage /> },
+      { path: '/contest/:slug', element: <ContestPage /> },
+      { path: '/contest/:slug/gate', element: <AccessGatePage /> },
+      { path: '/contest/:slug/submit', element: <SubmissionFormPage /> },
+      { path: '/contest/:slug/submit/preview', element: <SubmissionPreviewPage /> },
+      { path: '/contest/:slug/submit/confirmation', element: <SubmissionConfirmationPage /> },
+      { path: '/contest/:slug/gallery', element: <GalleryPage /> },
+      { path: '/contest/:slug/vote', element: <VoteCardPage /> },
+      { path: '/contest/:slug/vote/confirmation', element: <VoteConfirmationPage /> },
+      { path: '/contest/:slug/results', element: <ResultsPage /> },
+      { path: '/admin', element: <AdminLoginPage /> },
+      { path: '/admin/login', element: <AdminLoginPage /> },
+      { path: '/admin/contests', element: <AdminContestsListPage /> },
+      { path: '/admin/contests/new', element: <AdminContestFormPage /> },
+      { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
+      { path: '/admin/contests/:id/submissions', element: <AdminSubmissionsPage /> },
+      {
+        path: '/admin/contests/:id/submissions/:submissionId',
+        element: <AdminSubmissionEditPage />,
+      },
+    ],
+  },
 ]);
