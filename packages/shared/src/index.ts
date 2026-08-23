@@ -28,3 +28,4 @@ export interface ErrorResponseBody {
 
 export * from './nickname-pool.js';
 export * from './constants.js';
+export * from './contest.js';
