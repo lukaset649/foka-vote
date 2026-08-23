@@ -1,4 +1,4 @@
-import { ErrorCode } from './error-code.js';
+import { ErrorCode } from '@foka-vote/shared';
 
 export interface AppErrorOptions {
   details?: unknown;
