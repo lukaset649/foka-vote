@@ -1,9 +1,10 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { json, urlencoded } from 'express';
+import express, { json, static as serveStatic, urlencoded } from 'express';
 import type { Express } from 'express';
 import helmet from 'helmet';
 import { env, isProduction } from './config/env.js';
+import { MEDIA_URL_PREFIX, VARIANTS_DIR } from './lib/storage.js';
 import { errorHandler } from './middleware/error-handler.middleware.js';
 import { notFoundHandler } from './middleware/not-found.middleware.js';
 import { requestId } from './middleware/request-id.middleware.js';
@@ -28,6 +29,8 @@ export function createApp(): Express {
 
   app.use(requestId);
   app.use(requestLogger);
+
+  app.use(MEDIA_URL_PREFIX, serveStatic(VARIANTS_DIR));
 
   app.use('/api', apiRouter);
 
