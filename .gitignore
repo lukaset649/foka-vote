@@ -20,6 +20,9 @@ db_data
 *.db
 prisma/dev.db
 
+# Uploaded artwork files
+apps/api/uploads/
+
 # Logs
 *.log
 npm-debug.log*
