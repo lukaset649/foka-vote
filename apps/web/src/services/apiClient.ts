@@ -6,3 +6,7 @@ export function apiRequest(path: string, init?: RequestInit): Promise<Response> 
     ...init,
   });
 }
+
+export function mediaUrl(path: string): string {
+  return `${API_URL}${path}`;
+}

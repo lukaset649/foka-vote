@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
 
 const SubmissionPreviewPage = () => {
@@ -9,6 +10,8 @@ const SubmissionPreviewPage = () => {
   const draft = (location.state as SubmissionDraftState | null) ?? null;
 
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!draft) {
@@ -35,9 +38,30 @@ const SubmissionPreviewPage = () => {
     void navigate(`/contest/${slug}/submit`, { state: draft, replace: true });
   };
 
+  const submit = async () => {
+    if (!slug) {
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const submission = await createSubmission(
+        slug,
+        { firstName: draft.firstName, lastName: draft.lastName, description: draft.description },
+        draft.artworks,
+      );
+      void navigate(`/contest/${slug}/submit/confirmation`, { state: { submission } });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleSubmit = () => {
-    // Wired to the real API call in the next step.
-    console.log('submit', draft);
+    void submit();
   };
 
   return (
@@ -63,12 +87,14 @@ const SubmissionPreviewPage = () => {
         ))}
       </ul>
 
-      <button type="button" onClick={handleBack}>
+      <button type="button" onClick={handleBack} disabled={submitting}>
         Popraw
       </button>
-      <button type="button" onClick={handleSubmit}>
+      <button type="button" onClick={handleSubmit} disabled={submitting}>
         Wyślij
       </button>
+
+      {error && <p role="alert">{error}</p>}
     </div>
   );
 };
