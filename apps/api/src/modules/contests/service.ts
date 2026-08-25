@@ -10,6 +10,19 @@ export function contestAccessCookieName(contestId: string): string {
   return `contest_access_${contestId}`;
 }
 
+export function assertContestAccess(
+  contest: Contest,
+  signedCookies: Record<string, string | undefined>,
+): void {
+  if (contest.accessCode === null) {
+    return;
+  }
+  const cookieValue = signedCookies[contestAccessCookieName(contest.id)];
+  if (cookieValue !== contest.accessCode) {
+    throw unauthorized('Access code required');
+  }
+}
+
 function toPublicContestDto(contest: Contest): ContestDto {
   const status = computeContestStatus(new Date(), contest);
 
