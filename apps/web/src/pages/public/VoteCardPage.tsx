@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
-import type { ContestDto, SubmissionDto, VoteCardDto } from '@foka-vote/shared';
+import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
 import { fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
-import { fetchMyVoteCard } from '../../services/votes';
+import { fetchMyVoteCard, submitVoteCard } from '../../services/votes';
+import type { VoteConfirmationState } from './VoteConfirmationPage';
 
 const VoteCardPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
 
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [existingCard, setExistingCard] = useState<VoteCardDto | null | undefined>(undefined);
   const [picks, setPicks] = useState<Record<string, number>>({});
   const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -80,6 +84,34 @@ const VoteCardPage = () => {
 
   const complete = Object.keys(currentPicks).length === slots;
 
+  const submit = async () => {
+    if (!slug) {
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const submitPicks: VoteCardPick[] = Object.entries(picks).map(([submissionId, points]) => ({
+      submissionId,
+      points,
+    }));
+
+    try {
+      const card = await submitVoteCard(slug, submitPicks);
+      const state: VoteConfirmationState = { card, submissions };
+      void navigate(`/contest/${slug}/vote/confirmation`, { state });
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit vote');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    void submit();
+  };
+
   return (
     <div>
       <h1>Vote — {contest.title}</h1>
@@ -133,10 +165,11 @@ const VoteCardPage = () => {
           </ul>
 
           {!readOnly && (
-            <button type="button" disabled={!complete}>
+            <button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
               Wyślij
             </button>
           )}
+          {!readOnly && submitError && <p role="alert">{submitError}</p>}
           {readOnly && <p>You have already voted in this contest.</p>}
         </>
       )}
