@@ -3,8 +3,8 @@ import path from 'node:path';
 import type { ArtworkDto, SubmissionDto } from '@foka-vote/shared';
 import type { Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { contestAccessCookieName } from '../contests/service.js';
-import { badRequest, conflict, notFound, unauthorized } from '../../errors/app-error.js';
+import { assertContestAccess } from '../contests/service.js';
+import { badRequest, conflict, notFound } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
@@ -161,12 +161,7 @@ export async function createSubmission(
     throw conflict('This contest is not currently accepting submissions');
   }
 
-  if (contest.accessCode !== null) {
-    const cookieValue = signedCookies[contestAccessCookieName(contest.id)];
-    if (cookieValue !== contest.accessCode) {
-      throw unauthorized('Access code required');
-    }
-  }
+  assertContestAccess(contest, signedCookies);
 
   if (files.length < 1 || files.length > contest.maxArtworksPerSubmission) {
     throw badRequest(
