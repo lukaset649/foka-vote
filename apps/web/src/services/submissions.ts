@@ -10,6 +10,14 @@ async function extractErrorMessage(response: Response, fallback: string): Promis
   }
 }
 
+export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
+  const response = await apiRequest(`/api/contests/${slug}/submissions`);
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to fetch submissions'));
+  }
+  return response.json() as Promise<SubmissionDto[]>;
+}
+
 export interface CreateSubmissionData {
   firstName: string;
   lastName: string;

@@ -129,6 +129,21 @@ async function createSubmissionWithRetry(
   throw conflict('Could not allocate a unique nickname, please try again');
 }
 
+export async function listSubmissions(slug: string): Promise<SubmissionDto[]> {
+  const contest = await prisma.contest.findUnique({ where: { slug } });
+  if (!contest) {
+    throw notFound('Contest not found');
+  }
+
+  const submissions = await prisma.submission.findMany({
+    where: { contestId: contest.id },
+    include: { artworks: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  return submissions.map((submission) => toSubmissionDto(submission, submission.artworks));
+}
+
 export async function createSubmission(
   slug: string,
   input: CreateSubmissionInput,
