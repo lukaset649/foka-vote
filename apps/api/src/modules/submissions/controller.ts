@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
 import type { ArtworkMetaInput } from './service.js';
-import { createSubmission } from './service.js';
+import { createSubmission, listSubmissions } from './service.js';
 
 function requireSlugParam(request: Request): string {
   const { slug } = request.params;
@@ -43,6 +43,12 @@ function parseArtworkMeta(raw: unknown): ArtworkMetaInput[] {
       ...(descriptionValue !== undefined ? { description: descriptionValue } : {}),
     };
   });
+}
+
+export async function list(request: Request, response: Response): Promise<void> {
+  const slug = requireSlugParam(request);
+  const submissions = await listSubmissions(slug);
+  response.json(submissions);
 }
 
 export async function create(request: Request, response: Response): Promise<void> {
