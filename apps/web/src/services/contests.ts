@@ -24,6 +24,25 @@ export async function fetchContests(): Promise<ContestDto[]> {
   return response.json() as Promise<ContestDto[]>;
 }
 
+export async function fetchContest(slug: string): Promise<ContestDto> {
+  const response = await apiRequest(`/api/contests/${slug}`);
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to fetch contest'));
+  }
+  return response.json() as Promise<ContestDto>;
+}
+
+export async function verifyContestAccessCode(slug: string, code: string): Promise<void> {
+  const response = await apiRequest(`/api/contests/${slug}/access`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to verify access code'));
+  }
+}
+
 export async function fetchAdminContests(): Promise<AdminContestDto[]> {
   const response = await apiRequest('/api/admin/contests');
   if (!response.ok) {
