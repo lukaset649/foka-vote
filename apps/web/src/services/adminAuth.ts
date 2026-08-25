@@ -1,14 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL;
-
-function request(path: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${API_URL}${path}`, {
-    credentials: 'include',
-    ...init,
-  });
-}
+import { apiRequest } from './apiClient';
 
 export async function adminLogin(password: string): Promise<boolean> {
-  const response = await request('/api/admin/login', {
+  const response = await apiRequest('/api/admin/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
@@ -17,10 +10,10 @@ export async function adminLogin(password: string): Promise<boolean> {
 }
 
 export async function adminLogout(): Promise<void> {
-  await request('/api/admin/logout', { method: 'POST' });
+  await apiRequest('/api/admin/logout', { method: 'POST' });
 }
 
 export async function fetchAdminSession(): Promise<boolean> {
-  const response = await request('/api/admin/me');
+  const response = await apiRequest('/api/admin/me');
   return response.ok;
 }
