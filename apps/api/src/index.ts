@@ -2,8 +2,11 @@ import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './lib/logger.js';
 import { prisma } from './lib/prisma.js';
+import { ensureUploadDirs } from './lib/storage.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
+
+await ensureUploadDirs();
 
 const app = createApp();
 const server = app.listen(env.PORT, env.HOST, () => {
