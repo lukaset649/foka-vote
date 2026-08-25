@@ -1,5 +1,6 @@
 import type {
   AdminContestDto,
+  ContestDto,
   CreateContestDto,
   ErrorResponseBody,
   UpdateContestDto,
@@ -13,6 +14,14 @@ async function extractErrorMessage(response: Response, fallback: string): Promis
   } catch {
     return fallback;
   }
+}
+
+export async function fetchContests(): Promise<ContestDto[]> {
+  const response = await apiRequest('/api/contests');
+  if (!response.ok) {
+    throw new Error('Failed to fetch contests');
+  }
+  return response.json() as Promise<ContestDto[]>;
 }
 
 export async function fetchAdminContests(): Promise<AdminContestDto[]> {
