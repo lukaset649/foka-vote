@@ -1,5 +1,6 @@
 import type {
   AdminContestDto,
+  ContestDto,
   CreateContestDto,
   ErrorResponseBody,
   UpdateContestDto,
@@ -12,6 +13,33 @@ async function extractErrorMessage(response: Response, fallback: string): Promis
     return body.error.message;
   } catch {
     return fallback;
+  }
+}
+
+export async function fetchContests(): Promise<ContestDto[]> {
+  const response = await apiRequest('/api/contests');
+  if (!response.ok) {
+    throw new Error('Failed to fetch contests');
+  }
+  return response.json() as Promise<ContestDto[]>;
+}
+
+export async function fetchContest(slug: string): Promise<ContestDto> {
+  const response = await apiRequest(`/api/contests/${slug}`);
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to fetch contest'));
+  }
+  return response.json() as Promise<ContestDto>;
+}
+
+export async function verifyContestAccessCode(slug: string, code: string): Promise<void> {
+  const response = await apiRequest(`/api/contests/${slug}/access`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to verify access code'));
   }
 }
 
