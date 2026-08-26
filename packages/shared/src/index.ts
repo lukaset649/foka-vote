@@ -31,3 +31,4 @@ export * from './constants.js';
 export * from './contest.js';
 export * from './submission.js';
 export * from './vote.js';
+export * from './results.js';
