@@ -1,4 +1,10 @@
-import type { AdminSubmissionDto, ErrorResponseBody, SubmissionDto } from '@foka-vote/shared';
+import type {
+  AdminSubmissionDto,
+  ErrorResponseBody,
+  SubmissionDto,
+  UpdateArtworkDto,
+  UpdateSubmissionDto,
+} from '@foka-vote/shared';
 import { apiRequest } from './apiClient';
 
 async function extractErrorMessage(response: Response, fallback: string): Promise<string> {
@@ -81,4 +87,107 @@ export async function deleteAdminSubmission(
   if (!response.ok) {
     throw new Error(await extractErrorMessage(response, 'Failed to delete submission'));
   }
+}
+
+export async function fetchAdminSubmission(
+  contestId: string,
+  submissionId: string,
+): Promise<AdminSubmissionDto> {
+  const response = await apiRequest(`/api/admin/contests/${contestId}/submissions/${submissionId}`);
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to fetch submission'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
+}
+
+export async function updateAdminSubmission(
+  contestId: string,
+  submissionId: string,
+  input: UpdateSubmissionDto,
+): Promise<AdminSubmissionDto> {
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to update submission'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
+}
+
+export async function updateAdminArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+  input: UpdateArtworkDto,
+): Promise<AdminSubmissionDto> {
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}/artworks/${artworkId}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to update artwork'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
+}
+
+export async function deleteAdminArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+): Promise<AdminSubmissionDto> {
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}/artworks/${artworkId}`,
+    { method: 'DELETE' },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to delete artwork'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
+}
+
+export async function reorderAdminArtworks(
+  contestId: string,
+  submissionId: string,
+  order: string[],
+): Promise<AdminSubmissionDto> {
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}/artworks/order`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order }),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to reorder artworks'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
+}
+
+export async function replaceAdminArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+  file: File,
+): Promise<AdminSubmissionDto> {
+  const formData = new FormData();
+  formData.append('artwork', file);
+
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}/artworks/${artworkId}/replace`,
+    { method: 'POST', body: formData },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to replace artwork'));
+  }
+  return response.json() as Promise<AdminSubmissionDto>;
 }
