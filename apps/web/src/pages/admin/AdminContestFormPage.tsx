@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import type { AdminContestDto } from '@foka-vote/shared';
 import { createContest, fetchAdminContest, updateContest } from '../../services/contests';
 
@@ -125,6 +125,16 @@ const AdminContestFormPage = () => {
   return (
     <form onSubmit={handleSubmit}>
       <h1>{isEditing ? 'Edit contest' : 'New contest'}</h1>
+
+      <p>
+        <Link to="/admin/contests">Back to contests</Link>
+        {isEditing && (
+          <>
+            {' · '}
+            <Link to={`/admin/contests/${id}/submissions`}>Submissions &amp; vote cards</Link>
+          </>
+        )}
+      </p>
 
       <label htmlFor="title">Title</label>
       <input id="title" value={form.title} onChange={updateField('title')} required />

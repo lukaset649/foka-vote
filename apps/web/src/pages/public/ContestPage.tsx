@@ -82,6 +82,27 @@ const ContestPage = () => {
           <Link to={`/contest/${contest.slug}/gate`}>Enter access code</Link>
         </p>
       )}
+
+      <nav>
+        <ul>
+          <li>
+            <Link to={`/contest/${contest.slug}/gallery`}>Gallery</Link>
+          </li>
+          {contest.status === 'SUBMISSIONS' && (
+            <li>
+              <Link to={`/contest/${contest.slug}/submit`}>Submit your work</Link>
+            </li>
+          )}
+          {contest.status === 'VOTING' && (
+            <li>
+              <Link to={`/contest/${contest.slug}/vote`}>Vote</Link>
+            </li>
+          )}
+          <li>
+            <Link to={`/contest/${contest.slug}/results`}>Results</Link>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
 import { fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
@@ -72,6 +72,9 @@ const ResultsPage = () => {
           Results will be available once voting closes, on{' '}
           {new Date(contest.votingEnd).toLocaleString()}.
         </p>
+        <p>
+          <Link to={`/contest/${slug}`}>Back to the contest</Link>
+        </p>
       </div>
     );
   }
@@ -83,6 +86,9 @@ const ResultsPage = () => {
   return (
     <div>
       <h1>Results — {contest.title}</h1>
+      <p>
+        <Link to={`/contest/${slug}`}>Back to the contest</Link>
+      </p>
       <p>{results.voteCardCount} vote cards cast</p>
 
       <table>

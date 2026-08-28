@@ -40,7 +40,10 @@ const AdminContestsListPage = () => {
           {contests.map((contest) => (
             <li key={contest.id}>
               <Link to={`/admin/contests/${contest.id}`}>{contest.title}</Link> ({contest.slug},{' '}
-              {contest.status})
+              {contest.status}) —{' '}
+              <Link to={`/admin/contests/${contest.id}/submissions`}>
+                submissions &amp; vote cards
+              </Link>
             </li>
           ))}
         </ul>

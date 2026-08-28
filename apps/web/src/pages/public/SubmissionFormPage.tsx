@@ -137,7 +137,8 @@ const SubmissionFormPage = () => {
 
       <p>
         Your first and last name will be published next to your work once voting closes. After
-        submitting, only the admin can make changes — contact them if something needs fixing.
+        submitting, only the admin can make changes — message the club&apos;s Messenger group if
+        something needs fixing (a typo, a wrong file, a withdrawal).
       </p>
 
       <label htmlFor="firstName">First name</label>

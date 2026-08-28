@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
@@ -116,6 +116,10 @@ const VoteCardPage = () => {
     <div>
       <h1>Vote — {contest.title}</h1>
 
+      <p>
+        <Link to={`/contest/${slug}`}>Back to the contest</Link>
+      </p>
+
       {slots === 0 && <p>Not enough submissions to vote on yet.</p>}
 
       {slots > 0 && (
@@ -166,7 +170,7 @@ const VoteCardPage = () => {
 
           {!readOnly && (
             <button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
-              Wyślij
+              Submit
             </button>
           )}
           {!readOnly && submitError && <p role="alert">{submitError}</p>}
