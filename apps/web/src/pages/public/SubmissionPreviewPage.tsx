@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { ErrorCode } from '@foka-vote/shared';
+import { ApiError } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
 
@@ -54,6 +56,13 @@ const SubmissionPreviewPage = () => {
       );
       void navigate(`/contest/${slug}/submit/confirmation`, { state: { submission } });
     } catch (err) {
+      if (err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED) {
+        const redirect = `/contest/${slug}/submit/preview`;
+        void navigate(`/contest/${slug}/gate?redirect=${encodeURIComponent(redirect)}`, {
+          state: draft,
+        });
+        return;
+      }
       setError(err instanceof Error ? err.message : 'Failed to submit');
     } finally {
       setSubmitting(false);

@@ -1,25 +1,15 @@
 import type {
   AdminSubmissionDto,
-  ErrorResponseBody,
   SubmissionDto,
   UpdateArtworkDto,
   UpdateSubmissionDto,
 } from '@foka-vote/shared';
-import { apiRequest } from './apiClient';
-
-async function extractErrorMessage(response: Response, fallback: string): Promise<string> {
-  try {
-    const body = (await response.json()) as ErrorResponseBody;
-    return body.error.message;
-  } catch {
-    return fallback;
-  }
-}
+import { apiErrorFrom, apiRequest } from './apiClient';
 
 export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
   const response = await apiRequest(`/api/contests/${slug}/submissions`);
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to fetch submissions'));
+    throw await apiErrorFrom(response, 'Failed to fetch submissions');
   }
   return response.json() as Promise<SubmissionDto[]>;
 }
@@ -63,7 +53,7 @@ export async function createSubmission(
     body: formData,
   });
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to submit'));
+    throw await apiErrorFrom(response, 'Failed to submit');
   }
   return response.json() as Promise<SubmissionDto>;
 }
@@ -71,7 +61,7 @@ export async function createSubmission(
 export async function fetchAdminSubmissions(contestId: string): Promise<AdminSubmissionDto[]> {
   const response = await apiRequest(`/api/admin/contests/${contestId}/submissions`);
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to fetch submissions'));
+    throw await apiErrorFrom(response, 'Failed to fetch submissions');
   }
   return response.json() as Promise<AdminSubmissionDto[]>;
 }
@@ -85,7 +75,7 @@ export async function deleteAdminSubmission(
     { method: 'DELETE' },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to delete submission'));
+    throw await apiErrorFrom(response, 'Failed to delete submission');
   }
 }
 
@@ -95,7 +85,7 @@ export async function fetchAdminSubmission(
 ): Promise<AdminSubmissionDto> {
   const response = await apiRequest(`/api/admin/contests/${contestId}/submissions/${submissionId}`);
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to fetch submission'));
+    throw await apiErrorFrom(response, 'Failed to fetch submission');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
@@ -114,7 +104,7 @@ export async function updateAdminSubmission(
     },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to update submission'));
+    throw await apiErrorFrom(response, 'Failed to update submission');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
@@ -134,7 +124,7 @@ export async function updateAdminArtwork(
     },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to update artwork'));
+    throw await apiErrorFrom(response, 'Failed to update artwork');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
@@ -149,7 +139,7 @@ export async function deleteAdminArtwork(
     { method: 'DELETE' },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to delete artwork'));
+    throw await apiErrorFrom(response, 'Failed to delete artwork');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
@@ -168,7 +158,7 @@ export async function reorderAdminArtworks(
     },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to reorder artworks'));
+    throw await apiErrorFrom(response, 'Failed to reorder artworks');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
@@ -187,7 +177,7 @@ export async function replaceAdminArtwork(
     { method: 'POST', body: formData },
   );
   if (!response.ok) {
-    throw new Error(await extractErrorMessage(response, 'Failed to replace artwork'));
+    throw await apiErrorFrom(response, 'Failed to replace artwork');
   }
   return response.json() as Promise<AdminSubmissionDto>;
 }
