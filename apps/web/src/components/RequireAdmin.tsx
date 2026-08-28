@@ -28,7 +28,12 @@ const RequireAdmin = () => {
   }, []);
 
   if (status === 'checking') {
-    return <p>Loading…</p>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-zinc-500">
+        <i className="bi bi-arrow-repeat animate-spin text-lg" aria-hidden="true" />
+        <span>Loading…</span>
+      </div>
+    );
   }
 
   if (status === 'unauthenticated') {
