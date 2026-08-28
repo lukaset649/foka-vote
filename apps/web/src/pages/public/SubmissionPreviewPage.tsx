@@ -88,10 +88,10 @@ const SubmissionPreviewPage = () => {
       </ul>
 
       <button type="button" onClick={handleBack} disabled={submitting}>
-        Popraw
+        Edit
       </button>
       <button type="button" onClick={handleSubmit} disabled={submitting}>
-        Wyślij
+        Submit
       </button>
 
       {error && <p role="alert">{error}</p>}
