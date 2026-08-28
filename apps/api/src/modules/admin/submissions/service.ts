@@ -1,8 +1,13 @@
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import type { AdminSubmissionDto, ArtworkDto } from '@foka-vote/shared';
+import type {
+  AdminSubmissionDto,
+  ArtworkDto,
+  UpdateArtworkDto,
+  UpdateSubmissionDto,
+} from '@foka-vote/shared';
 import type { Artwork, Submission } from '@prisma/client';
-import { notFound } from '../../../errors/app-error.js';
+import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 import { MEDIA_URL_PREFIX, UPLOADS_DIR } from '../../../lib/storage.js';
 
@@ -56,6 +61,14 @@ async function loadSubmission(
   return submission;
 }
 
+function findArtwork(submission: Submission & { artworks: Artwork[] }, artworkId: string): Artwork {
+  const artwork = submission.artworks.find((candidate) => candidate.id === artworkId);
+  if (!artwork) {
+    throw notFound('Artwork not found');
+  }
+  return artwork;
+}
+
 async function unlinkArtworkFiles(artworks: Artwork[]): Promise<void> {
   await Promise.all(
     artworks.flatMap((artwork) =>
@@ -90,4 +103,90 @@ export async function deleteSubmission(contestId: string, submissionId: string):
   const submission = await loadSubmission(contestId, submissionId);
   await prisma.submission.delete({ where: { id: submission.id } });
   await unlinkArtworkFiles(submission.artworks);
+}
+
+export async function updateSubmission(
+  contestId: string,
+  submissionId: string,
+  input: UpdateSubmissionDto,
+): Promise<AdminSubmissionDto> {
+  const existing = await loadSubmission(contestId, submissionId);
+
+  const submission = await prisma.submission.update({
+    where: { id: existing.id },
+    data: {
+      firstName: input.firstName ?? existing.firstName,
+      lastName: input.lastName ?? existing.lastName,
+      description: input.description !== undefined ? input.description : existing.description,
+    },
+  });
+
+  return toAdminSubmissionDto(submission, existing.artworks);
+}
+
+export async function updateArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+  input: UpdateArtworkDto,
+): Promise<AdminSubmissionDto> {
+  const submission = await loadSubmission(contestId, submissionId);
+  const artwork = findArtwork(submission, artworkId);
+
+  await prisma.artwork.update({
+    where: { id: artwork.id },
+    data: {
+      title: input.title !== undefined ? input.title : artwork.title,
+      description: input.description !== undefined ? input.description : artwork.description,
+    },
+  });
+
+  return getAdminSubmission(contestId, submissionId);
+}
+
+export async function deleteArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+): Promise<AdminSubmissionDto> {
+  const submission = await loadSubmission(contestId, submissionId);
+  const artwork = findArtwork(submission, artworkId);
+
+  if (submission.artworks.length <= 1) {
+    throw conflict(
+      'A submission must keep at least one artwork; delete the whole submission instead',
+    );
+  }
+
+  await prisma.artwork.delete({ where: { id: artwork.id } });
+  await unlinkArtworkFiles([artwork]);
+
+  return getAdminSubmission(contestId, submissionId);
+}
+
+export async function reorderArtworks(
+  contestId: string,
+  submissionId: string,
+  order: string[],
+): Promise<AdminSubmissionDto> {
+  const submission = await loadSubmission(contestId, submissionId);
+
+  const existingIds = new Set(submission.artworks.map((artwork) => artwork.id));
+  const orderIds = new Set(order);
+  const isExactMatch =
+    order.length === submission.artworks.length &&
+    orderIds.size === order.length &&
+    [...orderIds].every((id) => existingIds.has(id));
+
+  if (!isExactMatch) {
+    throw badRequest('order must contain exactly the artwork ids of this submission, each once');
+  }
+
+  await prisma.$transaction(
+    order.map((artworkId, index) =>
+      prisma.artwork.update({ where: { id: artworkId }, data: { sortOrder: index } }),
+    ),
+  );
+
+  return getAdminSubmission(contestId, submissionId);
 }
