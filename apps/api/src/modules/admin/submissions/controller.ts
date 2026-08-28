@@ -6,6 +6,7 @@ import {
   deleteSubmission,
   getAdminSubmission,
   listAdminSubmissions,
+  replaceArtwork,
   reorderArtworks,
   updateArtwork,
   updateSubmission,
@@ -144,5 +145,18 @@ export async function reorder(request: Request, response: Response): Promise<voi
   const submissionId = requireSubmissionIdParam(request);
   const order = parseOrderBody(request.body);
   const submission = await reorderArtworks(contestId, submissionId, order);
+  response.json(submission);
+}
+
+export async function replace(request: Request, response: Response): Promise<void> {
+  const contestId = requireContestIdParam(request);
+  const submissionId = requireSubmissionIdParam(request);
+  const artworkId = requireArtworkIdParam(request);
+  const files = (request.files as Express.Multer.File[] | undefined) ?? [];
+  const file = files[0];
+  if (!file) {
+    throw badRequest('artwork file is required');
+  }
+  const submission = await replaceArtwork(contestId, submissionId, artworkId, file.buffer);
   response.json(submission);
 }

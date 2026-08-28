@@ -8,6 +8,7 @@ import type {
 } from '@foka-vote/shared';
 import type { Artwork, Submission } from '@prisma/client';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
+import { processArtworkImage } from '../../../lib/artwork-image.js';
 import { prisma } from '../../../lib/prisma.js';
 import { MEDIA_URL_PREFIX, UPLOADS_DIR } from '../../../lib/storage.js';
 
@@ -69,13 +70,17 @@ function findArtwork(submission: Submission & { artworks: Artwork[] }, artworkId
   return artwork;
 }
 
-async function unlinkArtworkFiles(artworks: Artwork[]): Promise<void> {
+async function unlinkRelativePaths(paths: string[]): Promise<void> {
   await Promise.all(
-    artworks.flatMap((artwork) =>
-      [artwork.filePath, artwork.previewPath, artwork.thumbPath].map((relativePath) =>
-        unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined),
-      ),
+    paths.map((relativePath) =>
+      unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined),
     ),
+  );
+}
+
+async function unlinkArtworkFiles(artworks: Artwork[]): Promise<void> {
+  await unlinkRelativePaths(
+    artworks.flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath]),
   );
 }
 
@@ -187,6 +192,38 @@ export async function reorderArtworks(
       prisma.artwork.update({ where: { id: artworkId }, data: { sortOrder: index } }),
     ),
   );
+
+  return getAdminSubmission(contestId, submissionId);
+}
+
+export async function replaceArtwork(
+  contestId: string,
+  submissionId: string,
+  artworkId: string,
+  file: Buffer,
+): Promise<AdminSubmissionDto> {
+  const submission = await loadSubmission(contestId, submissionId);
+  const artwork = findArtwork(submission, artworkId);
+
+  const processed = await processArtworkImage(file);
+
+  try {
+    await prisma.artwork.update({
+      where: { id: artwork.id },
+      data: {
+        filePath: processed.filePath,
+        previewPath: processed.previewPath,
+        thumbPath: processed.thumbPath,
+        width: processed.width,
+        height: processed.height,
+      },
+    });
+  } catch (error) {
+    await unlinkRelativePaths([processed.filePath, processed.previewPath, processed.thumbPath]);
+    throw error;
+  }
+
+  await unlinkRelativePaths([artwork.filePath, artwork.previewPath, artwork.thumbPath]);
 
   return getAdminSubmission(contestId, submissionId);
 }
