@@ -27,3 +27,14 @@ export interface CreateSubmissionDto {
   lastName: string;
   description?: string;
 }
+
+export interface UpdateSubmissionDto {
+  firstName?: string;
+  lastName?: string;
+  description?: string;
+}
+
+export interface UpdateArtworkDto {
+  title?: string;
+  description?: string;
+}
