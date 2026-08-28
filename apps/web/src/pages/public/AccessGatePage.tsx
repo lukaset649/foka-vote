@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { verifyContestAccessCode } from '../../services/contests';
 
 const AccessGatePage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -23,7 +24,7 @@ const AccessGatePage = () => {
 
     try {
       await verifyContestAccessCode(slug, code);
-      void navigate(redirectTarget);
+      void navigate(redirectTarget, { state: location.state as unknown, replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to verify access code');
     } finally {

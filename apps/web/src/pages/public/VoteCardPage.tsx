@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
+import { ErrorCode, MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
-import { mediaUrl } from '../../services/apiClient';
+import { ApiError, mediaUrl } from '../../services/apiClient';
 import { fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
 import { fetchMyVoteCard, submitVoteCard } from '../../services/votes';
@@ -102,6 +102,11 @@ const VoteCardPage = () => {
       const state: VoteConfirmationState = { card, submissions };
       void navigate(`/contest/${slug}/vote/confirmation`, { state });
     } catch (err) {
+      if (err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED) {
+        const redirect = `/contest/${slug}/vote`;
+        void navigate(`/contest/${slug}/gate?redirect=${encodeURIComponent(redirect)}`);
+        return;
+      }
       setSubmitError(err instanceof Error ? err.message : 'Failed to submit vote');
     } finally {
       setSubmitting(false);
