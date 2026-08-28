@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import type { SubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
 import { fetchSubmissions } from '../../services/submissions';
@@ -40,13 +40,15 @@ const GalleryPage = () => {
     return <p>Loading…</p>;
   }
 
-  if (submissions.length === 0) {
-    return <p>No submissions yet</p>;
-  }
-
   return (
     <div>
       <h1>Gallery</h1>
+
+      <p>
+        <Link to={`/contest/${slug}`}>Back to the contest</Link>
+      </p>
+
+      {submissions.length === 0 && <p>No submissions yet</p>}
 
       <ul>
         {submissions.map((submission) => (
