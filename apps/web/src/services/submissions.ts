@@ -1,4 +1,4 @@
-import type { ErrorResponseBody, SubmissionDto } from '@foka-vote/shared';
+import type { AdminSubmissionDto, ErrorResponseBody, SubmissionDto } from '@foka-vote/shared';
 import { apiRequest } from './apiClient';
 
 async function extractErrorMessage(response: Response, fallback: string): Promise<string> {
@@ -60,4 +60,25 @@ export async function createSubmission(
     throw new Error(await extractErrorMessage(response, 'Failed to submit'));
   }
   return response.json() as Promise<SubmissionDto>;
+}
+
+export async function fetchAdminSubmissions(contestId: string): Promise<AdminSubmissionDto[]> {
+  const response = await apiRequest(`/api/admin/contests/${contestId}/submissions`);
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to fetch submissions'));
+  }
+  return response.json() as Promise<AdminSubmissionDto[]>;
+}
+
+export async function deleteAdminSubmission(
+  contestId: string,
+  submissionId: string,
+): Promise<void> {
+  const response = await apiRequest(
+    `/api/admin/contests/${contestId}/submissions/${submissionId}`,
+    { method: 'DELETE' },
+  );
+  if (!response.ok) {
+    throw new Error(await extractErrorMessage(response, 'Failed to delete submission'));
+  }
 }
