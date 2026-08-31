@@ -13,6 +13,7 @@ import Card from '../../components/ui/Card';
 import Alert from '../../components/ui/Alert';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import ArtworkLightbox from '../../components/ArtworkLightbox';
 
 const VoteCardPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -25,6 +26,7 @@ const VoteCardPage = () => {
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [galleryFor, setGalleryFor] = useState<SubmissionDto | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -172,35 +174,46 @@ const VoteCardPage = () => {
                 const firstArtwork = submission.artworks[0];
                 return (
                   <li key={submission.id}>
-                    <button
-                      type="button"
-                      onClick={() => togglePick(submission.id)}
-                      disabled={readOnly}
-                      className={cn(
-                        'relative w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
-                        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-                        selected
-                          ? 'border-indigo-600 bg-indigo-50'
-                          : 'border-transparent bg-white shadow-sm hover:border-zinc-300',
-                        readOnly && 'cursor-not-allowed',
-                      )}
-                    >
-                      {firstArtwork && (
-                        <img
-                          src={mediaUrl(firstArtwork.thumbUrl)}
-                          alt={submission.alias}
-                          className="aspect-square w-full object-cover"
-                        />
-                      )}
-                      {selected && (
-                        <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
-                          {points}
-                        </span>
-                      )}
-                      <p className="px-2 py-2 text-sm font-medium text-zinc-900">
-                        {submission.alias}
-                      </p>
-                    </button>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => togglePick(submission.id)}
+                        disabled={readOnly}
+                        className={cn(
+                          'relative w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
+                          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+                          selected
+                            ? 'border-indigo-600 bg-indigo-50'
+                            : 'border-transparent bg-white shadow-sm hover:border-zinc-300',
+                          readOnly && 'cursor-not-allowed',
+                        )}
+                      >
+                        {firstArtwork && (
+                          <img
+                            src={mediaUrl(firstArtwork.thumbUrl)}
+                            alt={submission.alias}
+                            className="aspect-square w-full object-cover"
+                          />
+                        )}
+                        {selected && (
+                          <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+                            {points}
+                          </span>
+                        )}
+                        <p className="px-2 py-2 text-sm font-medium text-zinc-900">
+                          {submission.alias}
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setGalleryFor(submission)}
+                        aria-label={`View ${submission.alias}'s artworks`}
+                        className="absolute left-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        <i className="bi bi-images" aria-hidden="true" />
+                      </button>
+                    </div>
                   </li>
                 );
               })}
@@ -221,6 +234,16 @@ const VoteCardPage = () => {
           {!readOnly && submitError && <Alert variant="error">{submitError}</Alert>}
           {readOnly && <Alert variant="info">You have already voted in this contest.</Alert>}
         </div>
+      )}
+
+      {galleryFor && (
+        <ArtworkLightbox
+          artworks={galleryFor.artworks}
+          startIndex={0}
+          open
+          onClose={() => setGalleryFor(null)}
+          authorAlias={galleryFor.alias}
+        />
       )}
     </div>
   );

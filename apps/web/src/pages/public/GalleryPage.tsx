@@ -8,11 +8,18 @@ import Card from '../../components/ui/Card';
 import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
+import ArtworkLightbox from '../../components/ArtworkLightbox';
+
+interface OpenLightbox {
+  submissionId: string;
+  index: number;
+}
 
 const GalleryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [error, setError] = useState(false);
+  const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -45,6 +52,8 @@ const GalleryPage = () => {
     return <Spinner />;
   }
 
+  const openSubmission = submissions.find((submission) => submission.id === lightbox?.submissionId);
+
   return (
     <div>
       <PageHeader title="Gallery" backTo={`/contest/${slug}`} backLabel="Back to the contest" />
@@ -62,15 +71,19 @@ const GalleryPage = () => {
                 )}
 
                 <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {submission.artworks.map((artwork) => (
+                  {submission.artworks.map((artwork, index) => (
                     <li key={artwork.id}>
-                      <div className="overflow-hidden rounded-md border border-zinc-200">
+                      <button
+                        type="button"
+                        onClick={() => setLightbox({ submissionId: submission.id, index })}
+                        className="block w-full overflow-hidden rounded-md border border-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
                         <img
                           src={mediaUrl(artwork.thumbUrl)}
                           alt={artwork.title ?? submission.alias}
                           className="aspect-square w-full object-cover"
                         />
-                      </div>
+                      </button>
                       {artwork.title && (
                         <p className="mt-1 text-sm font-medium text-zinc-900">{artwork.title}</p>
                       )}
@@ -84,6 +97,16 @@ const GalleryPage = () => {
             </li>
           ))}
         </ul>
+      )}
+
+      {openSubmission && lightbox && (
+        <ArtworkLightbox
+          artworks={openSubmission.artworks}
+          startIndex={lightbox.index}
+          open
+          onClose={() => setLightbox(null)}
+          authorAlias={openSubmission.alias}
+        />
       )}
     </div>
   );

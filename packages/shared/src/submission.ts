@@ -2,6 +2,7 @@ export interface ArtworkDto {
   id: string;
   title: string | null;
   description: string | null;
+  fullUrl: string;
   previewUrl: string;
   thumbUrl: string;
   width: number | null;
