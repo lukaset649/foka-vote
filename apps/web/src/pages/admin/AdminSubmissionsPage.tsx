@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import type { AdminSubmissionDto, VoteCardDto } from '@foka-vote/shared';
 import { deleteAdminSubmission, fetchAdminSubmissions } from '../../services/submissions';
 import { fetchAdminVoteCards, unvoidVoteCard, voidVoteCard } from '../../services/votes';
@@ -8,6 +8,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import Alert from '../../components/ui/Alert';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import LinkButton from '../../components/ui/LinkButton';
 import EmptyState from '../../components/ui/EmptyState';
 import Table, {
   TableBody,
@@ -148,12 +149,14 @@ const AdminSubmissionsPage = () => {
                   <TableCell>{new Date(submission.createdAt).toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Link to={`/admin/contests/${contestId}/submissions/${submission.id}`}>
-                        <Button variant="ghost" size="sm">
-                          <i className="bi bi-pencil-square" aria-hidden="true" />
-                          Edit
-                        </Button>
-                      </Link>
+                      <LinkButton
+                        to={`/admin/contests/${contestId}/submissions/${submission.id}`}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <i className="bi bi-pencil-square" aria-hidden="true" />
+                        Edit
+                      </LinkButton>
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(submission.id)}>
                         <i className="bi bi-trash" aria-hidden="true" />
                         Delete

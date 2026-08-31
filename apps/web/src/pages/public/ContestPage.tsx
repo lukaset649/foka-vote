@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { fetchContest, verifyContestAccessCode } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
-import Button from '../../components/ui/Button';
+import LinkButton from '../../components/ui/LinkButton';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -99,43 +99,38 @@ const ContestPage = () => {
       </Card>
 
       {contest.hasAccessCode && (
-        <Link to={`/contest/${contest.slug}/gate`} className="inline-flex w-fit">
-          <Button variant="secondary" size="sm">
-            <i className="bi bi-lock" aria-hidden="true" />
-            Enter access code
-          </Button>
-        </Link>
+        <LinkButton
+          to={`/contest/${contest.slug}/gate`}
+          variant="secondary"
+          size="sm"
+          className="w-fit"
+        >
+          <i className="bi bi-lock" aria-hidden="true" />
+          Enter access code
+        </LinkButton>
       )}
 
       <nav className="flex flex-wrap gap-3">
-        <Link to={`/contest/${contest.slug}/gallery`} className="inline-flex">
-          <Button variant="secondary">
-            <i className="bi bi-images" aria-hidden="true" />
-            Gallery
-          </Button>
-        </Link>
+        <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary">
+          <i className="bi bi-images" aria-hidden="true" />
+          Gallery
+        </LinkButton>
         {contest.status === 'SUBMISSIONS' && (
-          <Link to={`/contest/${contest.slug}/submit`} className="inline-flex">
-            <Button variant="primary">
-              <i className="bi bi-send" aria-hidden="true" />
-              Submit your work
-            </Button>
-          </Link>
+          <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
+            <i className="bi bi-send" aria-hidden="true" />
+            Submit your work
+          </LinkButton>
         )}
         {contest.status === 'VOTING' && (
-          <Link to={`/contest/${contest.slug}/vote`} className="inline-flex">
-            <Button variant="primary">
-              <i className="bi bi-check2-square" aria-hidden="true" />
-              Vote
-            </Button>
-          </Link>
+          <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
+            <i className="bi bi-check2-square" aria-hidden="true" />
+            Vote
+          </LinkButton>
         )}
-        <Link to={`/contest/${contest.slug}/results`} className="inline-flex">
-          <Button variant="secondary">
-            <i className="bi bi-trophy" aria-hidden="true" />
-            Results
-          </Button>
-        </Link>
+        <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary">
+          <i className="bi bi-trophy" aria-hidden="true" />
+          Results
+        </LinkButton>
       </nav>
     </div>
   );
