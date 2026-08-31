@@ -3,6 +3,19 @@ import { Link, useParams } from 'react-router';
 import type { AdminSubmissionDto, VoteCardDto } from '@foka-vote/shared';
 import { deleteAdminSubmission, fetchAdminSubmissions } from '../../services/submissions';
 import { fetchAdminVoteCards, unvoidVoteCard, voidVoteCard } from '../../services/votes';
+import { cn } from '../../lib/cn';
+import PageHeader from '../../components/ui/PageHeader';
+import Alert from '../../components/ui/Alert';
+import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
+import EmptyState from '../../components/ui/EmptyState';
+import Table, {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from '../../components/ui/Table';
 
 type Tab = 'submissions' | 'voteCards';
 
@@ -62,128 +75,155 @@ const AdminSubmissionsPage = () => {
 
   return (
     <div>
-      <h1>Submissions &amp; vote cards</h1>
+      <PageHeader
+        title="Submissions & vote cards"
+        backTo="/admin/contests"
+        backLabel="Back to contests"
+      />
 
-      <p>
-        <Link to="/admin/contests">Back to contests</Link>
-      </p>
+      {error && <Alert variant="error">Something went wrong</Alert>}
 
-      {error && <p role="alert">Something went wrong</p>}
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="inline-flex items-center gap-1 text-zinc-600">
+          <i className="bi bi-person-badge" aria-hidden="true" />
+          {submissions?.length ?? '…'} submissions
+        </span>
+        <span className="inline-flex items-center gap-1 text-zinc-600">
+          <i className="bi bi-ticket-perforated" aria-hidden="true" />
+          {voteCards?.length ?? '…'} vote cards
+        </span>
+        {voidedCount > 0 && <Badge color="rose">{voidedCount} voided</Badge>}
+      </div>
 
-      <p>
-        {submissions?.length ?? '…'} submissions · {voteCards?.length ?? '…'} vote cards (
-        {voidedCount} voided)
-      </p>
-
-      <nav>
+      <nav className="mb-4 inline-flex w-fit rounded-md bg-zinc-100 p-1">
         <button
           type="button"
-          disabled={tab === 'submissions'}
           onClick={() => setTab('submissions')}
+          className={cn(
+            'min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors',
+            tab === 'submissions' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500',
+          )}
         >
           Submissions
-        </button>{' '}
-        <button type="button" disabled={tab === 'voteCards'} onClick={() => setTab('voteCards')}>
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('voteCards')}
+          className={cn(
+            'min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors',
+            tab === 'voteCards' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500',
+          )}
+        >
           Vote cards
         </button>
       </nav>
 
-      {tab === 'submissions' && (
-        <table>
-          <thead>
-            <tr>
-              <th>Author</th>
-              <th>Alias</th>
-              <th>Artworks</th>
-              <th>Submitted</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {submissions === null && (
-              <tr>
-                <td colSpan={5}>Loading…</td>
-              </tr>
-            )}
-            {submissions !== null && submissions.length === 0 && (
-              <tr>
-                <td colSpan={5}>No submissions yet</td>
-              </tr>
-            )}
-            {submissions?.map((submission) => (
-              <tr key={submission.id}>
-                <td>
-                  {submission.firstName} {submission.lastName}
-                </td>
-                <td>{submission.alias}</td>
-                <td>{submission.artworks.length}</td>
-                <td>{new Date(submission.createdAt).toLocaleString()}</td>
-                <td>
-                  <Link to={`/admin/contests/${contestId}/submissions/${submission.id}`}>edit</Link>{' '}
-                  <button type="button" onClick={() => handleDelete(submission.id)}>
-                    delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      {tab === 'submissions' &&
+        (submissions !== null && submissions.length === 0 ? (
+          <EmptyState icon="bi-person-badge" text="No submissions yet" />
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Author</TableHeaderCell>
+                <TableHeaderCell>Alias</TableHeaderCell>
+                <TableHeaderCell>Artworks</TableHeaderCell>
+                <TableHeaderCell>Submitted</TableHeaderCell>
+                <TableHeaderCell></TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {submissions === null && (
+                <TableRow>
+                  <TableCell colSpan={5}>Loading…</TableCell>
+                </TableRow>
+              )}
+              {submissions?.map((submission) => (
+                <TableRow key={submission.id}>
+                  <TableCell>
+                    {submission.firstName} {submission.lastName}
+                  </TableCell>
+                  <TableCell>{submission.alias}</TableCell>
+                  <TableCell>{submission.artworks.length}</TableCell>
+                  <TableCell>{new Date(submission.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Link to={`/admin/contests/${contestId}/submissions/${submission.id}`}>
+                        <Button variant="ghost" size="sm">
+                          <i className="bi bi-pencil-square" aria-hidden="true" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(submission.id)}>
+                        <i className="bi bi-trash" aria-hidden="true" />
+                        Delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ))}
 
-      {tab === 'voteCards' && (
-        <table>
-          <thead>
-            <tr>
-              <th>Cast at</th>
-              <th>Picks</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {voteCards === null && (
-              <tr>
-                <td colSpan={4}>Loading…</td>
-              </tr>
-            )}
-            {voteCards !== null && voteCards.length === 0 && (
-              <tr>
-                <td colSpan={4}>No vote cards yet</td>
-              </tr>
-            )}
-            {voteCards?.map((card) => (
-              <tr key={card.id}>
-                <td>{new Date(card.createdAt).toLocaleString()}</td>
-                <td>
-                  {[...card.items]
-                    .sort((a, b) => b.points - a.points)
-                    .map(
-                      (item) =>
-                        `${aliasBySubmissionId.get(item.submissionId) ?? item.submissionId} (${item.points} pkt)`,
-                    )
-                    .join(', ')}
-                </td>
-                <td>
-                  {card.isVoid
-                    ? `voided${card.voidReason ? ` (${card.voidReason})` : ''}`
-                    : 'valid'}
-                </td>
-                <td>
-                  {card.isVoid ? (
-                    <button type="button" onClick={() => handleUnvoid(card.id)}>
-                      restore
-                    </button>
-                  ) : (
-                    <button type="button" onClick={() => handleVoid(card.id)}>
-                      void
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      {tab === 'voteCards' &&
+        (voteCards !== null && voteCards.length === 0 ? (
+          <EmptyState icon="bi-ticket-perforated" text="No vote cards yet" />
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Cast at</TableHeaderCell>
+                <TableHeaderCell>Picks</TableHeaderCell>
+                <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell></TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {voteCards === null && (
+                <TableRow>
+                  <TableCell colSpan={4}>Loading…</TableCell>
+                </TableRow>
+              )}
+              {voteCards?.map((card) => (
+                <TableRow key={card.id}>
+                  <TableCell>{new Date(card.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>
+                    {[...card.items]
+                      .sort((a, b) => b.points - a.points)
+                      .map(
+                        (item) =>
+                          `${aliasBySubmissionId.get(item.submissionId) ?? item.submissionId} (${item.points} pkt)`,
+                      )
+                      .join(', ')}
+                  </TableCell>
+                  <TableCell>
+                    {card.isVoid ? (
+                      <Badge color="rose">
+                        voided{card.voidReason ? ` (${card.voidReason})` : ''}
+                      </Badge>
+                    ) : (
+                      <Badge color="emerald">valid</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {card.isVoid ? (
+                      <Button variant="ghost" size="sm" onClick={() => handleUnvoid(card.id)}>
+                        <i className="bi bi-arrow-clockwise" aria-hidden="true" />
+                        Restore
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" size="sm" onClick={() => handleVoid(card.id)}>
+                        <i className="bi bi-ban" aria-hidden="true" />
+                        Void
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ))}
     </div>
   );
 };

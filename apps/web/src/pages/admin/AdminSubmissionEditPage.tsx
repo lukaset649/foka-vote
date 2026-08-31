@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import type { AdminSubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
 import {
@@ -10,6 +10,14 @@ import {
   updateAdminArtwork,
   updateAdminSubmission,
 } from '../../services/submissions';
+import PageHeader from '../../components/ui/PageHeader';
+import Card from '../../components/ui/Card';
+import Input from '../../components/ui/Input';
+import Textarea from '../../components/ui/Textarea';
+import Label from '../../components/ui/Label';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
+import Spinner from '../../components/ui/Spinner';
 
 interface ArtworkFields {
   title: string;
@@ -101,121 +109,175 @@ const AdminSubmissionEditPage = () => {
   };
 
   if (error) {
-    return <p role="alert">Something went wrong</p>;
+    return <Alert variant="error">Something went wrong</Alert>;
   }
 
   if (submission === null) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   const artworks = [...submission.artworks].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <div>
-      <h1>Edit submission — {submission.alias}</h1>
+      <PageHeader
+        title={`Edit submission — ${submission.alias}`}
+        backTo={`/admin/contests/${contestId}/submissions`}
+        backLabel="Back to submissions"
+      />
 
-      <p>
-        <Link to={`/admin/contests/${contestId}/submissions`}>Back to submissions</Link>
-      </p>
+      <div className="flex flex-col gap-6">
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Author</h2>
 
-      <section>
-        <h2>Author</h2>
-        <label>
-          First name
-          <input value={firstName} onChange={(event) => setFirstName(event.target.value)} />
-        </label>
-        <label>
-          Last name
-          <input value={lastName} onChange={(event) => setLastName(event.target.value)} />
-        </label>
-        <label>
-          Description
-          <textarea value={description} onChange={(event) => setDescription(event.target.value)} />
-        </label>
-        <button type="button" onClick={handleSaveData}>
-          Save data
-        </button>
-      </section>
-
-      <section>
-        <h2>Artworks</h2>
-        {artworks.map((artwork, index) => (
-          <fieldset key={artwork.id}>
-            <img
-              src={mediaUrl(artwork.thumbUrl)}
-              alt={artwork.title ?? submission.alias}
-              width={150}
+          <div>
+            <Label htmlFor="firstName">First name</Label>
+            <Input
+              id="firstName"
+              value={firstName}
+              onChange={(event) => setFirstName(event.target.value)}
             />
-
-            <label>
-              Title
-              <input
-                value={artworkFields[artwork.id]?.title ?? ''}
-                onChange={(event) =>
-                  setArtworkFields((prev) => ({
-                    ...prev,
-                    [artwork.id]: {
-                      ...(prev[artwork.id] as ArtworkFields),
-                      title: event.target.value,
-                    },
-                  }))
-                }
-              />
-            </label>
-            <label>
-              Description
-              <textarea
-                value={artworkFields[artwork.id]?.description ?? ''}
-                onChange={(event) =>
-                  setArtworkFields((prev) => ({
-                    ...prev,
-                    [artwork.id]: {
-                      ...(prev[artwork.id] as ArtworkFields),
-                      description: event.target.value,
-                    },
-                  }))
-                }
-              />
-            </label>
-            <button type="button" onClick={() => handleSaveArtwork(artwork.id)}>
-              Save
-            </button>
-
-            <button type="button" disabled={index === 0} onClick={() => handleMove(index, -1)}>
-              ↑
-            </button>
-            <button
-              type="button"
-              disabled={index === artworks.length - 1}
-              onClick={() => handleMove(index, 1)}
-            >
-              ↓
-            </button>
-
-            <button
-              type="button"
-              disabled={artworks.length === 1}
-              onClick={() => handleDeleteArtwork(artwork.id)}
-            >
-              Delete
-            </button>
-
-            <input
-              type="file"
-              accept="image/jpeg,image/png"
-              onChange={(event) =>
-                setReplaceFiles((prev) => ({
-                  ...prev,
-                  [artwork.id]: event.target.files?.[0] ?? null,
-                }))
-              }
+          </div>
+          <div>
+            <Label htmlFor="lastName">Last name</Label>
+            <Input
+              id="lastName"
+              value={lastName}
+              onChange={(event) => setLastName(event.target.value)}
             />
-            <button type="button" onClick={() => handleReplace(artwork.id)}>
-              Replace
-            </button>
-          </fieldset>
-        ))}
-      </section>
+          </div>
+          <div>
+            <Label htmlFor="submission-description">Description</Label>
+            <Textarea
+              id="submission-description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </div>
+
+          <Button type="button" variant="secondary" className="w-fit" onClick={handleSaveData}>
+            Save data
+          </Button>
+        </Card>
+
+        <div>
+          <h2 className="mb-3 text-lg font-semibold text-zinc-900">Artworks</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {artworks.map((artwork, index) => (
+              <Card key={artwork.id} className="flex flex-col gap-3">
+                <img
+                  src={mediaUrl(artwork.thumbUrl)}
+                  alt={artwork.title ?? submission.alias}
+                  className="aspect-square w-full rounded-md object-cover"
+                />
+
+                <div>
+                  <Label htmlFor={`title-${artwork.id}`}>Title</Label>
+                  <Input
+                    id={`title-${artwork.id}`}
+                    value={artworkFields[artwork.id]?.title ?? ''}
+                    onChange={(event) =>
+                      setArtworkFields((prev) => ({
+                        ...prev,
+                        [artwork.id]: {
+                          ...(prev[artwork.id] as ArtworkFields),
+                          title: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`description-${artwork.id}`}>Description</Label>
+                  <Textarea
+                    id={`description-${artwork.id}`}
+                    value={artworkFields[artwork.id]?.description ?? ''}
+                    onChange={(event) =>
+                      setArtworkFields((prev) => ({
+                        ...prev,
+                        [artwork.id]: {
+                          ...(prev[artwork.id] as ArtworkFields),
+                          description: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleSaveArtwork(artwork.id)}
+                  >
+                    Save
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={index === 0}
+                    onClick={() => handleMove(index, -1)}
+                    aria-label="Move up"
+                  >
+                    <i className="bi bi-arrow-up-short" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={index === artworks.length - 1}
+                    onClick={() => handleMove(index, 1)}
+                    aria-label="Move down"
+                  >
+                    <i className="bi bi-arrow-down-short" aria-hidden="true" />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={artworks.length === 1}
+                    onClick={() => handleDeleteArtwork(artwork.id)}
+                  >
+                    <i className="bi bi-trash" aria-hidden="true" />
+                    Delete
+                  </Button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 border-t border-zinc-200 pt-3">
+                  <label className="flex items-center gap-2">
+                    <span className="sr-only">Replacement file</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      onChange={(event) =>
+                        setReplaceFiles((prev) => ({
+                          ...prev,
+                          [artwork.id]: event.target.files?.[0] ?? null,
+                        }))
+                      }
+                      className="block text-sm text-zinc-700 file:mr-2 file:min-h-8 file:rounded-md file:border-0 file:bg-zinc-100 file:px-2 file:py-1 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
+                    />
+                  </label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleReplace(artwork.id)}
+                  >
+                    <i className="bi bi-upload" aria-hidden="true" />
+                    Replace
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
