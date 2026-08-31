@@ -156,41 +156,6 @@ const ContestPage = () => {
 
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-zinc-900">Gallery</h2>
-            <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary" size="sm">
-              View gallery
-              <i className="bi bi-arrow-right" aria-hidden="true" />
-            </LinkButton>
-          </div>
-
-          {galleryPreview === null ? (
-            <div className="mt-4">
-              <Spinner />
-            </div>
-          ) : galleryPreview.length === 0 ? (
-            <EmptyState icon="bi-images" text="No submissions yet" className="mt-4" />
-          ) : (
-            <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {galleryPreview.slice(0, GALLERY_PREVIEW_COUNT).map((submission) => (
-                <li key={submission.id}>
-                  {submission.artworks[0] && (
-                    <img
-                      src={mediaUrl(submission.artworks[0].thumbUrl)}
-                      alt={submission.alias}
-                      className="aspect-square w-full rounded-md object-cover"
-                    />
-                  )}
-                  <p className="mt-1 truncate text-sm font-medium text-zinc-900">
-                    {submission.alias}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card>
-          <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-zinc-900">Results</h2>
             <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary" size="sm">
               View results
@@ -223,6 +188,41 @@ const ContestPage = () => {
                 </li>
               ))}
             </ol>
+          )}
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-zinc-900">Gallery</h2>
+            <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary" size="sm">
+              View gallery
+              <i className="bi bi-arrow-right" aria-hidden="true" />
+            </LinkButton>
+          </div>
+
+          {galleryPreview === null ? (
+            <div className="mt-4">
+              <Spinner />
+            </div>
+          ) : galleryPreview.length === 0 ? (
+            <EmptyState icon="bi-images" text="No submissions yet" className="mt-4" />
+          ) : (
+            <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {galleryPreview.slice(0, GALLERY_PREVIEW_COUNT).map((submission) => (
+                <li key={submission.id}>
+                  {submission.artworks[0] && (
+                    <img
+                      src={mediaUrl(submission.artworks[0].thumbUrl)}
+                      alt={submission.alias}
+                      className="aspect-square w-full rounded-md object-cover"
+                    />
+                  )}
+                  <p className="mt-1 truncate text-sm font-medium text-zinc-900">
+                    {submission.alias}
+                  </p>
+                </li>
+              ))}
+            </ul>
           )}
         </Card>
       </div>
