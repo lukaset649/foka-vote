@@ -38,6 +38,7 @@ function toArtworkDto(artwork: Artwork): ArtworkDto {
     id: artwork.id,
     title: artwork.title,
     description: artwork.description,
+    fullUrl: mediaUrl(artwork.filePath),
     previewUrl: mediaUrl(artwork.previewPath),
     thumbUrl: mediaUrl(artwork.thumbPath),
     width: artwork.width,
