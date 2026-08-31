@@ -21,7 +21,7 @@ services:
       PORT: 3000
       HOST: 0.0.0.0
       DATABASE_URL: postgresql://foka:foka@db:5432/foka_vote?schema=public
-      ADMIN_PASSWORD_HASH: '17bec975fe108c56dc6f3bb4540c9c48:2b6d6a205915acc35cbe0696905492ba1ae58b1f66a8644bd88d130a51ebb0f46890814f83e00e33ed161f2229322b366696b9a8d722fc527ddbadb64f3c87ea'
+      ADMIN_PASSWORD_HASH: '7243d45a465fcdccf76b5bd4b4cda97e:a0b416070f6e82cb782a872231c39c710aae14c74b5243e32b9c38e7fe6328a7c9cde4aafa59fb84a18f77410000a2a88e37c36ad28b371b0643f91cc7fe5b37'
       COOKIE_SECRET: 1849ff17de31b93f209ff9fa639e5df12fd367cda3e7778e346ebf2bea7319f2
     volumes:
       - .:/app
