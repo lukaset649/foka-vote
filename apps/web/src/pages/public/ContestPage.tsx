@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { fetchContest, verifyContestAccessCode } from '../../services/contests';
+import { isUnauthorizedError } from '../../services/apiClient';
+import { contestGatePath, fetchContest, verifyContestAccessCode } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
@@ -15,6 +16,7 @@ function formatDate(iso: string): string {
 
 const ContestPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [error, setError] = useState(false);
@@ -25,40 +27,37 @@ const ContestPage = () => {
     }
     let cancelled = false;
 
-    fetchContest(slug)
-      .then((data) => {
+    const load = async () => {
+      const code = searchParams.get('kod');
+      if (code) {
+        await verifyContestAccessCode(slug, code).catch(() => undefined);
+        setSearchParams({}, { replace: true });
+      }
+
+      try {
+        const data = await fetchContest(slug);
         if (!cancelled) {
           setContest(data);
         }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      } catch (err) {
+        if (cancelled) {
+          return;
         }
-      });
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}`), { replace: true });
+          return;
+        }
+        setError(true);
+      }
+    };
+
+    void load();
 
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the slug changes, not on every searchParams update
   }, [slug]);
-
-  useEffect(() => {
-    const code = searchParams.get('kod');
-    if (!slug || !code || !contest) {
-      return;
-    }
-
-    const stripCodeParam = () => setSearchParams({}, { replace: true });
-
-    if (!contest.hasAccessCode) {
-      stripCodeParam();
-      return;
-    }
-
-    verifyContestAccessCode(slug, code)
-      .catch(() => undefined)
-      .finally(stripCodeParam);
-  }, [slug, contest, searchParams, setSearchParams]);
 
   if (error) {
     return <Alert variant="error">Failed to load contest</Alert>;
@@ -97,18 +96,6 @@ const ContestPage = () => {
             </div>
           </dl>
         </Card>
-
-        {contest.hasAccessCode && (
-          <LinkButton
-            to={`/contest/${contest.slug}/gate`}
-            variant="secondary"
-            size="sm"
-            className="w-fit"
-          >
-            <i className="bi bi-lock" aria-hidden="true" />
-            Enter access code
-          </LinkButton>
-        )}
 
         <nav className="flex flex-wrap gap-3">
           <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary">

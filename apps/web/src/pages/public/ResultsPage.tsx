@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
-import { fetchContest } from '../../services/contests';
+import { isUnauthorizedError } from '../../services/apiClient';
+import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
@@ -31,6 +32,7 @@ function formatBreakdown(entry: ResultEntryDto): string {
 
 const ResultsPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [results, setResults] = useState<ResultsDto | null>(null);
   const [error, setError] = useState(false);
@@ -56,16 +58,21 @@ const ResultsPage = () => {
           }
         });
       })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
         }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/results`), { replace: true });
+          return;
+        }
+        setError(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, navigate]);
 
   if (error) {
     return <Alert variant="error">Failed to load results</Alert>;
