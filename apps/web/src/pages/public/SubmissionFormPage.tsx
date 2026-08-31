@@ -7,6 +7,7 @@ import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import Label from '../../components/ui/Label';
 import Button from '../../components/ui/Button';
+import LinkButton from '../../components/ui/LinkButton';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
 
@@ -250,10 +251,19 @@ const SubmissionFormPage = () => {
         )}
       </div>
 
-      <Button type="submit" className="w-full sm:w-fit">
-        <i className="bi bi-send" aria-hidden="true" />
-        Continue to preview
-      </Button>
+      <div className="flex flex-wrap justify-between gap-3">
+        <LinkButton
+          to={`/contest/${slug}`}
+          variant="secondary"
+          className="hover:!border-rose-600 hover:!bg-rose-600 hover:!text-white"
+        >
+          Cancel
+        </LinkButton>
+        <Button type="submit">
+          <i className="bi bi-send" aria-hidden="true" />
+          Continue to preview
+        </Button>
+      </div>
 
       {formError && <Alert variant="error">{formError}</Alert>}
     </form>
