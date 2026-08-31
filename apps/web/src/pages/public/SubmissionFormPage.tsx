@@ -2,6 +2,13 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { fetchContest } from '../../services/contests';
+import Card from '../../components/ui/Card';
+import Input from '../../components/ui/Input';
+import Textarea from '../../components/ui/Textarea';
+import Label from '../../components/ui/Label';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
+import Spinner from '../../components/ui/Spinner';
 
 export interface SubmissionArtworkDraft {
   file: File;
@@ -124,92 +131,131 @@ const SubmissionFormPage = () => {
   };
 
   if (loadError) {
-    return <p role="alert">Failed to load contest</p>;
+    return <Alert variant="error">Failed to load contest</Alert>;
   }
 
   if (!contest) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Submit your work — {contest.title}</h1>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
+        Submit your work — {contest.title}
+      </h1>
 
-      <p>
+      <Alert variant="info">
         Your first and last name will be published next to your work once voting closes. After
         submitting, only the admin can make changes — message the club&apos;s Messenger group if
         something needs fixing (a typo, a wrong file, a withdrawal).
-      </p>
+      </Alert>
 
-      <label htmlFor="firstName">First name</label>
-      <input
-        id="firstName"
-        value={firstName}
-        onChange={(event) => setFirstName(event.target.value)}
-        required
-      />
-
-      <label htmlFor="lastName">Last name</label>
-      <input
-        id="lastName"
-        value={lastName}
-        onChange={(event) => setLastName(event.target.value)}
-        required
-      />
-
-      <label htmlFor="description">Description (optional)</label>
-      <textarea
-        id="description"
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-      />
-
-      <h2>Artworks (up to {maxArtworks})</h2>
-
-      {slots.map((slot, index) => (
-        <fieldset key={index}>
-          <legend>Artwork {index + 1}</legend>
-
-          <label htmlFor={`file-${index}`}>File</label>
-          <input
-            id={`file-${index}`}
-            type="file"
-            accept="image/jpeg,image/png"
-            onChange={handleFileChange(index)}
+      <Card className="flex flex-col gap-4">
+        <div>
+          <Label htmlFor="firstName">First name</Label>
+          <Input
+            id="firstName"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
+            required
           />
-          {slot.file && <span> Currently attached: {slot.file.name}</span>}
+        </div>
 
-          <label htmlFor={`title-${index}`}>Title (optional)</label>
-          <input
-            id={`title-${index}`}
-            value={slot.title}
-            onChange={(event) => updateSlot(index, { title: event.target.value })}
+        <div>
+          <Label htmlFor="lastName">Last name</Label>
+          <Input
+            id="lastName"
+            value={lastName}
+            onChange={(event) => setLastName(event.target.value)}
+            required
           />
+        </div>
 
-          <label htmlFor={`artwork-description-${index}`}>Description (optional)</label>
-          <input
-            id={`artwork-description-${index}`}
-            value={slot.description}
-            onChange={(event) => updateSlot(index, { description: event.target.value })}
+        <div>
+          <Label htmlFor="description">Description (optional)</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
           />
+        </div>
+      </Card>
 
-          {slots.length > 1 && (
-            <button type="button" onClick={() => removeSlot(index)}>
-              Remove
-            </button>
-          )}
-        </fieldset>
-      ))}
+      <div className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-zinc-900">Artworks (up to {maxArtworks})</h2>
 
-      {slots.length < maxArtworks && (
-        <button type="button" onClick={addSlot}>
-          Add another artwork
-        </button>
-      )}
+        {slots.map((slot, index) => (
+          <fieldset
+            key={index}
+            className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6"
+          >
+            <legend className="px-1 text-sm font-semibold text-zinc-700">
+              Artwork {index + 1}
+            </legend>
 
-      <button type="submit">Continue to preview</button>
+            <div>
+              <Label htmlFor={`file-${index}`}>
+                <i className="bi bi-upload" aria-hidden="true" /> File
+              </Label>
+              <input
+                id={`file-${index}`}
+                type="file"
+                accept="image/jpeg,image/png"
+                onChange={handleFileChange(index)}
+                className="block w-full text-sm text-zinc-700 file:mr-3 file:min-h-10 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
+              />
+              {slot.file && (
+                <p className="mt-1 text-sm text-zinc-500">Currently attached: {slot.file.name}</p>
+              )}
+            </div>
 
-      {formError && <p role="alert">{formError}</p>}
+            <div>
+              <Label htmlFor={`title-${index}`}>Title (optional)</Label>
+              <Input
+                id={`title-${index}`}
+                value={slot.title}
+                onChange={(event) => updateSlot(index, { title: event.target.value })}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor={`artwork-description-${index}`}>Description (optional)</Label>
+              <Input
+                id={`artwork-description-${index}`}
+                value={slot.description}
+                onChange={(event) => updateSlot(index, { description: event.target.value })}
+              />
+            </div>
+
+            {slots.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-fit"
+                onClick={() => removeSlot(index)}
+              >
+                <i className="bi bi-trash" aria-hidden="true" />
+                Remove
+              </Button>
+            )}
+          </fieldset>
+        ))}
+
+        {slots.length < maxArtworks && (
+          <Button type="button" variant="secondary" className="w-fit" onClick={addSlot}>
+            <i className="bi bi-plus-circle" aria-hidden="true" />
+            Add another artwork
+          </Button>
+        )}
+      </div>
+
+      <Button type="submit" className="w-full sm:w-fit">
+        <i className="bi bi-send" aria-hidden="true" />
+        Continue to preview
+      </Button>
+
+      {formError && <Alert variant="error">{formError}</Alert>}
     </form>
   );
 };
