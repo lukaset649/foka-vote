@@ -109,12 +109,25 @@ const ContestPage = () => {
   }
 
   const topResults = results?.results.filter((entry) => entry.place <= RESULTS_PREVIEW_PLACES);
-  const hasActions = contest.status === 'SUBMISSIONS' || contest.status === 'VOTING';
 
   return (
     <div>
       <PageHeader title={contest.title} backTo="/" backLabel="Back to contests">
-        <ContestStatusBadge status={contest.status} />
+        <div className="flex flex-wrap items-center gap-5">
+          <ContestStatusBadge status={contest.status} />
+          {contest.status === 'SUBMISSIONS' && (
+            <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
+              <i className="bi bi-send" aria-hidden="true" />
+              Submit your work
+            </LinkButton>
+          )}
+          {contest.status === 'VOTING' && (
+            <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
+              <i className="bi bi-check2-square" aria-hidden="true" />
+              Vote
+            </LinkButton>
+          )}
+        </div>
       </PageHeader>
 
       <div className="flex flex-col gap-6">
@@ -140,23 +153,6 @@ const ContestPage = () => {
             </div>
           </dl>
         </Card>
-
-        {hasActions && (
-          <nav className="flex flex-wrap gap-3">
-            {contest.status === 'SUBMISSIONS' && (
-              <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
-                <i className="bi bi-send" aria-hidden="true" />
-                Submit your work
-              </LinkButton>
-            )}
-            {contest.status === 'VOTING' && (
-              <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
-                <i className="bi bi-check2-square" aria-hidden="true" />
-                Vote
-              </LinkButton>
-            )}
-          </nav>
-        )}
 
         <Card>
           <div className="flex items-center justify-between gap-3">
