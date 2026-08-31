@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { fetchContests } from '../../services/contests';
+import Card from '../../components/ui/Card';
+import { ContestStatusBadge } from '../../components/ui/Badge';
+import Alert from '../../components/ui/Alert';
+import EmptyState from '../../components/ui/EmptyState';
+import Spinner from '../../components/ui/Spinner';
 
 function isCurrent(contest: ContestDto): boolean {
   return contest.status === 'SUBMISSIONS' || contest.status === 'VOTING';
@@ -9,7 +14,12 @@ function isCurrent(contest: ContestDto): boolean {
 
 const ContestListItem = ({ contest }: { contest: ContestDto }) => (
   <li>
-    <Link to={`/contest/${contest.slug}`}>{contest.title}</Link> ({contest.status})
+    <Link to={`/contest/${contest.slug}`}>
+      <Card className="flex items-center justify-between gap-3 transition-colors hover:border-indigo-300">
+        <span className="font-medium text-zinc-900">{contest.title}</span>
+        <ContestStatusBadge status={contest.status} />
+      </Card>
+    </Link>
   </li>
 );
 
@@ -38,15 +48,15 @@ const ContestsListPage = () => {
   }, []);
 
   if (error) {
-    return <p role="alert">Failed to load contests</p>;
+    return <Alert variant="error">Failed to load contests</Alert>;
   }
 
   if (contests === null) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   if (contests.length === 0) {
-    return <p>No contests yet</p>;
+    return <EmptyState icon="bi-images" text="No contests yet" />;
   }
 
   const current = contests.filter(isCurrent);
@@ -56,8 +66,10 @@ const ContestsListPage = () => {
     <div>
       {current.length > 0 && (
         <section>
-          <h2>Current</h2>
-          <ul>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Current
+          </h2>
+          <ul className="mb-6 flex flex-col gap-3">
             {current.map((contest) => (
               <ContestListItem key={contest.id} contest={contest} />
             ))}
@@ -65,12 +77,20 @@ const ContestsListPage = () => {
         </section>
       )}
       <section>
-        {current.length > 0 && <h2>All contests</h2>}
-        <ul>
-          {rest.map((contest) => (
-            <ContestListItem key={contest.id} contest={contest} />
-          ))}
-        </ul>
+        {current.length > 0 && (
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            All contests
+          </h2>
+        )}
+        {rest.length === 0 && current.length === 0 ? (
+          <EmptyState icon="bi-images" text="No contests yet" />
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {rest.map((contest) => (
+              <ContestListItem key={contest.id} contest={contest} />
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );
