@@ -12,9 +12,9 @@ interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300',
   secondary:
-    'bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-50 disabled:text-zinc-400',
+    'bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100 disabled:text-zinc-400',
   danger: 'bg-rose-600 text-white hover:bg-rose-700 disabled:bg-rose-300',
-  ghost: 'bg-transparent text-zinc-700 hover:bg-zinc-100 disabled:text-zinc-400',
+  ghost: 'bg-transparent text-zinc-700 hover:bg-zinc-200 disabled:text-zinc-400',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
