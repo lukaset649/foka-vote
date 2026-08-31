@@ -4,7 +4,7 @@ import express, { json, static as serveStatic, urlencoded } from 'express';
 import type { Express, NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { env, isProduction } from './config/env.js';
-import { MEDIA_URL_PREFIX, VARIANTS_DIR } from './lib/storage.js';
+import { MEDIA_URL_PREFIX, ORIGINALS_DIR, VARIANTS_DIR } from './lib/storage.js';
 import { errorHandler } from './middleware/error-handler.middleware.js';
 import { notFoundHandler } from './middleware/not-found.middleware.js';
 import { requestId } from './middleware/request-id.middleware.js';
@@ -39,6 +39,7 @@ export function createApp(): Express {
       next();
     },
     serveStatic(VARIANTS_DIR),
+    serveStatic(ORIGINALS_DIR),
   );
 
   app.use('/api', apiRouter);
