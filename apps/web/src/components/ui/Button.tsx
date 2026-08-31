@@ -1,15 +1,15 @@
 import type { ComponentPropsWithoutRef } from 'react';
 import { cn } from '../../lib/cn';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
-type Size = 'default' | 'sm';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
+export type ButtonSize = 'default' | 'sm';
 
 interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
-  variant?: Variant;
-  size?: Size;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
-const variantClasses: Record<Variant, string> = {
+const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300',
   secondary:
     'bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-50 disabled:text-zinc-400',
@@ -17,25 +17,28 @@ const variantClasses: Record<Variant, string> = {
   ghost: 'bg-transparent text-zinc-700 hover:bg-zinc-100 disabled:text-zinc-400',
 };
 
-const sizeClasses: Record<Size, string> = {
+const sizeClasses: Record<ButtonSize, string> = {
   default: 'px-4 py-2 text-sm',
   sm: 'px-3 py-1.5 text-sm',
 };
 
-const Button = ({ variant = 'primary', size = 'default', className, ...props }: ButtonProps) => {
-  return (
-    <button
-      className={cn(
-        'inline-flex min-h-10 items-center justify-center gap-2 rounded-md font-medium transition-colors',
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-        'disabled:cursor-not-allowed',
-        variantClasses[variant],
-        sizeClasses[size],
-        className,
-      )}
-      {...props}
-    />
+export function buttonClasses(
+  variant: ButtonVariant = 'primary',
+  size: ButtonSize = 'default',
+  className?: string,
+): string {
+  return cn(
+    'inline-flex min-h-10 items-center justify-center gap-2 rounded-md font-medium transition-colors',
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
+    'disabled:cursor-not-allowed',
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
   );
+}
+
+const Button = ({ variant = 'primary', size = 'default', className, ...props }: ButtonProps) => {
+  return <button className={buttonClasses(variant, size, className)} {...props} />;
 };
 
 export default Button;
