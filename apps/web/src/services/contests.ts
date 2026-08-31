@@ -6,6 +6,10 @@ import type {
 } from '@foka-vote/shared';
 import { apiErrorFrom, apiRequest } from './apiClient';
 
+export function contestGatePath(slug: string, redirectTo: string): string {
+  return `/contest/${slug}/gate?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
 export async function fetchContests(): Promise<ContestDto[]> {
   const response = await apiRequest('/api/contests');
   if (!response.ok) {

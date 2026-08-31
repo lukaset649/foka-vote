@@ -31,6 +31,8 @@ export async function getMyVoteCard(
     throw notFound('Contest not found');
   }
 
+  assertContestAccess(contest, signedCookies);
+
   const cardId = signedCookies[voteCardCookieName(contest.id)];
   if (!cardId) {
     throw notFound('No vote card found');

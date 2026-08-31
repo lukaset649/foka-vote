@@ -1,4 +1,5 @@
 import type { ResultEntryDto, ResultsDto } from '@foka-vote/shared';
+import { assertContestAccess } from '../contests/service.js';
 import { conflict, notFound } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { prisma } from '../../lib/prisma.js';
@@ -41,11 +42,16 @@ function assignPlaces(sorted: ScoredSubmission[]): ResultEntryDto[] {
   return results;
 }
 
-export async function getContestResults(slug: string): Promise<ResultsDto> {
+export async function getContestResults(
+  slug: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<ResultsDto> {
   const contest = await prisma.contest.findUnique({ where: { slug } });
   if (!contest) {
     throw notFound('Contest not found');
   }
+
+  assertContestAccess(contest, signedCookies);
 
   const status = computeContestStatus(new Date(), contest);
   if (status !== 'CLOSED') {

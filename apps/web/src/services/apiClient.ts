@@ -24,6 +24,10 @@ export class ApiError extends Error {
   }
 }
 
+export function isUnauthorizedError(err: unknown): boolean {
+  return err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED;
+}
+
 export async function apiErrorFrom(response: Response, fallback: string): Promise<ApiError> {
   try {
     const body = (await response.json()) as ErrorResponseBody;
