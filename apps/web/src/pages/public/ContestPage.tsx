@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
-import type { ContestDto } from '@foka-vote/shared';
-import { isUnauthorizedError } from '../../services/apiClient';
+import type { ContestDto, ResultsDto, SubmissionDto } from '@foka-vote/shared';
+import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
 import { contestGatePath, fetchContest, verifyContestAccessCode } from '../../services/contests';
+import { fetchResults } from '../../services/results';
+import { fetchSubmissions } from '../../services/submissions';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
+import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
+
+const GALLERY_PREVIEW_COUNT = 3;
+const RESULTS_PREVIEW_PLACES = 3;
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -20,6 +26,8 @@ const ContestPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [error, setError] = useState(false);
+  const [galleryPreview, setGalleryPreview] = useState<SubmissionDto[] | null>(null);
+  const [results, setResults] = useState<ResultsDto | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -59,6 +67,39 @@ const ContestPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the slug changes, not on every searchParams update
   }, [slug]);
 
+  useEffect(() => {
+    if (!contest) {
+      return;
+    }
+    let cancelled = false;
+
+    fetchSubmissions(contest.slug)
+      .then((data) => {
+        if (!cancelled) {
+          setGalleryPreview(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setGalleryPreview([]);
+        }
+      });
+
+    if (contest.status === 'CLOSED') {
+      fetchResults(contest.slug)
+        .then((data) => {
+          if (!cancelled) {
+            setResults(data);
+          }
+        })
+        .catch(() => undefined);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [contest]);
+
   if (error) {
     return <Alert variant="error">Failed to load contest</Alert>;
   }
@@ -66,6 +107,9 @@ const ContestPage = () => {
   if (!contest) {
     return <Spinner />;
   }
+
+  const topResults = results?.results.filter((entry) => entry.place <= RESULTS_PREVIEW_PLACES);
+  const hasActions = contest.status === 'SUBMISSIONS' || contest.status === 'VOTING';
 
   return (
     <div>
@@ -97,28 +141,94 @@ const ContestPage = () => {
           </dl>
         </Card>
 
-        <nav className="flex flex-wrap gap-3">
-          <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary">
-            <i className="bi bi-images" aria-hidden="true" />
-            Gallery
-          </LinkButton>
-          {contest.status === 'SUBMISSIONS' && (
-            <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
-              <i className="bi bi-send" aria-hidden="true" />
-              Submit your work
+        {hasActions && (
+          <nav className="flex flex-wrap gap-3">
+            {contest.status === 'SUBMISSIONS' && (
+              <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
+                <i className="bi bi-send" aria-hidden="true" />
+                Submit your work
+              </LinkButton>
+            )}
+            {contest.status === 'VOTING' && (
+              <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
+                <i className="bi bi-check2-square" aria-hidden="true" />
+                Vote
+              </LinkButton>
+            )}
+          </nav>
+        )}
+
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-zinc-900">Gallery</h2>
+            <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary" size="sm">
+              View gallery
+              <i className="bi bi-arrow-right" aria-hidden="true" />
             </LinkButton>
+          </div>
+
+          {galleryPreview === null ? (
+            <div className="mt-4">
+              <Spinner />
+            </div>
+          ) : galleryPreview.length === 0 ? (
+            <EmptyState icon="bi-images" text="No submissions yet" className="mt-4" />
+          ) : (
+            <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              {galleryPreview.slice(0, GALLERY_PREVIEW_COUNT).map((submission) => (
+                <li key={submission.id}>
+                  {submission.artworks[0] && (
+                    <img
+                      src={mediaUrl(submission.artworks[0].thumbUrl)}
+                      alt={submission.alias}
+                      className="aspect-square w-full rounded-md object-cover"
+                    />
+                  )}
+                  <p className="mt-1 truncate text-sm font-medium text-zinc-900">
+                    {submission.alias}
+                  </p>
+                </li>
+              ))}
+            </ul>
           )}
-          {contest.status === 'VOTING' && (
-            <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
-              <i className="bi bi-check2-square" aria-hidden="true" />
-              Vote
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-zinc-900">Results</h2>
+            <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary" size="sm">
+              View results
+              <i className="bi bi-arrow-right" aria-hidden="true" />
             </LinkButton>
+          </div>
+
+          {contest.status !== 'CLOSED' ? (
+            <p className="mt-4 text-sm text-zinc-500">
+              Results will be available once voting closes, on {formatDate(contest.votingEnd)}.
+            </p>
+          ) : topResults === undefined ? (
+            <div className="mt-4">
+              <Spinner />
+            </div>
+          ) : (
+            <ol className="mt-4 flex flex-col gap-2">
+              {topResults.map((entry) => (
+                <li
+                  key={entry.submissionId}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <span className="flex items-center gap-2 font-medium text-zinc-900">
+                    {entry.place === 1 && (
+                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                    )}
+                    {entry.place}. {entry.firstName} {entry.lastName} ({entry.alias})
+                  </span>
+                  <span className="font-semibold text-indigo-600">{entry.total} pkt</span>
+                </li>
+              ))}
+            </ol>
           )}
-          <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary">
-            <i className="bi bi-trophy" aria-hidden="true" />
-            Results
-          </LinkButton>
-        </nav>
+        </Card>
       </div>
     </div>
   );
