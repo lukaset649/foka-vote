@@ -215,13 +215,13 @@ const ContestPage = () => {
                   <button
                     type="button"
                     onClick={() => setLightboxSubmission(submission)}
-                    className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="group block w-full cursor-pointer text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     {submission.artworks[0] && (
                       <img
                         src={mediaUrl(submission.artworks[0].thumbUrl)}
                         alt={submission.alias}
-                        className="aspect-square w-full rounded-md object-cover"
+                        className="aspect-square w-full rounded-md object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
                       />
                     )}
                     <p className="mt-1 truncate text-sm font-medium text-zinc-900">

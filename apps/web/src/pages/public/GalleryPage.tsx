@@ -83,12 +83,12 @@ const GalleryPage = () => {
                       <button
                         type="button"
                         onClick={() => setLightbox({ submissionId: submission.id, index })}
-                        className="block w-full overflow-hidden rounded-md border border-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className="group block w-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       >
                         <img
                           src={mediaUrl(artwork.thumbUrl)}
                           alt={artwork.title ?? submission.alias}
-                          className="aspect-square w-full object-cover"
+                          className="aspect-square w-full rounded-md border border-zinc-200 object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
                         />
                       </button>
                       {artwork.title && (
