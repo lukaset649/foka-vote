@@ -39,6 +39,7 @@ const ArtworkLightbox = ({
       slides={slides}
       plugins={[Captions, Counter]}
       counter={{ container: { style: { top: 'unset', bottom: 0 } } }}
+      animation={{ fade: 0, swipe: 0 }}
     />
   );
 };
