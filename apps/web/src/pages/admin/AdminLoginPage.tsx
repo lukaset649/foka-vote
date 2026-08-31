@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { adminLogin } from '../../services/adminAuth';
+import Card from '../../components/ui/Card';
+import Input from '../../components/ui/Input';
+import Label from '../../components/ui/Label';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
 
 const AdminLoginPage = () => {
   const [password, setPassword] = useState('');
@@ -28,20 +33,33 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="admin-password">Password</label>
-      <input
-        id="admin-password"
-        type="password"
-        autoComplete="current-password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-      />
-      <button type="submit" disabled={submitting}>
-        Log in
-      </button>
-      {error && <p role="alert">Invalid password</p>}
-    </form>
+    <div className="mx-auto max-w-sm">
+      <Card>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <i className="bi bi-box-arrow-in-right text-2xl text-indigo-600" aria-hidden="true" />
+            <h1 className="text-lg font-semibold text-zinc-900">Admin login</h1>
+          </div>
+
+          <div>
+            <Label htmlFor="admin-password">Password</Label>
+            <Input
+              id="admin-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
+
+          <Button type="submit" disabled={submitting} className="w-full">
+            Log in
+          </Button>
+
+          {error && <Alert variant="error">Invalid password</Alert>}
+        </form>
+      </Card>
+    </div>
   );
 };
 
