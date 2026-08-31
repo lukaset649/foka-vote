@@ -23,7 +23,10 @@ export async function list(_request: Request, response: Response): Promise<void>
 }
 
 export async function getOne(request: Request, response: Response): Promise<void> {
-  const contest = await getPublicContestBySlug(requireSlugParam(request));
+  const contest = await getPublicContestBySlug(
+    requireSlugParam(request),
+    request.signedCookies as Record<string, string | undefined>,
+  );
   response.json(contest);
 }
 

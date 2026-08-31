@@ -47,7 +47,10 @@ function parseArtworkMeta(raw: unknown): ArtworkMetaInput[] {
 
 export async function list(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const submissions = await listSubmissions(slug);
+  const submissions = await listSubmissions(
+    slug,
+    request.signedCookies as Record<string, string | undefined>,
+  );
   response.json(submissions);
 }
 
