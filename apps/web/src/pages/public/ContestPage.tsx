@@ -5,6 +5,7 @@ import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
 import { contestGatePath, fetchContest, verifyContestAccessCode } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { fetchSubmissions } from '../../services/submissions';
+import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
@@ -28,6 +29,7 @@ const ContestPage = () => {
   const [error, setError] = useState(false);
   const [galleryPreview, setGalleryPreview] = useState<SubmissionDto[] | null>(null);
   const [results, setResults] = useState<ResultsDto | null>(null);
+  const [lightboxSubmission, setLightboxSubmission] = useState<SubmissionDto | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -210,22 +212,38 @@ const ContestPage = () => {
             <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {galleryPreview.slice(0, GALLERY_PREVIEW_COUNT).map((submission) => (
                 <li key={submission.id}>
-                  {submission.artworks[0] && (
-                    <img
-                      src={mediaUrl(submission.artworks[0].thumbUrl)}
-                      alt={submission.alias}
-                      className="aspect-square w-full rounded-md object-cover"
-                    />
-                  )}
-                  <p className="mt-1 truncate text-sm font-medium text-zinc-900">
-                    {submission.alias}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setLightboxSubmission(submission)}
+                    className="block w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    {submission.artworks[0] && (
+                      <img
+                        src={mediaUrl(submission.artworks[0].thumbUrl)}
+                        alt={submission.alias}
+                        className="aspect-square w-full rounded-md object-cover"
+                      />
+                    )}
+                    <p className="mt-1 truncate text-sm font-medium text-zinc-900">
+                      {submission.alias}
+                    </p>
+                  </button>
                 </li>
               ))}
             </ul>
           )}
         </Card>
       </div>
+
+      {lightboxSubmission && (
+        <ArtworkLightbox
+          artworks={lightboxSubmission.artworks}
+          startIndex={0}
+          open
+          onClose={() => setLightboxSubmission(null)}
+          authorAlias={lightboxSubmission.alias}
+        />
+      )}
     </div>
   );
 };
