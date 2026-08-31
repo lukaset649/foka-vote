@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
 import { fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
+import { cn } from '../../lib/cn';
+import PageHeader from '../../components/ui/PageHeader';
+import Alert from '../../components/ui/Alert';
+import Spinner from '../../components/ui/Spinner';
+import Table, {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from '../../components/ui/Table';
 
 function formatBreakdown(entry: ResultEntryDto): string {
   const parts: string[] = [];
@@ -57,62 +68,77 @@ const ResultsPage = () => {
   }, [slug]);
 
   if (error) {
-    return <p role="alert">Failed to load results</p>;
+    return <Alert variant="error">Failed to load results</Alert>;
   }
 
   if (!contest) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   if (contest.status !== 'CLOSED') {
     return (
       <div>
-        <h1>Results — {contest.title}</h1>
-        <p>
+        <PageHeader
+          title={`Results — ${contest.title}`}
+          backTo={`/contest/${slug}`}
+          backLabel="Back to the contest"
+        />
+        <Alert variant="info">
           Results will be available once voting closes, on{' '}
           {new Date(contest.votingEnd).toLocaleString()}.
-        </p>
-        <p>
-          <Link to={`/contest/${slug}`}>Back to the contest</Link>
-        </p>
+        </Alert>
       </div>
     );
   }
 
   if (!results) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   return (
     <div>
-      <h1>Results — {contest.title}</h1>
-      <p>
-        <Link to={`/contest/${slug}`}>Back to the contest</Link>
-      </p>
-      <p>{results.voteCardCount} vote cards cast</p>
+      <PageHeader
+        title={`Results — ${contest.title}`}
+        backTo={`/contest/${slug}`}
+        backLabel="Back to the contest"
+      >
+        <span className="inline-flex items-center gap-2 text-sm text-zinc-500">
+          <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+          {results.voteCardCount} vote cards cast
+        </span>
+      </PageHeader>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Place</th>
-            <th>Author</th>
-            <th>Points</th>
-            <th>Breakdown</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>Place</TableHeaderCell>
+            <TableHeaderCell>Author</TableHeaderCell>
+            <TableHeaderCell>Points</TableHeaderCell>
+            <TableHeaderCell>Breakdown</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {results.results.map((entry) => (
-            <tr key={entry.submissionId}>
-              <td>{entry.place}</td>
-              <td>
+            <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
+              <TableCell className="font-semibold text-zinc-900">
+                {entry.place === 1 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                    {entry.place}
+                  </span>
+                ) : (
+                  entry.place
+                )}
+              </TableCell>
+              <TableCell>
                 {entry.firstName} {entry.lastName} ({entry.alias})
-              </td>
-              <td>{entry.total} pkt</td>
-              <td>{formatBreakdown(entry)}</td>
-            </tr>
+              </TableCell>
+              <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
+              <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
