@@ -209,7 +209,7 @@ const VoteCardPage = () => {
                         type="button"
                         onClick={() => setGalleryFor(submission)}
                         aria-label={`View ${submission.alias}'s artworks`}
-                        className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className="absolute left-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         <i className="bi bi-images" aria-hidden="true" />
                       </button>
