@@ -4,6 +4,9 @@ import { ErrorCode } from '@foka-vote/shared';
 import { ApiError } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
 
 const SubmissionPreviewPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -30,9 +33,13 @@ const SubmissionPreviewPage = () => {
 
   if (!draft) {
     return (
-      <p>
-        No submission data found. <Link to={`/contest/${slug}/submit`}>Go back to the form</Link>.
-      </p>
+      <Alert variant="info">
+        No submission data found.{' '}
+        <Link to={`/contest/${slug}/submit`} className="font-medium underline">
+          Go back to the form
+        </Link>
+        .
+      </Alert>
     );
   }
 
@@ -74,36 +81,50 @@ const SubmissionPreviewPage = () => {
   };
 
   return (
-    <div>
-      <h1>Preview your submission</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
+        Preview your submission
+      </h1>
 
-      <p>
-        {draft.firstName} {draft.lastName}
-      </p>
-      {draft.description && <p>{draft.description}</p>}
+      <Card>
+        <p className="font-medium text-zinc-900">
+          {draft.firstName} {draft.lastName}
+        </p>
+        {draft.description && <p className="mt-1 text-sm text-zinc-600">{draft.description}</p>}
+      </Card>
 
-      <ul>
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {draft.artworks.map((artwork, index) => (
           <li key={index}>
-            <img
-              src={previewUrls[index]}
-              alt={artwork.title || `Artwork ${index + 1}`}
-              width={200}
-            />
-            {artwork.title && <p>{artwork.title}</p>}
-            {artwork.description && <p>{artwork.description}</p>}
+            <div className="flex flex-col gap-2 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+              <img
+                src={previewUrls[index]}
+                alt={artwork.title || `Artwork ${index + 1}`}
+                className="aspect-square w-full object-cover"
+              />
+              <div className="px-4 pb-4">
+                {artwork.title && <p className="font-medium text-zinc-900">{artwork.title}</p>}
+                {artwork.description && (
+                  <p className="text-sm text-zinc-600">{artwork.description}</p>
+                )}
+              </div>
+            </div>
           </li>
         ))}
       </ul>
 
-      <button type="button" onClick={handleBack} disabled={submitting}>
-        Edit
-      </button>
-      <button type="button" onClick={handleSubmit} disabled={submitting}>
-        Submit
-      </button>
+      <div className="flex flex-wrap gap-3">
+        <Button type="button" variant="secondary" onClick={handleBack} disabled={submitting}>
+          <i className="bi bi-pencil-square" aria-hidden="true" />
+          Edit
+        </Button>
+        <Button type="button" variant="primary" onClick={handleSubmit} disabled={submitting}>
+          <i className="bi bi-send" aria-hidden="true" />
+          Submit
+        </Button>
+      </div>
 
-      {error && <p role="alert">{error}</p>}
+      {error && <Alert variant="error">{error}</Alert>}
     </div>
   );
 };
