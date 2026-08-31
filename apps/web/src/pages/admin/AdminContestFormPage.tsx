@@ -2,6 +2,14 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { AdminContestDto } from '@foka-vote/shared';
 import { createContest, fetchAdminContest, updateContest } from '../../services/contests';
+import PageHeader from '../../components/ui/PageHeader';
+import Card from '../../components/ui/Card';
+import Input from '../../components/ui/Input';
+import Textarea from '../../components/ui/Textarea';
+import Label from '../../components/ui/Label';
+import Button from '../../components/ui/Button';
+import Alert from '../../components/ui/Alert';
+import Spinner from '../../components/ui/Spinner';
 
 function toDateTimeLocalValue(iso: string): string {
   const date = new Date(iso);
@@ -119,85 +127,129 @@ const AdminContestFormPage = () => {
   };
 
   if (loading) {
-    return <p>Loading…</p>;
+    return <Spinner />;
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <h1>{isEditing ? 'Edit contest' : 'New contest'}</h1>
-
-      <p>
-        <Link to="/admin/contests">Back to contests</Link>
+      <PageHeader
+        title={isEditing ? 'Edit contest' : 'New contest'}
+        backTo="/admin/contests"
+        backLabel="Back to contests"
+      >
         {isEditing && (
-          <>
-            {' · '}
-            <Link to={`/admin/contests/${id}/submissions`}>Submissions &amp; vote cards</Link>
-          </>
+          <Link
+            to={`/admin/contests/${id}/submissions`}
+            className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
+          >
+            <i className="bi bi-ticket-perforated" aria-hidden="true" />
+            Submissions &amp; vote cards
+          </Link>
         )}
-      </p>
+      </PageHeader>
 
-      <label htmlFor="title">Title</label>
-      <input id="title" value={form.title} onChange={updateField('title')} required />
+      <div className="flex flex-col gap-6">
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Basic info
+          </h2>
 
-      <label htmlFor="slug">Slug (optional override)</label>
-      <input id="slug" value={form.slug} onChange={updateField('slug')} />
+          <div>
+            <Label htmlFor="title">Title</Label>
+            <Input id="title" value={form.title} onChange={updateField('title')} required />
+          </div>
 
-      <label htmlFor="description">Description</label>
-      <textarea id="description" value={form.description} onChange={updateField('description')} />
+          <div>
+            <Label htmlFor="slug">Slug (optional override)</Label>
+            <Input id="slug" value={form.slug} onChange={updateField('slug')} />
+          </div>
 
-      <label htmlFor="submissionStart">Submission start</label>
-      <input
-        id="submissionStart"
-        type="datetime-local"
-        value={form.submissionStart}
-        onChange={updateField('submissionStart')}
-        required
-      />
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={form.description}
+              onChange={updateField('description')}
+            />
+          </div>
+        </Card>
 
-      <label htmlFor="submissionDeadline">Submission deadline</label>
-      <input
-        id="submissionDeadline"
-        type="datetime-local"
-        value={form.submissionDeadline}
-        onChange={updateField('submissionDeadline')}
-        required
-      />
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Timeline</h2>
 
-      <label htmlFor="votingStart">Voting start</label>
-      <input
-        id="votingStart"
-        type="datetime-local"
-        value={form.votingStart}
-        onChange={updateField('votingStart')}
-        required
-      />
+          <div>
+            <Label htmlFor="submissionStart">Submission start</Label>
+            <Input
+              id="submissionStart"
+              type="datetime-local"
+              value={form.submissionStart}
+              onChange={updateField('submissionStart')}
+              required
+            />
+          </div>
 
-      <label htmlFor="votingEnd">Voting end</label>
-      <input
-        id="votingEnd"
-        type="datetime-local"
-        value={form.votingEnd}
-        onChange={updateField('votingEnd')}
-        required
-      />
+          <div>
+            <Label htmlFor="submissionDeadline">Submission deadline</Label>
+            <Input
+              id="submissionDeadline"
+              type="datetime-local"
+              value={form.submissionDeadline}
+              onChange={updateField('submissionDeadline')}
+              required
+            />
+          </div>
 
-      <label htmlFor="maxArtworksPerSubmission">Max artworks per submission</label>
-      <input
-        id="maxArtworksPerSubmission"
-        type="number"
-        min={1}
-        value={form.maxArtworksPerSubmission}
-        onChange={updateField('maxArtworksPerSubmission')}
-      />
+          <div>
+            <Label htmlFor="votingStart">Voting start</Label>
+            <Input
+              id="votingStart"
+              type="datetime-local"
+              value={form.votingStart}
+              onChange={updateField('votingStart')}
+              required
+            />
+          </div>
 
-      <label htmlFor="accessCode">Access code (optional)</label>
-      <input id="accessCode" value={form.accessCode} onChange={updateField('accessCode')} />
+          <div>
+            <Label htmlFor="votingEnd">Voting end</Label>
+            <Input
+              id="votingEnd"
+              type="datetime-local"
+              value={form.votingEnd}
+              onChange={updateField('votingEnd')}
+              required
+            />
+          </div>
+        </Card>
 
-      <button type="submit" disabled={submitting}>
-        {isEditing ? 'Save changes' : 'Create contest'}
-      </button>
+        <Card className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Limits &amp; access
+          </h2>
 
-      {error && <p role="alert">{error}</p>}
+          <div>
+            <Label htmlFor="maxArtworksPerSubmission">Max artworks per submission</Label>
+            <Input
+              id="maxArtworksPerSubmission"
+              type="number"
+              min={1}
+              value={form.maxArtworksPerSubmission}
+              onChange={updateField('maxArtworksPerSubmission')}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="accessCode">Access code (optional)</Label>
+            <Input id="accessCode" value={form.accessCode} onChange={updateField('accessCode')} />
+          </div>
+        </Card>
+
+        <Button type="submit" disabled={submitting} className="w-full sm:w-fit">
+          {isEditing ? 'Save changes' : 'Create contest'}
+        </Button>
+
+        {error && <Alert variant="error">{error}</Alert>}
+      </div>
     </form>
   );
 };
