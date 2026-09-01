@@ -231,14 +231,14 @@ const ContestPage = () => {
             </>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
                   <i className={`bi ${phase.icon} text-indigo-600`} aria-hidden="true" />
                   {phase.title}
                 </div>
                 <Countdown targetIso={phase.countdownTargetIso} />
               </div>
-              <dl className="mt-3 grid grid-cols-2 gap-4">
+              <dl className="mt-3 flex justify-center gap-12 text-center">
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                     Starts
