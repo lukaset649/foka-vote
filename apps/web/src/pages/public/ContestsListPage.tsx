@@ -51,7 +51,7 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => (
             to={`/contest/${contest.slug}/vote`}
             variant="primary"
             size="sm"
-            className={SQUARE_BUTTON_CLASSES}
+            className={`${SQUARE_BUTTON_CLASSES} !border-green-800 !bg-green-800 hover:!bg-green-900`}
             aria-label="Vote"
             title="Vote"
           >

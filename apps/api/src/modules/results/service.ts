@@ -92,5 +92,7 @@ export async function getContestResults(
     where: { contestId: contest.id, isVoid: false },
   });
 
-  return { results: assignPlaces(scored), voteCardCount, final: status === 'CLOSED' };
+  const results = voteCardCount === 0 ? [] : assignPlaces(scored);
+
+  return { results, voteCardCount, final: status === 'CLOSED' };
 }

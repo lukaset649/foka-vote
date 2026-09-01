@@ -156,9 +156,9 @@ const SubmissionFormPage = () => {
       </h1>
 
       <Alert variant="info">
-        Your first and last name will be published next to your work once voting closes. After
-        submitting, only the admin can make changes — message the club&apos;s Messenger group if
-        something needs fixing (a typo, a wrong file, a withdrawal).
+        Your first and last name will be published next to your work once voting closes.<br/>
+        Since then, the random alias will be displayed instead.<br/>
+        After submitting, only the admin can make changes.
       </Alert>
 
       <Card className="flex flex-col gap-4">

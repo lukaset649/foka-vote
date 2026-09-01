@@ -20,8 +20,8 @@ const colorClasses: Record<BadgeColor, string> = {
 const contestStatusColor: Record<ContestStatus, BadgeColor> = {
   DRAFT: 'zinc',
   SUBMISSIONS: 'blue',
-  VOTING: 'amber',
-  CLOSED: 'emerald',
+  VOTING: 'emerald',
+  CLOSED: 'amber',
 };
 
 const Badge = ({ color, children, className }: BadgeProps) => {

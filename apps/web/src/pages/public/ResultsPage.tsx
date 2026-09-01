@@ -7,6 +7,7 @@ import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
 import Alert from '../../components/ui/Alert';
+import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import Table, {
   TableBody,
@@ -121,37 +122,41 @@ const ResultsPage = () => {
         </Alert>
       )}
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Place</TableHeaderCell>
-            <TableHeaderCell>Author</TableHeaderCell>
-            <TableHeaderCell>Points</TableHeaderCell>
-            <TableHeaderCell>Breakdown</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {results.results.map((entry) => (
-            <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
-              <TableCell className="font-semibold text-zinc-900">
-                {entry.place === 1 ? (
-                  <span className="inline-flex items-center gap-1">
-                    <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-                    {entry.place}
-                  </span>
-                ) : (
-                  entry.place
-                )}
-              </TableCell>
-              <TableCell>
-                {entry.firstName} {entry.lastName} ({entry.alias})
-              </TableCell>
-              <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
-              <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+      {results.results.length === 0 ? (
+        <EmptyState icon="bi-trophy" text="No votes cast yet" />
+      ) : (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Place</TableHeaderCell>
+              <TableHeaderCell>Author</TableHeaderCell>
+              <TableHeaderCell>Points</TableHeaderCell>
+              <TableHeaderCell>Breakdown</TableHeaderCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {results.results.map((entry) => (
+              <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
+                <TableCell className="font-semibold text-zinc-900">
+                  {entry.place === 1 ? (
+                    <span className="inline-flex items-center gap-1">
+                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                      {entry.place}
+                    </span>
+                  ) : (
+                    entry.place
+                  )}
+                </TableCell>
+                <TableCell>
+                  {entry.firstName} {entry.lastName} ({entry.alias})
+                </TableCell>
+                <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
+                <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };
