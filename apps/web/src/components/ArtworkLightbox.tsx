@@ -23,7 +23,7 @@ const ArtworkLightbox = ({
   authorAlias,
 }: ArtworkLightboxProps) => {
   const slides = artworks.map((artwork) => ({
-    src: mediaUrl(artwork.fullUrl),
+    src: mediaUrl(artwork.previewUrl),
     alt: artwork.title ?? authorAlias ?? 'Artwork',
     ...(artwork.width ? { width: artwork.width } : {}),
     ...(artwork.height ? { height: artwork.height } : {}),
