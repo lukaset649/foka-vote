@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ErrorCode, MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
-import { ApiError, mediaUrl } from '../../services/apiClient';
-import { fetchContest } from '../../services/contests';
+import { ApiError, isUnauthorizedError, mediaUrl } from '../../services/apiClient';
+import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
 import { fetchMyVoteCard, submitVoteCard } from '../../services/votes';
 import type { VoteConfirmationState } from './VoteConfirmationPage';
@@ -43,16 +43,21 @@ const VoteCardPage = () => {
         setSubmissions(submissionsData);
         setExistingCard(cardData);
       })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
         }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/vote`), { replace: true });
+          return;
+        }
+        setError(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, navigate]);
 
   if (error) {
     return <Alert variant="error">Failed to load voting card</Alert>;

@@ -12,6 +12,9 @@ function requireSlugParam(request: Request): string {
 
 export async function getResults(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const results = await getContestResults(slug);
+  const results = await getContestResults(
+    slug,
+    request.signedCookies as Record<string, string | undefined>,
+  );
   response.json(results);
 }

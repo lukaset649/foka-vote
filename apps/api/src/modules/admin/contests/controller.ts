@@ -1,7 +1,13 @@
 import type { Request, Response } from 'express';
 import type { CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
-import { createContest, getContestById, listContests, updateContest } from './service.js';
+import {
+  createContest,
+  deleteContest,
+  getContestById,
+  listContests,
+  updateContest,
+} from './service.js';
 
 function assertCreatePayload(body: unknown): CreateContestDto {
   const input = body as Partial<CreateContestDto> | null;
@@ -50,4 +56,9 @@ export async function update(request: Request, response: Response): Promise<void
   const input = request.body as UpdateContestDto;
   const contest = await updateContest(requireIdParam(request), input);
   response.json(contest);
+}
+
+export async function remove(request: Request, response: Response): Promise<void> {
+  await deleteContest(requireIdParam(request));
+  response.status(204).end();
 }

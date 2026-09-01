@@ -1,7 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { fetchContest } from '../../services/contests';
+import { isUnauthorizedError } from '../../services/apiClient';
+import { contestGatePath, fetchContest } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -69,16 +70,25 @@ const SubmissionFormPage = () => {
           setContest(data);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setLoadError(true);
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
         }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/submit`), {
+            replace: true,
+            state: draft,
+          });
+          return;
+        }
+        setLoadError(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- draft is a one-time navigation payload, not expected to change
+  }, [slug, navigate]);
 
   const maxArtworks = contest?.maxArtworksPerSubmission ?? 1;
 
@@ -146,9 +156,11 @@ const SubmissionFormPage = () => {
       </h1>
 
       <Alert variant="info">
-        Your first and last name will be published next to your work once voting closes. After
-        submitting, only the admin can make changes — message the club&apos;s Messenger group if
-        something needs fixing (a typo, a wrong file, a withdrawal).
+        Your first and last name will be published next to your work once voting closes.
+        <br />
+        Since then, the random alias will be displayed instead.
+        <br />
+        After submitting, only the admin can make changes.
       </Alert>
 
       <Card className="flex flex-col gap-4">

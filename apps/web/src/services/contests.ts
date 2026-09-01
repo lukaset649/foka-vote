@@ -6,6 +6,10 @@ import type {
 } from '@foka-vote/shared';
 import { apiErrorFrom, apiRequest } from './apiClient';
 
+export function contestGatePath(slug: string, redirectTo: string): string {
+  return `/contest/${slug}/gate?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
 export async function fetchContests(): Promise<ContestDto[]> {
   const response = await apiRequest('/api/contests');
   if (!response.ok) {
@@ -71,4 +75,11 @@ export async function updateContest(id: string, input: UpdateContestDto): Promis
     throw await apiErrorFrom(response, 'Failed to update contest');
   }
   return response.json() as Promise<AdminContestDto>;
+}
+
+export async function deleteContest(id: string): Promise<void> {
+  const response = await apiRequest(`/api/admin/contests/${id}`, { method: 'DELETE' });
+  if (!response.ok) {
+    throw await apiErrorFrom(response, 'Failed to delete contest');
+  }
 }

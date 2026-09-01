@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import type { SubmissionDto } from '@foka-vote/shared';
-import { mediaUrl } from '../../services/apiClient';
+import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
+import { contestGatePath } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -17,6 +18,7 @@ interface OpenLightbox {
 
 const GalleryPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [error, setError] = useState(false);
   const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
@@ -33,16 +35,21 @@ const GalleryPage = () => {
           setSubmissions(data);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
         }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/gallery`), { replace: true });
+          return;
+        }
+        setError(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, navigate]);
 
   if (error) {
     return <Alert variant="error">Failed to load gallery</Alert>;
@@ -76,12 +83,12 @@ const GalleryPage = () => {
                       <button
                         type="button"
                         onClick={() => setLightbox({ submissionId: submission.id, index })}
-                        className="block w-full overflow-hidden rounded-md border border-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className="group block w-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       >
                         <img
                           src={mediaUrl(artwork.thumbUrl)}
                           alt={artwork.title ?? submission.alias}
-                          className="aspect-square w-full object-cover"
+                          className="aspect-square w-full rounded-md border border-zinc-200 object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
                         />
                       </button>
                       {artwork.title && (

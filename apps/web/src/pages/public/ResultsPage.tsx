@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
-import { fetchContest } from '../../services/contests';
+import { isUnauthorizedError } from '../../services/apiClient';
+import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
 import Alert from '../../components/ui/Alert';
+import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import Table, {
   TableBody,
@@ -31,6 +33,7 @@ function formatBreakdown(entry: ResultEntryDto): string {
 
 const ResultsPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [results, setResults] = useState<ResultsDto | null>(null);
   const [error, setError] = useState(false);
@@ -47,7 +50,7 @@ const ResultsPage = () => {
           return;
         }
         setContest(contestData);
-        if (contestData.status !== 'CLOSED') {
+        if (contestData.status !== 'CLOSED' && contestData.status !== 'VOTING') {
           return undefined;
         }
         return fetchResults(slug).then((resultsData) => {
@@ -56,16 +59,21 @@ const ResultsPage = () => {
           }
         });
       })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
         }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/results`), { replace: true });
+          return;
+        }
+        setError(true);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, navigate]);
 
   if (error) {
     return <Alert variant="error">Failed to load results</Alert>;
@@ -75,7 +83,7 @@ const ResultsPage = () => {
     return <Spinner />;
   }
 
-  if (contest.status !== 'CLOSED') {
+  if (contest.status !== 'CLOSED' && contest.status !== 'VOTING') {
     return (
       <div>
         <PageHeader
@@ -84,8 +92,8 @@ const ResultsPage = () => {
           backLabel="Back to the contest"
         />
         <Alert variant="info">
-          Results will be available once voting closes, on{' '}
-          {new Date(contest.votingEnd).toLocaleString()}.
+          Results will be available once voting starts, on{' '}
+          {new Date(contest.votingStart).toLocaleString()}.
         </Alert>
       </div>
     );
@@ -108,37 +116,47 @@ const ResultsPage = () => {
         </span>
       </PageHeader>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Place</TableHeaderCell>
-            <TableHeaderCell>Author</TableHeaderCell>
-            <TableHeaderCell>Points</TableHeaderCell>
-            <TableHeaderCell>Breakdown</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {results.results.map((entry) => (
-            <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
-              <TableCell className="font-semibold text-zinc-900">
-                {entry.place === 1 ? (
-                  <span className="inline-flex items-center gap-1">
-                    <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-                    {entry.place}
-                  </span>
-                ) : (
-                  entry.place
-                )}
-              </TableCell>
-              <TableCell>
-                {entry.firstName} {entry.lastName} ({entry.alias})
-              </TableCell>
-              <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
-              <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+      {!results.final && (
+        <Alert variant="info" className="mb-4">
+          Voting is still in progress — standings may change before the contest closes.
+        </Alert>
+      )}
+
+      {results.results.length === 0 ? (
+        <EmptyState icon="bi-trophy" text="No votes cast yet" />
+      ) : (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeaderCell>Place</TableHeaderCell>
+              <TableHeaderCell>Author</TableHeaderCell>
+              <TableHeaderCell>Points</TableHeaderCell>
+              <TableHeaderCell>Breakdown</TableHeaderCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {results.results.map((entry) => (
+              <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
+                <TableCell className="font-semibold text-zinc-900">
+                  {entry.place === 1 ? (
+                    <span className="inline-flex items-center gap-1">
+                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                      {entry.place}
+                    </span>
+                  ) : (
+                    entry.place
+                  )}
+                </TableCell>
+                <TableCell>
+                  {entry.firstName} {entry.lastName} ({entry.alias})
+                </TableCell>
+                <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
+                <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

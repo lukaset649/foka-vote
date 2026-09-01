@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { fetchContest, verifyContestAccessCode } from '../../services/contests';
-import Card from '../../components/ui/Card';
+import { isUnauthorizedError } from '../../services/apiClient';
+import { contestGatePath, fetchContest, verifyContestAccessCode } from '../../services/contests';
+import ContestGalleryCard from '../../components/ContestGalleryCard';
+import ContestPhaseCard from '../../components/ContestPhaseCard';
+import ContestResultsCard from '../../components/ContestResultsCard';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString();
-}
-
 const ContestPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [error, setError] = useState(false);
@@ -25,40 +25,37 @@ const ContestPage = () => {
     }
     let cancelled = false;
 
-    fetchContest(slug)
-      .then((data) => {
+    const load = async () => {
+      const code = searchParams.get('kod');
+      if (code) {
+        await verifyContestAccessCode(slug, code).catch(() => undefined);
+        setSearchParams({}, { replace: true });
+      }
+
+      try {
+        const data = await fetchContest(slug);
         if (!cancelled) {
           setContest(data);
         }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError(true);
+      } catch (err) {
+        if (cancelled) {
+          return;
         }
-      });
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}`), { replace: true });
+          return;
+        }
+        setError(true);
+      }
+    };
+
+    void load();
 
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the slug changes, not on every searchParams update
   }, [slug]);
-
-  useEffect(() => {
-    const code = searchParams.get('kod');
-    if (!slug || !code || !contest) {
-      return;
-    }
-
-    const stripCodeParam = () => setSearchParams({}, { replace: true });
-
-    if (!contest.hasAccessCode) {
-      stripCodeParam();
-      return;
-    }
-
-    verifyContestAccessCode(slug, code)
-      .catch(() => undefined)
-      .finally(stripCodeParam);
-  }, [slug, contest, searchParams, setSearchParams]);
 
   if (error) {
     return <Alert variant="error">Failed to load contest</Alert>;
@@ -71,50 +68,8 @@ const ContestPage = () => {
   return (
     <div>
       <PageHeader title={contest.title} backTo="/" backLabel="Back to contests">
-        <ContestStatusBadge status={contest.status} />
-      </PageHeader>
-
-      <div className="flex flex-col gap-6">
-        {contest.description && <p className="text-zinc-600">{contest.description}</p>}
-
-        <Card>
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                Submissions
-              </dt>
-              <dd className="mt-1 text-sm text-zinc-900">
-                {formatDate(contest.submissionStart)} – {formatDate(contest.submissionDeadline)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                Voting
-              </dt>
-              <dd className="mt-1 text-sm text-zinc-900">
-                {formatDate(contest.votingStart)} – {formatDate(contest.votingEnd)}
-              </dd>
-            </div>
-          </dl>
-        </Card>
-
-        {contest.hasAccessCode && (
-          <LinkButton
-            to={`/contest/${contest.slug}/gate`}
-            variant="secondary"
-            size="sm"
-            className="w-fit"
-          >
-            <i className="bi bi-lock" aria-hidden="true" />
-            Enter access code
-          </LinkButton>
-        )}
-
-        <nav className="flex flex-wrap gap-3">
-          <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary">
-            <i className="bi bi-images" aria-hidden="true" />
-            Gallery
-          </LinkButton>
+        <div className="flex flex-wrap items-center gap-5">
+          <ContestStatusBadge status={contest.status} />
           {contest.status === 'SUBMISSIONS' && (
             <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
               <i className="bi bi-send" aria-hidden="true" />
@@ -127,11 +82,15 @@ const ContestPage = () => {
               Vote
             </LinkButton>
           )}
-          <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary">
-            <i className="bi bi-trophy" aria-hidden="true" />
-            Results
-          </LinkButton>
-        </nav>
+        </div>
+      </PageHeader>
+
+      <div className="flex flex-col gap-6">
+        {contest.description && <p className="text-zinc-600">{contest.description}</p>}
+
+        <ContestPhaseCard contest={contest} />
+        <ContestResultsCard contest={contest} />
+        <ContestGalleryCard contest={contest} />
       </div>
     </div>
   );

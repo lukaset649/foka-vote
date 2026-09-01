@@ -1,4 +1,5 @@
 import { Link, Outlet } from 'react-router';
+import logo from '../assets/logo.svg';
 import LinkButton from './ui/LinkButton';
 
 const Layout = () => {
@@ -7,7 +8,7 @@ const Layout = () => {
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <i className="bi bi-camera-fill text-lg text-indigo-600" aria-hidden="true" />
+            <img src={logo} alt="FO-KA" className="h-10 w-auto" />
             <span className="text-lg font-semibold tracking-tight">FOKA Vote</span>
           </Link>
           <nav className="flex items-center gap-2">
