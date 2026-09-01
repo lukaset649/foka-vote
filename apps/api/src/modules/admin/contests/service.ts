@@ -1,3 +1,5 @@
+import { unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { DEFAULT_MAX_ARTWORKS_PER_SUBMISSION } from '@foka-vote/shared';
 import type { AdminContestDto, CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
 import type { Contest } from '@prisma/client';
@@ -5,6 +7,7 @@ import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
+import { UPLOADS_DIR } from '../../../lib/storage.js';
 
 function toAdminContestDto(contest: Contest): AdminContestDto {
   const status = computeContestStatus(new Date(), contest);
@@ -141,4 +144,26 @@ export async function updateContest(id: string, input: UpdateContestDto): Promis
   });
 
   return toAdminContestDto(contest);
+}
+
+export async function deleteContest(id: string): Promise<void> {
+  const existing = await prisma.contest.findUnique({ where: { id } });
+  if (!existing) {
+    throw notFound('Contest not found');
+  }
+
+  const artworks = await prisma.artwork.findMany({
+    where: { submission: { contestId: id } },
+    select: { filePath: true, previewPath: true, thumbPath: true },
+  });
+
+  // The DB cascades submissions, artworks, vote cards and vote items; only the
+  // files on disk need explicit cleanup.
+  await prisma.contest.delete({ where: { id } });
+
+  await Promise.all(
+    artworks
+      .flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath])
+      .map((relativePath) => unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined)),
+  );
 }

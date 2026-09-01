@@ -1,7 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { AdminContestDto } from '@foka-vote/shared';
-import { createContest, fetchAdminContest, updateContest } from '../../services/contests';
+import {
+  createContest,
+  deleteContest,
+  fetchAdminContest,
+  updateContest,
+} from '../../services/contests';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -67,6 +72,7 @@ const AdminContestFormPage = () => {
   const [contest, setContest] = useState<AdminContestDto | null>(null);
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -127,6 +133,27 @@ const AdminContestFormPage = () => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     void submit();
+  };
+
+  const handleDelete = () => {
+    if (!id || !contest) {
+      return;
+    }
+    if (
+      !window.confirm(
+        `Delete "${contest.title}"? This permanently removes all its submissions, artworks and votes.`,
+      )
+    ) {
+      return;
+    }
+
+    setDeleting(true);
+    deleteContest(id)
+      .then(() => navigate('/admin/contests'))
+      .catch(() => {
+        window.alert('Failed to delete the contest');
+        setDeleting(false);
+      });
   };
 
   if (loading) {
@@ -262,9 +289,24 @@ const AdminContestFormPage = () => {
           </div>
         </Card>
 
-        <Button type="submit" disabled={submitting} className="w-full sm:w-fit">
-          {isEditing ? 'Save changes' : 'Create contest'}
-        </Button>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Button type="submit" disabled={submitting} className="w-full sm:w-fit">
+            {isEditing ? 'Save changes' : 'Create contest'}
+          </Button>
+
+          {isEditing && (
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="w-full sm:w-fit"
+            >
+              <i className="bi bi-trash" aria-hidden="true" />
+              Delete contest
+            </Button>
+          )}
+        </div>
 
         {error && <Alert variant="error">{error}</Alert>}
       </div>
