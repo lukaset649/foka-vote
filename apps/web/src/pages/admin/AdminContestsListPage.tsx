@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AdminContestDto } from '@foka-vote/shared';
 import { fetchAdminContests } from '../../services/contests';
+import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
@@ -51,7 +52,7 @@ const AdminContestsListPage = () => {
         <ul className="flex flex-col gap-3">
           {contests.map((contest) => (
             <li key={contest.id}>
-              <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Card className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-zinc-900">{contest.title}</span>
@@ -59,7 +60,15 @@ const AdminContestsListPage = () => {
                   </div>
                   <p className="text-sm text-zinc-500">{contest.slug}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                  <ContestPhaseActions
+                    contest={contest}
+                    onUpdated={(updated) =>
+                      setContests(
+                        (prev) => prev?.map((c) => (c.id === updated.id ? updated : c)) ?? prev,
+                      )
+                    }
+                  />
                   <LinkButton
                     to={`/admin/contests/${contest.id}/submissions`}
                     variant="secondary"

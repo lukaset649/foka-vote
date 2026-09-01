@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { AdminContestDto } from '@foka-vote/shared';
 import { createContest, fetchAdminContest, updateContest } from '../../services/contests';
+import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
@@ -63,6 +64,7 @@ const AdminContestFormPage = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [contest, setContest] = useState<AdminContestDto | null>(null);
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,8 +74,9 @@ const AdminContestFormPage = () => {
       return;
     }
     fetchAdminContest(id)
-      .then((contest) => {
-        setForm(toFormState(contest));
+      .then((data) => {
+        setContest(data);
+        setForm(toFormState(data));
       })
       .catch(() => {
         setError('Failed to load contest');
@@ -175,7 +178,20 @@ const AdminContestFormPage = () => {
         </Card>
 
         <Card className="flex flex-col gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Timeline</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+              Timeline
+            </h2>
+            {contest && (
+              <ContestPhaseActions
+                contest={contest}
+                onUpdated={(updated) => {
+                  setContest(updated);
+                  setForm(toFormState(updated));
+                }}
+              />
+            )}
+          </div>
 
           <div>
             <Label htmlFor="submissionStart">Submission start</Label>
