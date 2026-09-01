@@ -13,4 +13,5 @@ export interface ResultEntryDto {
 export interface ResultsDto {
   results: ResultEntryDto[];
   voteCardCount: number;
+  final: boolean;
 }

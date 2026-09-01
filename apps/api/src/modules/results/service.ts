@@ -54,8 +54,8 @@ export async function getContestResults(
   assertContestAccess(contest, signedCookies);
 
   const status = computeContestStatus(new Date(), contest);
-  if (status !== 'CLOSED') {
-    throw conflict('Results are not available until this contest has closed');
+  if (status !== 'CLOSED' && status !== 'VOTING') {
+    throw conflict('Results are not available until voting has started');
   }
 
   const submissions = await prisma.submission.findMany({
@@ -92,5 +92,5 @@ export async function getContestResults(
     where: { contestId: contest.id, isVoid: false },
   });
 
-  return { results: assignPlaces(scored), voteCardCount };
+  return { results: assignPlaces(scored), voteCardCount, final: status === 'CLOSED' };
 }

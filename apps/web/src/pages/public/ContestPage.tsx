@@ -164,7 +164,7 @@ const ContestPage = () => {
         }
       });
 
-    if (contest.status === 'CLOSED') {
+    if (contest.status === 'VOTING' || contest.status === 'CLOSED') {
       fetchResults(contest.slug)
         .then((data) => {
           if (!cancelled) {
@@ -256,42 +256,53 @@ const ContestPage = () => {
           )}
         </Card>
 
-        <Card>
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-zinc-900">Results</h2>
-            <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary" size="sm">
-              View results
-              <i className="bi bi-arrow-right" aria-hidden="true" />
-            </LinkButton>
-          </div>
-
-          {contest.status !== 'CLOSED' ? (
-            <p className="mt-4 text-sm text-zinc-500">
-              Results will be available once voting closes, on {formatDate(contest.votingEnd)}.
-            </p>
-          ) : topResults === undefined ? (
-            <div className="mt-4">
-              <Spinner />
+        {(contest.status === 'VOTING' || contest.status === 'CLOSED') && (
+          <Card>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-zinc-900">Results</h2>
+              <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary" size="sm">
+                View results
+                <i className="bi bi-arrow-right" aria-hidden="true" />
+              </LinkButton>
             </div>
-          ) : (
-            <ol className="mt-4 flex flex-col gap-2">
-              {topResults.map((entry) => (
-                <li
-                  key={entry.submissionId}
-                  className="flex items-center justify-between gap-3 text-sm"
-                >
-                  <span className="flex items-center gap-2 font-medium text-zinc-900">
-                    {entry.place === 1 && (
-                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-                    )}
-                    {entry.place}. {entry.firstName} {entry.lastName} ({entry.alias})
-                  </span>
-                  <span className="font-semibold text-indigo-600">{entry.total} pkt</span>
-                </li>
-              ))}
-            </ol>
-          )}
-        </Card>
+
+            {topResults === undefined ? (
+              <div className="mt-4">
+                <Spinner />
+              </div>
+            ) : (
+              <>
+                {results && !results.final && (
+                  <Alert variant="info" className="mt-4">
+                    Voting is still in progress — these standings aren&apos;t final.
+                  </Alert>
+                )}
+                <ol className="mt-4 flex flex-col gap-2">
+                  {topResults.map((entry) => (
+                    <li
+                      key={entry.submissionId}
+                      className="flex items-center justify-between gap-3 text-sm"
+                    >
+                      <span className="flex items-center gap-2 font-medium text-zinc-900">
+                        {entry.place === 1 && (
+                          <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                        )}
+                        {entry.place}. {entry.firstName} {entry.lastName} ({entry.alias})
+                      </span>
+                      <span className="font-semibold text-indigo-600">{entry.total} pkt</span>
+                    </li>
+                  ))}
+                </ol>
+                {results && results.results.length > topResults.length && (
+                  <p className="mt-3 text-xs text-zinc-500">
+                    Showing the top {topResults.length} of {results.results.length} results — see
+                    the full standings on the results page.
+                  </p>
+                )}
+              </>
+            )}
+          </Card>
+        )}
 
         <Card>
           <div className="flex items-center justify-between gap-3">
