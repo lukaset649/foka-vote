@@ -156,8 +156,10 @@ const SubmissionFormPage = () => {
       </h1>
 
       <Alert variant="info">
-        Your first and last name will be published next to your work once voting closes.<br/>
-        Since then, the random alias will be displayed instead.<br/>
+        Your first and last name will be published next to your work once voting closes.
+        <br />
+        Since then, the random alias will be displayed instead.
+        <br />
         After submitting, only the admin can make changes.
       </Alert>
 
