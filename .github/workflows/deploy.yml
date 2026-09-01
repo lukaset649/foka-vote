@@ -1,0 +1,71 @@
+name: deploy
+
+on:
+  push:
+    branches: [deploy]
+
+env:
+  MIKRUS_HOST: wiktor144.mikrus.xyz
+  MIKRUS_PORT: 10144
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build:shared
+      - run: npm run build:api
+      - name: Build web (same-origin API in production)
+        run: npm run build:web
+        env:
+          VITE_API_URL: ''
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MIKRUS_SSH_KEY }}
+
+      - name: Trust host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ env.MIKRUS_PORT }} ${{ env.MIKRUS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Ship built files
+        run: |
+          rsync -az --delete \
+            -e "ssh -p ${{ env.MIKRUS_PORT }}" \
+            apps/web/dist/ root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/web/
+
+          rsync -az --delete \
+            --exclude uploads --exclude .env --exclude node_modules \
+            -e "ssh -p ${{ env.MIKRUS_PORT }}" \
+            apps/api/dist apps/api/package.json apps/api/prisma \
+            root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/apps/api/
+
+          rsync -az --delete \
+            -e "ssh -p ${{ env.MIKRUS_PORT }}" \
+            packages/shared/dist packages/shared/package.json \
+            root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/packages/shared/
+
+          rsync -az \
+            -e "ssh -p ${{ env.MIKRUS_PORT }}" \
+            package.json package-lock.json tsconfig.base.json \
+            root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/
+
+      - name: Install, migrate, restart
+        run: |
+          ssh -p ${{ env.MIKRUS_PORT }} root@${{ env.MIKRUS_HOST }} '
+            set -e
+            cd /var/www/foka-vote &&
+            npm ci --omit=dev -w apps/api &&
+            cd apps/api &&
+            npx prisma generate --schema=prisma/schema.prisma &&
+            npx prisma migrate deploy --schema=prisma/schema.prisma &&
+            pm2 reload foka-api
+          '
