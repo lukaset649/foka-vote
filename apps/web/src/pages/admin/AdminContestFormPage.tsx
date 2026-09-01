@@ -183,13 +183,15 @@ const AdminContestFormPage = () => {
               Timeline
             </h2>
             {contest && (
-              <ContestPhaseActions
-                contest={contest}
-                onUpdated={(updated) => {
-                  setContest(updated);
-                  setForm(toFormState(updated));
-                }}
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                <ContestPhaseActions
+                  contest={contest}
+                  onUpdated={(updated) => {
+                    setContest(updated);
+                    setForm(toFormState(updated));
+                  }}
+                />
+              </div>
             )}
           </div>
 
