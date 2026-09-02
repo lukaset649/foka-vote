@@ -1,6 +1,9 @@
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { DEFAULT_MAX_ARTWORKS_PER_SUBMISSION } from '@foka-vote/shared';
+import {
+  DEFAULT_MAX_ARTWORKS_PER_SUBMISSION,
+  MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
+} from '@foka-vote/shared';
 import type { AdminContestDto, CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
 import type { Contest } from '@prisma/client';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
@@ -58,6 +61,14 @@ function assertValidDateOrder(dates: ContestDateInput): void {
   }
 }
 
+function assertValidMaxArtworks(value: number): void {
+  if (!Number.isInteger(value) || value < 1 || value > MAX_ARTWORKS_PER_SUBMISSION_LIMIT) {
+    throw badRequest(
+      `maxArtworksPerSubmission must be between 1 and ${MAX_ARTWORKS_PER_SUBMISSION_LIMIT}`,
+    );
+  }
+}
+
 async function ensureUniqueSlug(slug: string, excludeId?: string): Promise<void> {
   const existing = await prisma.contest.findUnique({ where: { slug } });
   if (existing && existing.id !== excludeId) {
@@ -75,6 +86,10 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
   const votingEnd = new Date(input.votingEnd);
   assertValidDateOrder({ submissionStart, submissionDeadline, votingStart, votingEnd });
 
+  const maxArtworksPerSubmission =
+    input.maxArtworksPerSubmission ?? DEFAULT_MAX_ARTWORKS_PER_SUBMISSION;
+  assertValidMaxArtworks(maxArtworksPerSubmission);
+
   const contest = await prisma.contest.create({
     data: {
       slug,
@@ -84,8 +99,7 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
       submissionDeadline,
       votingStart,
       votingEnd,
-      maxArtworksPerSubmission:
-        input.maxArtworksPerSubmission ?? DEFAULT_MAX_ARTWORKS_PER_SUBMISSION,
+      maxArtworksPerSubmission,
       accessCode: input.accessCode ?? null,
     },
   });
@@ -122,6 +136,10 @@ export async function updateContest(id: string, input: UpdateContestDto): Promis
   const votingEnd = input.votingEnd ? new Date(input.votingEnd) : existing.votingEnd;
   assertValidDateOrder({ submissionStart, submissionDeadline, votingStart, votingEnd });
 
+  const maxArtworksPerSubmission =
+    input.maxArtworksPerSubmission ?? existing.maxArtworksPerSubmission;
+  assertValidMaxArtworks(maxArtworksPerSubmission);
+
   let slug = existing.slug;
   if (input.slug && input.slug !== existing.slug) {
     await ensureUniqueSlug(input.slug, id);
@@ -138,7 +156,7 @@ export async function updateContest(id: string, input: UpdateContestDto): Promis
       submissionDeadline,
       votingStart,
       votingEnd,
-      maxArtworksPerSubmission: input.maxArtworksPerSubmission ?? existing.maxArtworksPerSubmission,
+      maxArtworksPerSubmission,
       accessCode: input.accessCode !== undefined ? input.accessCode : existing.accessCode,
     },
   });
