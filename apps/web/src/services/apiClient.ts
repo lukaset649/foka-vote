@@ -10,6 +10,28 @@ export function apiRequest(path: string, init?: RequestInit): Promise<Response> 
   });
 }
 
+export function apiUploadWithProgress(
+  path: string,
+  formData: FormData,
+  onProgress?: (fraction: number) => void,
+): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_URL}${path}`);
+    xhr.withCredentials = true;
+    xhr.upload.onprogress = (event) => {
+      if (onProgress && event.lengthComputable) {
+        onProgress(event.loaded / event.total);
+      }
+    };
+    xhr.onload = () => {
+      resolve(new Response(xhr.responseText, { status: xhr.status, statusText: xhr.statusText }));
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(formData);
+  });
+}
+
 export function mediaUrl(path: string): string {
   return `${API_URL}${path}`;
 }
