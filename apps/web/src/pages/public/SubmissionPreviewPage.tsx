@@ -16,6 +16,7 @@ const SubmissionPreviewPage = () => {
 
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,12 +55,14 @@ const SubmissionPreviewPage = () => {
 
     setSubmitting(true);
     setError(null);
+    setUploadProgress(0);
 
     try {
       const submission = await createSubmission(
         slug,
         { firstName: draft.firstName, lastName: draft.lastName, description: draft.description },
         draft.artworks,
+        (fraction) => setUploadProgress(Math.round(fraction * 100)),
       );
       void navigate(`/contest/${slug}/submit/confirmation`, { state: { submission } });
     } catch (err) {
@@ -123,6 +126,20 @@ const SubmissionPreviewPage = () => {
           Submit
         </Button>
       </div>
+
+      {submitting && (
+        <div className="flex flex-col gap-1">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
+            <div
+              className="h-full rounded-full bg-indigo-600 transition-all"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+          <p className="text-sm text-zinc-600">
+            {uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Processing…'}
+          </p>
+        </div>
+      )}
 
       {error && <Alert variant="error">{error}</Alert>}
     </div>
