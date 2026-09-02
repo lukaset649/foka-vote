@@ -1,7 +1,7 @@
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import type { ArtworkDto, SubmissionDto } from '@foka-vote/shared';
-import type { Artwork, Submission } from '@prisma/client';
+import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/shared';
+import type { AliasReservation, Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, notFound } from '../../errors/app-error.js';
@@ -13,11 +13,13 @@ import { prisma } from '../../lib/prisma.js';
 import { MEDIA_URL_PREFIX, UPLOADS_DIR } from '../../lib/storage.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
+const ALIAS_RESERVATION_TTL_MS = 20 * 60 * 1000;
 
 export interface CreateSubmissionInput {
   firstName: string;
   lastName: string;
   description?: string;
+  reservationId?: string;
 }
 
 export interface ArtworkMetaInput {
@@ -57,6 +59,74 @@ function toSubmissionDto(submission: Submission, artworks: Artwork[]): Submissio
   };
 }
 
+function toAliasReservationDto(reservation: AliasReservation): AliasReservationDto {
+  return {
+    reservationId: reservation.id,
+    alias: reservation.alias,
+    expiresAt: reservation.expiresAt.toISOString(),
+  };
+}
+
+async function listUsedAliases(contestId: string, now: Date): Promise<string[]> {
+  const [submissions, reservations] = await Promise.all([
+    prisma.submission.findMany({ where: { contestId }, select: { alias: true } }),
+    prisma.aliasReservation.findMany({
+      where: { contestId, expiresAt: { gt: now } },
+      select: { alias: true },
+    }),
+  ]);
+  return [...submissions.map((s) => s.alias), ...reservations.map((r) => r.alias)];
+}
+
+export async function reserveAlias(
+  slug: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<AliasReservationDto> {
+  const contest = await prisma.contest.findUnique({ where: { slug } });
+  if (!contest) {
+    throw notFound('Contest not found');
+  }
+
+  const status = computeContestStatus(new Date(), contest);
+  if (status !== 'SUBMISSIONS') {
+    throw conflict('This contest is not currently accepting submissions');
+  }
+
+  assertContestAccess(contest, signedCookies);
+
+  const now = new Date();
+  await prisma.aliasReservation.deleteMany({
+    where: { contestId: contest.id, expiresAt: { lt: now } },
+  });
+
+  for (let attempt = 0; attempt < MAX_ALIAS_ATTEMPTS; attempt++) {
+    const used = await listUsedAliases(contest.id, now);
+    const alias = pickAvailableAlias(used);
+    if (alias === null) {
+      throw conflict('This contest has reached its submission limit');
+    }
+
+    try {
+      // eslint-disable-next-line no-await-in-loop -- each attempt depends on the previous one's outcome
+      const reservation = await prisma.aliasReservation.create({
+        data: {
+          contestId: contest.id,
+          alias,
+          expiresAt: new Date(now.getTime() + ALIAS_RESERVATION_TTL_MS),
+        },
+      });
+      return toAliasReservationDto(reservation);
+    } catch (error) {
+      if (isUniqueConstraintError(error) && attempt < MAX_ALIAS_ATTEMPTS - 1) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw conflict('Could not allocate a unique nickname, please try again');
+}
+
 async function cleanupProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
   await Promise.all(
     processed.flatMap((file) =>
@@ -72,15 +142,33 @@ async function createSubmissionWithRetry(
   input: CreateSubmissionInput,
   processed: ArtworkImageResult[],
   meta: ArtworkMetaInput[],
+  reservationId: string | undefined,
 ): Promise<{ submission: Submission; artworks: Artwork[] }> {
   for (let attempt = 0; attempt < MAX_ALIAS_ATTEMPTS; attempt++) {
-    const existing = await prisma.submission.findMany({
-      where: { contestId },
-      select: { alias: true },
-    });
-    const alias = pickAvailableAlias(existing.map((submission) => submission.alias));
-    if (alias === null) {
-      throw conflict('This contest has reached its submission limit');
+    const now = new Date();
+    let reservedAlias: { id: string; alias: string } | null = null;
+
+    if (reservationId && attempt === 0) {
+      // eslint-disable-next-line no-await-in-loop -- only checked on the first attempt
+      const reservation = await prisma.aliasReservation.findUnique({
+        where: { id: reservationId },
+      });
+      if (reservation && reservation.contestId === contestId && reservation.expiresAt > now) {
+        reservedAlias = { id: reservation.id, alias: reservation.alias };
+      }
+    }
+
+    let alias: string;
+    if (reservedAlias) {
+      alias = reservedAlias.alias;
+    } else {
+      // eslint-disable-next-line no-await-in-loop -- each attempt depends on the previous one's outcome
+      const used = await listUsedAliases(contestId, now);
+      const picked = pickAvailableAlias(used);
+      if (picked === null) {
+        throw conflict('This contest has reached its submission limit');
+      }
+      alias = picked;
     }
 
     try {
@@ -95,6 +183,10 @@ async function createSubmissionWithRetry(
             alias,
           },
         });
+
+        if (reservedAlias) {
+          await tx.aliasReservation.deleteMany({ where: { id: reservedAlias.id } });
+        }
 
         const artworks: Artwork[] = [];
         for (let i = 0; i < processed.length; i++) {
@@ -202,6 +294,7 @@ export async function createSubmission(
       input,
       processed,
       meta,
+      input.reservationId,
     );
     return toSubmissionDto(submission, artworks);
   } catch (error) {
