@@ -127,21 +127,26 @@ const SubmissionPreviewPage = () => {
         </Button>
       </div>
 
+      {error && <Alert variant="error">{error}</Alert>}
+
       {submitting && (
-        <div className="flex flex-col gap-1">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
-            <div
-              className="h-full rounded-full bg-indigo-600 transition-all"
-              style={{ width: `${uploadProgress}%` }}
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+            <p className="mb-3 text-center font-medium text-zinc-900">
+              {uploadProgress < 100 ? 'Uploading your submission…' : 'Processing…'}
+            </p>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
+              <div
+                className="h-full rounded-full bg-indigo-600 transition-all"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="mt-2 text-center text-sm text-zinc-500">
+              {uploadProgress < 100 ? `${uploadProgress}%` : 'Almost done…'}
+            </p>
           </div>
-          <p className="text-sm text-zinc-600">
-            {uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Processing…'}
-          </p>
         </div>
       )}
-
-      {error && <Alert variant="error">{error}</Alert>}
     </div>
   );
 };
