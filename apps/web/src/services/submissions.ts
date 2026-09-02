@@ -4,7 +4,7 @@ import type {
   UpdateArtworkDto,
   UpdateSubmissionDto,
 } from '@foka-vote/shared';
-import { apiErrorFrom, apiRequest } from './apiClient';
+import { apiErrorFrom, apiRequest, apiUploadWithProgress } from './apiClient';
 
 export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
   const response = await apiRequest(`/api/contests/${slug}/submissions`);
@@ -30,6 +30,7 @@ export async function createSubmission(
   slug: string,
   data: CreateSubmissionData,
   artworks: CreateSubmissionArtwork[],
+  onProgress?: (fraction: number) => void,
 ): Promise<SubmissionDto> {
   const formData = new FormData();
   formData.append('firstName', data.firstName);
@@ -48,10 +49,11 @@ export async function createSubmission(
   );
   artworks.forEach((artwork) => formData.append('artworks', artwork.file));
 
-  const response = await apiRequest(`/api/contests/${slug}/submissions`, {
-    method: 'POST',
-    body: formData,
-  });
+  const response = await apiUploadWithProgress(
+    `/api/contests/${slug}/submissions`,
+    formData,
+    onProgress,
+  );
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to submit');
   }
