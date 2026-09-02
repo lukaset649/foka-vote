@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import type { ContestDto } from '@foka-vote/shared';
+import { MAX_ARTWORK_FILE_SIZE_MB, type ContestDto } from '@foka-vote/shared';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import Card from '../../components/ui/Card';
@@ -195,7 +195,12 @@ const SubmissionFormPage = () => {
       </Card>
 
       <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-zinc-900">Artworks (up to {maxArtworks})</h2>
+        <div>
+          <h2 className="text-lg font-semibold text-zinc-900">Artworks (up to {maxArtworks})</h2>
+          <p className="text-sm text-zinc-500">
+            Max file size per photo: {MAX_ARTWORK_FILE_SIZE_MB} MB
+          </p>
+        </div>
 
         {slots.map((slot, index) => (
           <fieldset

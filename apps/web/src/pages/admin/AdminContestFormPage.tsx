@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import type { AdminContestDto } from '@foka-vote/shared';
+import { MAX_ARTWORKS_PER_SUBMISSION_LIMIT, type AdminContestDto } from '@foka-vote/shared';
 import {
   createContest,
   deleteContest,
@@ -273,11 +273,14 @@ const AdminContestFormPage = () => {
           </h2>
 
           <div>
-            <Label htmlFor="maxArtworksPerSubmission">Max artworks per submission</Label>
+            <Label htmlFor="maxArtworksPerSubmission">
+              Max artworks per submission (up to {MAX_ARTWORKS_PER_SUBMISSION_LIMIT})
+            </Label>
             <Input
               id="maxArtworksPerSubmission"
               type="number"
               min={1}
+              max={MAX_ARTWORKS_PER_SUBMISSION_LIMIT}
               value={form.maxArtworksPerSubmission}
               onChange={updateField('maxArtworksPerSubmission')}
             />
