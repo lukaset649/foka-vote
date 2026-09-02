@@ -1,5 +1,6 @@
 import type {
   AdminSubmissionDto,
+  AliasReservationDto,
   SubmissionDto,
   UpdateArtworkDto,
   UpdateSubmissionDto,
@@ -14,10 +15,21 @@ export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
   return response.json() as Promise<SubmissionDto[]>;
 }
 
+export async function reserveAlias(slug: string): Promise<AliasReservationDto> {
+  const response = await apiRequest(`/api/contests/${slug}/submissions/alias-reservations`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    throw await apiErrorFrom(response, 'Failed to reserve a nickname');
+  }
+  return response.json() as Promise<AliasReservationDto>;
+}
+
 export interface CreateSubmissionData {
   firstName: string;
   lastName: string;
   description: string;
+  reservationId?: string;
 }
 
 export interface CreateSubmissionArtwork {
@@ -37,6 +49,9 @@ export async function createSubmission(
   formData.append('lastName', data.lastName);
   if (data.description) {
     formData.append('description', data.description);
+  }
+  if (data.reservationId) {
+    formData.append('reservationId', data.reservationId);
   }
   formData.append(
     'meta',
