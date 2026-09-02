@@ -28,8 +28,21 @@ model Contest {
   status                   ContestStatus @default(DRAFT)
   createdAt                DateTime      @default(now())
 
-  submissions Submission[]
-  voteCards   VoteCard[]
+  submissions       Submission[]
+  voteCards         VoteCard[]
+  aliasReservations AliasReservation[]
+}
+
+model AliasReservation {
+  id        String   @id @default(cuid())
+  contestId String
+  alias     String
+  expiresAt DateTime
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, alias])
+  @@index([contestId, expiresAt])
 }
 
 model Submission {
