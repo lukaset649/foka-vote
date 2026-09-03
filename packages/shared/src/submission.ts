@@ -27,6 +27,13 @@ export interface CreateSubmissionDto {
   firstName: string;
   lastName: string;
   description?: string;
+  reservationId?: string;
+}
+
+export interface AliasReservationDto {
+  reservationId: string;
+  alias: string;
+  expiresAt: string;
 }
 
 export interface UpdateSubmissionDto {

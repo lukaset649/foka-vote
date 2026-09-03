@@ -28,6 +28,13 @@ const SubmissionConfirmationPage = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      <Link
+        to={`/contest/${slug}`}
+        className="inline-flex w-fit items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
+      >
+        <i className="bi bi-arrow-left" aria-hidden="true" /> Back to the contest
+      </Link>
+
       <div className="flex flex-col items-center gap-2 text-center">
         <i className="bi bi-check2-circle text-3xl text-emerald-600" aria-hidden="true" />
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
@@ -58,10 +65,6 @@ const SubmissionConfirmationPage = () => {
           </li>
         ))}
       </ul>
-
-      <Link to={`/contest/${slug}`} className="w-fit text-sm text-indigo-600 hover:text-indigo-800">
-        <i className="bi bi-arrow-left" aria-hidden="true" /> Back to the contest
-      </Link>
     </div>
   );
 };

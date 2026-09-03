@@ -1,8 +1,8 @@
 export interface ResultEntryDto {
   submissionId: string;
   alias: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   total: number;
   place: number;
   votes3: number;

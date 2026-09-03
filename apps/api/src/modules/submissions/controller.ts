@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
 import type { ArtworkMetaInput } from './service.js';
-import { createSubmission, listSubmissions } from './service.js';
+import { createSubmission, listSubmissions, reserveAlias } from './service.js';
 
 function requireSlugParam(request: Request): string {
   const { slug } = request.params;
@@ -54,9 +54,21 @@ export async function list(request: Request, response: Response): Promise<void> 
   response.json(submissions);
 }
 
+export async function reserveAliasHandler(request: Request, response: Response): Promise<void> {
+  const slug = requireSlugParam(request);
+  const reservation = await reserveAlias(
+    slug,
+    request.signedCookies as Record<string, string | undefined>,
+  );
+  response.status(201).json(reservation);
+}
+
 export async function create(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const { firstName, lastName, description, meta } = request.body as Record<string, unknown>;
+  const { firstName, lastName, description, meta, reservationId } = request.body as Record<
+    string,
+    unknown
+  >;
 
   if (typeof firstName !== 'string' || firstName.length === 0) {
     throw badRequest('firstName is required');
@@ -68,6 +80,7 @@ export async function create(request: Request, response: Response): Promise<void
   const files = (request.files as Express.Multer.File[] | undefined) ?? [];
   const artworksMeta = parseArtworkMeta(meta);
   const descriptionValue = optionalString(description);
+  const reservationIdValue = optionalString(reservationId);
 
   const submission = await createSubmission(
     slug,
@@ -75,6 +88,7 @@ export async function create(request: Request, response: Response): Promise<void
       firstName,
       lastName,
       ...(descriptionValue !== undefined ? { description: descriptionValue } : {}),
+      ...(reservationIdValue !== undefined ? { reservationId: reservationIdValue } : {}),
     },
     files,
     artworksMeta,
