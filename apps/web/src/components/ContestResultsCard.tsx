@@ -74,10 +74,10 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                     className="flex items-center justify-between gap-3 text-sm"
                   >
                     <span className="flex items-center gap-2 font-medium text-zinc-900">
-                      {entry.place === 1 && (
+                      {entry.place}.
+                      {results?.final && entry.place === 1 && (
                         <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-                      )}
-                      {entry.place}.{' '}
+                      )}{' '}
                       {entry.firstName
                         ? `${entry.firstName} ${entry.lastName} (${entry.alias})`
                         : entry.alias}

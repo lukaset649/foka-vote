@@ -138,10 +138,10 @@ const ResultsPage = () => {
             {results.results.map((entry) => (
               <TableRow key={entry.submissionId} className={cn(entry.place === 1 && 'bg-amber-50')}>
                 <TableCell className="font-semibold text-zinc-900">
-                  {entry.place === 1 ? (
+                  {results.final && entry.place === 1 ? (
                     <span className="inline-flex items-center gap-1">
-                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
                       {entry.place}
+                      <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
                     </span>
                   ) : (
                     entry.place
