@@ -26,7 +26,7 @@ function compareByNameThenTotal(a: ScoredSubmission, b: ScoredSubmission): numbe
   return a.firstName.localeCompare(b.firstName, 'pl');
 }
 
-function assignPlaces(sorted: ScoredSubmission[]): ResultEntryDto[] {
+function assignPlaces(sorted: ScoredSubmission[], includeNames: boolean): ResultEntryDto[] {
   const results: ResultEntryDto[] = [];
   let place = 0;
   let previousTotal: number | null = null;
@@ -36,7 +36,8 @@ function assignPlaces(sorted: ScoredSubmission[]): ResultEntryDto[] {
       place += 1;
       previousTotal = entry.total;
     }
-    results.push({ ...entry, place });
+    const { firstName, lastName, ...rest } = entry;
+    results.push({ ...rest, ...(includeNames ? { firstName, lastName } : {}), place });
   }
 
   return results;
@@ -92,7 +93,8 @@ export async function getContestResults(
     where: { contestId: contest.id, isVoid: false },
   });
 
-  const results = voteCardCount === 0 ? [] : assignPlaces(scored);
+  const final = status === 'CLOSED';
+  const results = voteCardCount === 0 ? [] : assignPlaces(scored, final);
 
-  return { results, voteCardCount, final: status === 'CLOSED' };
+  return { results, voteCardCount, final };
 }
