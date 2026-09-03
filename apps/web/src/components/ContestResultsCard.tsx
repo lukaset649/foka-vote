@@ -77,7 +77,10 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                       {entry.place === 1 && (
                         <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
                       )}
-                      {entry.place}. {entry.firstName} {entry.lastName} ({entry.alias})
+                      {entry.place}.{' '}
+                      {entry.firstName
+                        ? `${entry.firstName} ${entry.lastName} (${entry.alias})`
+                        : entry.alias}
                     </span>
                     <span className="font-semibold text-indigo-600">{entry.total} pkt</span>
                   </li>

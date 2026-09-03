@@ -148,7 +148,9 @@ const ResultsPage = () => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {entry.firstName} {entry.lastName} ({entry.alias})
+                  {entry.firstName
+                    ? `${entry.firstName} ${entry.lastName} (${entry.alias})`
+                    : entry.alias}
                 </TableCell>
                 <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
                 <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
