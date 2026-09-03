@@ -60,7 +60,12 @@ const SubmissionPreviewPage = () => {
     try {
       const submission = await createSubmission(
         slug,
-        { firstName: draft.firstName, lastName: draft.lastName, description: draft.description },
+        {
+          firstName: draft.firstName,
+          lastName: draft.lastName,
+          description: draft.description,
+          reservationId: draft.reservationId,
+        },
         draft.artworks,
         (fraction) => setUploadProgress(Math.round(fraction * 100)),
       );

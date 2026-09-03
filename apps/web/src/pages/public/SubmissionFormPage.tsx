@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { MAX_ARTWORK_FILE_SIZE_MB, type ContestDto } from '@foka-vote/shared';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
+import { reserveAlias } from '../../services/submissions';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -23,6 +24,8 @@ export interface SubmissionDraftState {
   lastName: string;
   description: string;
   artworks: SubmissionArtworkDraft[];
+  alias: string;
+  reservationId: string;
 }
 
 interface ArtworkSlot {
@@ -58,6 +61,10 @@ const SubmissionFormPage = () => {
   );
   const [formError, setFormError] = useState<string | null>(null);
 
+  const [alias, setAlias] = useState(draft?.alias ?? '');
+  const [reservationId, setReservationId] = useState(draft?.reservationId ?? '');
+  const [aliasError, setAliasError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!slug) {
       return;
@@ -89,6 +96,39 @@ const SubmissionFormPage = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- draft is a one-time navigation payload, not expected to change
   }, [slug, navigate]);
+
+  useEffect(() => {
+    if (!slug || !contest || reservationId) {
+      return;
+    }
+    let cancelled = false;
+
+    reserveAlias(slug)
+      .then((data) => {
+        if (!cancelled) {
+          setAlias(data.alias);
+          setReservationId(data.reservationId);
+        }
+      })
+      .catch((err: unknown) => {
+        if (cancelled) {
+          return;
+        }
+        if (isUnauthorizedError(err)) {
+          void navigate(contestGatePath(slug, `/contest/${slug}/submit`), {
+            replace: true,
+            state: draft,
+          });
+          return;
+        }
+        setAliasError(err instanceof Error ? err.message : 'Failed to assign a nickname');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- draft is a one-time navigation payload, not expected to change
+  }, [slug, contest, reservationId, navigate]);
 
   const maxArtworks = contest?.maxArtworksPerSubmission ?? 1;
 
@@ -131,11 +171,18 @@ const SubmissionFormPage = () => {
       return;
     }
 
+    if (!alias || !reservationId) {
+      setFormError('Your nickname is still being assigned, please wait a moment and try again');
+      return;
+    }
+
     const draft: SubmissionDraftState = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       description,
       artworks,
+      alias,
+      reservationId,
     };
 
     void navigate(`/contest/${slug}/submit/preview`, { state: draft });
@@ -164,6 +211,20 @@ const SubmissionFormPage = () => {
       </Alert>
 
       <Card className="flex flex-col gap-4">
+        <div>
+          <Label htmlFor="alias">Your nickname</Label>
+          <Input
+            id="alias"
+            value={alias || (aliasError ? 'Unavailable' : 'Assigning…')}
+            disabled
+            className="cursor-not-allowed bg-zinc-100 text-zinc-500"
+          />
+          <p className="mt-1 text-sm text-zinc-500">
+            Randomly assigned and shown next to your work during voting phase.
+          </p>
+          {aliasError && <p className="mt-1 text-sm text-rose-600">{aliasError}</p>}
+        </div>
+
         <div>
           <Label htmlFor="firstName">First name</Label>
           <Input
