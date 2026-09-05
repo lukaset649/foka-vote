@@ -1,8 +1,12 @@
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
+import type { RouteHandle } from '../routes';
 import LinkButton from './ui/LinkButton';
 
 const Layout = () => {
+  const matches = useMatches();
+  const isWide = matches.some((match) => (match.handle as RouteHandle | undefined)?.wide);
+
   return (
     <div className="min-h-full bg-zinc-50 text-zinc-900">
       <header className="border-b border-zinc-200 bg-white">
@@ -26,7 +30,9 @@ const Layout = () => {
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+      <main
+        className={`mx-auto px-4 py-6 sm:px-6 sm:py-8 ${isWide ? 'max-w-5xl' : 'max-w-3xl'}`}
+      >
         <Outlet />
       </main>
     </div>
