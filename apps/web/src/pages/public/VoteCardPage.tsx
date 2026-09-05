@@ -96,6 +96,8 @@ const VoteCardPage = () => {
   };
 
   const complete = Object.keys(currentPicks).length === slots;
+  const pickedWeights = new Set(Object.values(currentPicks));
+  const showActionBar = slots > 0 && !readOnly;
 
   const submit = async () => {
     if (!slug) {
@@ -131,7 +133,7 @@ const VoteCardPage = () => {
   };
 
   return (
-    <div>
+    <div className={cn(showActionBar && 'pb-24')}>
       <PageHeader
         title={`Vote — ${contest.title}`}
         backTo={`/contest/${slug}`}
@@ -146,7 +148,7 @@ const VoteCardPage = () => {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
               Slots
             </h2>
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-col gap-2">
               {activeWeights.map((weight) => {
                 const submissionId = Object.keys(currentPicks).find(
                   (id) => currentPicks[id] === weight,
@@ -225,19 +227,41 @@ const VoteCardPage = () => {
             </ul>
           </div>
 
-          {!readOnly && (
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!complete || submitting}
-              className="w-full sm:w-fit"
-            >
-              <i className="bi bi-check2-square" aria-hidden="true" />
-              Submit
-            </Button>
-          )}
-          {!readOnly && submitError && <Alert variant="error">{submitError}</Alert>}
           {readOnly && <Alert variant="info">You have already voted in this contest.</Alert>}
+        </div>
+      )}
+
+      {showActionBar && (
+        <div className="fixed inset-x-0 bottom-0 z-10">
+          <div className="mx-auto max-w-3xl border-t border-zinc-200 bg-white px-4 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] sm:px-6">
+            {submitError && (
+              <Alert variant="error" className="mb-3">
+                {submitError}
+              </Alert>
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <ul className="flex items-center gap-2">
+                {activeWeights.map((weight) => (
+                  <li
+                    key={weight}
+                    aria-label={`Slot ${weight} pkt ${pickedWeights.has(weight) ? 'filled' : 'empty'}`}
+                    className={cn(
+                      'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
+                      pickedWeights.has(weight)
+                        ? 'border-indigo-600 bg-indigo-600 text-white'
+                        : 'border-zinc-300 bg-zinc-50 text-zinc-400',
+                    )}
+                  >
+                    {weight}
+                  </li>
+                ))}
+              </ul>
+              <Button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
+                <i className="bi bi-check2-square" aria-hidden="true" />
+                Submit
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
