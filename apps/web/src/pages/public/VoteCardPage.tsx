@@ -233,7 +233,7 @@ const VoteCardPage = () => {
 
       {showActionBar && (
         <div className="fixed inset-x-0 bottom-0 z-10">
-          <div className="mx-auto max-w-3xl border-t border-zinc-200 bg-white px-4 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] sm:px-6">
+          <div className="mx-auto max-w-3xl rounded-t-lg border-x border-t border-zinc-200 bg-white px-4 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] sm:px-6">
             {submitError && (
               <Alert variant="error" className="mb-3">
                 {submitError}
