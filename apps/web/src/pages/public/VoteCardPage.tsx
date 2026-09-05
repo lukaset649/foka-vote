@@ -9,6 +9,7 @@ import { fetchMyVoteCard, submitVoteCard } from '../../services/votes';
 import type { VoteConfirmationState } from './VoteConfirmationPage';
 import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
+import ActionBar from '../../components/ui/ActionBar';
 import Card from '../../components/ui/Card';
 import Alert from '../../components/ui/Alert';
 import Button from '../../components/ui/Button';
@@ -232,37 +233,35 @@ const VoteCardPage = () => {
       )}
 
       {showActionBar && (
-        <div className="fixed inset-x-0 bottom-0 z-10">
-          <div className="mx-auto max-w-3xl rounded-t-lg border-x border-t border-zinc-200 bg-white px-4 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] sm:px-6">
-            {submitError && (
-              <Alert variant="error" className="mb-3">
-                {submitError}
-              </Alert>
-            )}
-            <div className="flex items-center justify-between gap-3">
-              <ul className="flex items-center gap-2">
-                {activeWeights.map((weight) => (
-                  <li
-                    key={weight}
-                    aria-label={`Slot ${weight} pkt ${pickedWeights.has(weight) ? 'filled' : 'empty'}`}
-                    className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
-                      pickedWeights.has(weight)
-                        ? 'border-indigo-600 bg-indigo-600 text-white'
-                        : 'border-zinc-300 bg-zinc-50 text-zinc-400',
-                    )}
-                  >
-                    {weight}
-                  </li>
-                ))}
-              </ul>
-              <Button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
-                <i className="bi bi-check2-square" aria-hidden="true" />
-                Submit
-              </Button>
-            </div>
+        <ActionBar>
+          {submitError && (
+            <Alert variant="error" className="mb-3">
+              {submitError}
+            </Alert>
+          )}
+          <div className="flex items-center justify-between gap-3">
+            <ul className="flex items-center gap-2">
+              {activeWeights.map((weight) => (
+                <li
+                  key={weight}
+                  aria-label={`Slot ${weight} pkt ${pickedWeights.has(weight) ? 'filled' : 'empty'}`}
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
+                    pickedWeights.has(weight)
+                      ? 'border-indigo-600 bg-indigo-600 text-white'
+                      : 'border-zinc-300 bg-zinc-50 text-zinc-400',
+                  )}
+                >
+                  {weight}
+                </li>
+              ))}
+            </ul>
+            <Button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
+              <i className="bi bi-check2-square" aria-hidden="true" />
+              Submit
+            </Button>
           </div>
-        </div>
+        </ActionBar>
       )}
 
       {galleryFor && (
