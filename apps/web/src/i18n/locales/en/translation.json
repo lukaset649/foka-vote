@@ -19,6 +19,15 @@
     "VOTING": "Voting",
     "CLOSED": "Closed"
   },
+  "errors": {
+    "VALIDATION_FAILED": "The submitted data is invalid",
+    "NOT_FOUND": "Not found",
+    "UNAUTHORIZED": "You need to sign in",
+    "FORBIDDEN": "You don't have permission to do this",
+    "CONFLICT": "There was a data conflict",
+    "INTERNAL_ERROR": "A server error occurred",
+    "generic": "Something went wrong, please try again"
+  },
   "pages": {
     "contestsList": {
       "current": "Current",
@@ -28,6 +37,12 @@
     },
     "contest": {
       "failedToLoad": "Failed to load contest"
+    },
+    "accessGate": {
+      "title": "Access code required",
+      "codeLabel": "Access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
     }
   },
   "components": {

@@ -19,6 +19,15 @@
     "VOTING": "Głosowanie",
     "CLOSED": "Zakończony"
   },
+  "errors": {
+    "VALIDATION_FAILED": "Podane dane są nieprawidłowe",
+    "NOT_FOUND": "Nie znaleziono",
+    "UNAUTHORIZED": "Wymagane jest zalogowanie",
+    "FORBIDDEN": "Brak uprawnień do wykonania tej czynności",
+    "CONFLICT": "Wystąpił konflikt danych",
+    "INTERNAL_ERROR": "Wystąpił błąd serwera",
+    "generic": "Coś poszło nie tak, spróbuj ponownie"
+  },
   "pages": {
     "contestsList": {
       "current": "Aktualne",
@@ -28,6 +37,12 @@
     },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
+    },
+    "accessGate": {
+      "title": "Wymagany kod dostępu",
+      "codeLabel": "Kod dostępu",
+      "submit": "Wejdź",
+      "invalidCode": "Nieprawidłowy kod dostępu"
     }
   },
   "components": {

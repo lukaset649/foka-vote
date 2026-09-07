@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
+import { ErrorCode } from '@foka-vote/shared';
+import { errorMessage } from '../../lib/errorMessage';
+import { ApiError } from '../../services/apiClient';
 import { verifyContestAccessCode } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
@@ -8,6 +12,7 @@ import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 
 const AccessGatePage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -31,7 +36,13 @@ const AccessGatePage = () => {
       await verifyContestAccessCode(slug, code);
       void navigate(redirectTarget, { state: location.state as unknown, replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to verify access code');
+      // The gate's only expected failure is a wrong code; UNAUTHORIZED is also used
+      // for unrelated auth cases elsewhere, so it can't be shown via the generic mapping here.
+      if (err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED) {
+        setError(t('pages.accessGate.invalidCode'));
+      } else {
+        setError(errorMessage(err, t));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -48,11 +59,13 @@ const AccessGatePage = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 text-center">
             <i className="bi bi-lock text-2xl text-indigo-600" aria-hidden="true" />
-            <h1 className="text-lg font-semibold text-zinc-900">Access code required</h1>
+            <h1 className="text-lg font-semibold text-zinc-900">
+              {t('pages.accessGate.title')}
+            </h1>
           </div>
 
           <div>
-            <Label htmlFor="code">Access code</Label>
+            <Label htmlFor="code">{t('pages.accessGate.codeLabel')}</Label>
             <Input
               id="code"
               value={code}
@@ -62,7 +75,7 @@ const AccessGatePage = () => {
           </div>
 
           <Button type="submit" disabled={submitting} className="w-full">
-            Enter
+            {t('pages.accessGate.submit')}
           </Button>
 
           {error && <Alert variant="error">{error}</Alert>}
