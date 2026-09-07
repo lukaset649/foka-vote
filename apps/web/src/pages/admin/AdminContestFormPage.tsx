@@ -9,6 +9,7 @@ import {
 } from '../../services/contests';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
+import ActionBar from '../../components/ui/ActionBar';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -161,7 +162,7 @@ const AdminContestFormPage = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="pb-24">
       <PageHeader
         title={isEditing ? 'Edit contest' : 'New contest'}
         backTo="/admin/contests"
@@ -291,28 +292,32 @@ const AdminContestFormPage = () => {
             <Input id="accessCode" value={form.accessCode} onChange={updateField('accessCode')} />
           </div>
         </Card>
+      </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Button type="submit" disabled={submitting} className="w-full sm:w-fit">
-            {isEditing ? 'Save changes' : 'Create contest'}
-          </Button>
-
+      <ActionBar>
+        {error && (
+          <Alert variant="error" className="mb-3">
+            {error}
+          </Alert>
+        )}
+        <div className={`flex items-center gap-3 ${isEditing ? 'justify-between' : 'justify-end'}`}>
           {isEditing && (
             <Button
               type="button"
               variant="danger"
               onClick={handleDelete}
               disabled={deleting}
-              className="w-full sm:w-fit"
+              aria-label="Delete contest"
             >
               <i className="bi bi-trash" aria-hidden="true" />
-              Delete contest
+              <span className="hidden sm:inline">Delete contest</span>
             </Button>
           )}
+          <Button type="submit" disabled={submitting}>
+            {isEditing ? 'Save changes' : 'Create contest'}
+          </Button>
         </div>
-
-        {error && <Alert variant="error">{error}</Alert>}
-      </div>
+      </ActionBar>
     </form>
   );
 };

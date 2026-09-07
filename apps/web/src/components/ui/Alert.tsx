@@ -28,7 +28,7 @@ const Alert = ({ variant, children, className }: AlertProps) => {
         className,
       )}
     >
-      <i className={cn('bi mt-0.5', variantIcon[variant])} aria-hidden="true" />
+      <i className={`bi mt-0.5 ${variantIcon[variant]}`} aria-hidden="true" />
       <span>{children}</span>
     </div>
   );

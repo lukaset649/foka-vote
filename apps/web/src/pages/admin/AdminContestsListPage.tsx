@@ -61,7 +61,12 @@ const AdminContestsListPage = () => {
   return (
     <div>
       <PageHeader title="Contests">
-        <LinkButton to="/admin/contests/new" variant="primary" size="sm">
+        <LinkButton
+          to="/admin/contests/new"
+          variant="primary"
+          size="sm"
+          className="!border-green-800 !bg-green-800 hover:!bg-green-900"
+        >
           <i className="bi bi-plus-circle" aria-hidden="true" />
           New contest
         </LinkButton>
@@ -101,7 +106,12 @@ const AdminContestsListPage = () => {
                     <i className="bi bi-ticket-perforated" aria-hidden="true" />
                     Submissions &amp; vote cards
                   </LinkButton>
-                  <LinkButton to={`/admin/contests/${contest.id}`} variant="ghost" size="sm">
+                  <LinkButton
+                    to={`/admin/contests/${contest.id}`}
+                    variant="primary"
+                    size="sm"
+                    className="sm:w-28"
+                  >
                     <i className="bi bi-pencil-square" aria-hidden="true" />
                     Edit
                   </LinkButton>
@@ -111,6 +121,7 @@ const AdminContestsListPage = () => {
                     size="sm"
                     onClick={() => handleDelete(contest)}
                     disabled={deletingId === contest.id}
+                    className="sm:w-28"
                   >
                     <i className="bi bi-trash" aria-hidden="true" />
                     Delete

@@ -18,6 +18,10 @@ import AdminContestFormPage from './pages/admin/AdminContestFormPage';
 import AdminSubmissionsPage from './pages/admin/AdminSubmissionsPage';
 import AdminSubmissionEditPage from './pages/admin/AdminSubmissionEditPage';
 
+export interface RouteHandle {
+  wide?: boolean;
+}
+
 export const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -40,7 +44,11 @@ export const router = createBrowserRouter([
           { path: '/admin/contests', element: <AdminContestsListPage /> },
           { path: '/admin/contests/new', element: <AdminContestFormPage /> },
           { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
-          { path: '/admin/contests/:id/submissions', element: <AdminSubmissionsPage /> },
+          {
+            path: '/admin/contests/:id/submissions',
+            element: <AdminSubmissionsPage />,
+            handle: { wide: true } satisfies RouteHandle,
+          },
           {
             path: '/admin/contests/:id/submissions/:submissionId',
             element: <AdminSubmissionEditPage />,
