@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ContestDto, ResultsDto } from '@foka-vote/shared';
 import { fetchResults } from '../services/results';
-import Alert from './ui/Alert';
 import Card from './ui/Card';
 import EmptyState from './ui/EmptyState';
 import LinkButton from './ui/LinkButton';
@@ -15,7 +14,7 @@ interface ContestResultsCardProps {
 
 const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
   const [results, setResults] = useState<ResultsDto | null>(null);
-  const showResults = contest.status === 'VOTING' || contest.status === 'CLOSED';
+  const showResults = contest.status === 'CLOSED';
 
   useEffect(() => {
     if (!showResults) {
@@ -58,11 +57,6 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
         </div>
       ) : (
         <>
-          {results && !results.final && (
-            <Alert variant="info" className="mt-4">
-              Voting is still in progress - these standings aren&apos;t final.
-            </Alert>
-          )}
           {topResults.length === 0 ? (
             <EmptyState icon="bi-trophy" text="No votes cast yet" className="mt-4" />
           ) : (
