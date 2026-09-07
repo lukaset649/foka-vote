@@ -1,1 +1,41 @@
-{}
+{
+  "nav": {
+    "voting": "Głosowanie",
+    "admin": "Admin"
+  },
+  "common": {
+    "timeRemaining": "Pozostało {{time}}",
+    "backToContests": "Powrót do konkursów",
+    "actions": {
+      "gallery": "Galeria",
+      "submit": "Wyślij swoją pracę",
+      "vote": "Głosuj",
+      "results": "Wyniki"
+    }
+  },
+  "contestStatus": {
+    "DRAFT": "Szkic",
+    "SUBMISSIONS": "Zgłoszenia",
+    "VOTING": "Głosowanie",
+    "CLOSED": "Zakończony"
+  },
+  "pages": {
+    "contestsList": {
+      "current": "Aktualne",
+      "allContests": "Wszystkie konkursy",
+      "noContestsYet": "Brak konkursów",
+      "failedToLoad": "Nie udało się wczytać konkursów"
+    },
+    "contest": {
+      "failedToLoad": "Nie udało się wczytać konkursu"
+    }
+  },
+  "components": {
+    "contestPhaseCard": {
+      "submissionsStart": "Rozpoczęcie zgłoszeń",
+      "votingEnded": "Głosowanie zakończone",
+      "starts": "Rozpoczęcie",
+      "ends": "Zakończenie"
+    }
+  }
+}
