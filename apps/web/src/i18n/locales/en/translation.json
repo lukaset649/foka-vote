@@ -19,7 +19,9 @@
     "remove": "Remove",
     "points": "pts",
     "submit": "Submit",
-    "noConfirmationDataFound": "No confirmation data found."
+    "noConfirmationDataFound": "No confirmation data found.",
+    "loading": "Loading…",
+    "back": "Back"
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -121,6 +123,77 @@
       "tablePoints": "Points",
       "tableBreakdown": "Breakdown",
       "breakdownEntry": "{{count}}× {{weight}} pts"
+    },
+    "adminLogin": {
+      "title": "Admin login",
+      "passwordLabel": "Password",
+      "logIn": "Log in",
+      "invalidPassword": "Invalid password"
+    },
+    "adminContestsList": {
+      "title": "Contests",
+      "newContest": "New contest",
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes all its submissions, artworks and votes.",
+      "deleteFailed": "Failed to delete the contest",
+      "submissionsAndVoteCards": "Submissions & vote cards"
+    },
+    "adminContestForm": {
+      "editContest": "Edit contest",
+      "basicInfo": "Basic info",
+      "titleLabel": "Title",
+      "slugLabel": "Slug (optional override)",
+      "descriptionLabel": "Description",
+      "timeline": "Timeline",
+      "submissionStartLabel": "Submission start",
+      "submissionDeadlineLabel": "Submission deadline",
+      "votingStartLabel": "Voting start",
+      "votingEndLabel": "Voting end",
+      "limitsAndAccess": "Limits & access",
+      "maxArtworksLabel": "Max artworks per submission (up to {{max}})",
+      "accessCodeLabel": "Access code (optional)",
+      "deleteContest": "Delete contest",
+      "saveChanges": "Save changes",
+      "createContest": "Create contest",
+      "saveFailed": "Failed to save contest"
+    },
+    "adminSubmissions": {
+      "loadingSubmissions": "Loading submissions…",
+      "loadingVoteCards": "Loading vote cards…",
+      "submissionsCount_one": "{{count}} submission",
+      "submissionsCount_other": "{{count}} submissions",
+      "voteCardsCount_one": "{{count}} vote card",
+      "voteCardsCount_other": "{{count}} vote cards",
+      "voidedCount_one": "{{count}} voided",
+      "voidedCount_other": "{{count}} voided",
+      "submissionsTab": "Submissions",
+      "voteCardsTab": "Vote cards",
+      "noSubmissionsYet": "No submissions yet",
+      "noVoteCardsYet": "No vote cards yet",
+      "tableAlias": "Alias",
+      "tableArtworks": "Artworks",
+      "tableSubmitted": "Submitted",
+      "confirmDeleteSubmission": "Delete this submission and all its artworks?",
+      "tableCastAt": "Cast at",
+      "tablePicks": "Picks",
+      "tableStatus": "Status",
+      "voided": "voided",
+      "valid": "valid",
+      "restore": "Restore",
+      "void": "Void",
+      "voidReasonPrompt": "Reason (optional)"
+    },
+    "adminSubmissionEdit": {
+      "heading": "Edit submission — {{alias}}",
+      "backToSubmissions": "Back to submissions",
+      "author": "Author",
+      "saveData": "Save data",
+      "artworksHeading": "Artworks",
+      "save": "Save",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "confirmDeleteArtwork": "Delete this artwork?",
+      "replacementFileSr": "Replacement file",
+      "replace": "Replace"
     }
   },
   "components": {
@@ -129,6 +202,19 @@
       "votingEnded": "Voting ended",
       "starts": "Starts",
       "ends": "Ends"
+    },
+    "contestPhaseActions": {
+      "resumeSubmissionsLabel": "Resume submissions (+24h)",
+      "resumeSubmissionsConfirm": "Reopen submissions for 24 more hours? Voting will be pushed back to start once that window ends.",
+      "startSubmissionsLabel": "Start submissions now",
+      "startSubmissionsConfirm": "Start the submissions phase immediately?",
+      "endSubmissionsStartVotingLabel": "End submissions & start voting now",
+      "endSubmissionsStartVotingConfirm": "End submissions and start voting immediately?",
+      "endVotingLabel": "End voting now",
+      "endVotingConfirm": "End voting immediately? This closes the contest and reveals results.",
+      "resumeVotingLabel": "Resume voting (+24h)",
+      "resumeVotingConfirm": "Reopen voting for 24 more hours? The contest will become active again and results will no longer be final until it closes.",
+      "updateFailed": "Failed to update the contest phase"
     },
     "contestGalleryCard": {
       "viewGallery": "View gallery",

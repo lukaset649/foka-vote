@@ -19,7 +19,9 @@
     "remove": "Usuń",
     "points": "pkt",
     "submit": "Wyślij",
-    "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia."
+    "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia.",
+    "loading": "Wczytywanie…",
+    "back": "Wstecz"
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -123,6 +125,83 @@
       "tablePoints": "Punkty",
       "tableBreakdown": "Rozkład głosów",
       "breakdownEntry": "{{count}}× {{weight}} pkt"
+    },
+    "adminLogin": {
+      "title": "Logowanie administratora",
+      "passwordLabel": "Hasło",
+      "logIn": "Zaloguj się",
+      "invalidPassword": "Nieprawidłowe hasło"
+    },
+    "adminContestsList": {
+      "title": "Konkursy",
+      "newContest": "Nowy konkurs",
+      "confirmDelete": "Usunąć „{{title}}”? To trwale usunie wszystkie jego zgłoszenia, prace i głosy.",
+      "deleteFailed": "Nie udało się usunąć konkursu",
+      "submissionsAndVoteCards": "Zgłoszenia i karty do głosowania"
+    },
+    "adminContestForm": {
+      "editContest": "Edytuj konkurs",
+      "basicInfo": "Podstawowe informacje",
+      "titleLabel": "Tytuł",
+      "slugLabel": "Slug (opcjonalne nadpisanie)",
+      "descriptionLabel": "Opis",
+      "timeline": "Harmonogram",
+      "submissionStartLabel": "Rozpoczęcie zgłoszeń",
+      "submissionDeadlineLabel": "Termin zgłoszeń",
+      "votingStartLabel": "Rozpoczęcie głosowania",
+      "votingEndLabel": "Zakończenie głosowania",
+      "limitsAndAccess": "Limity i dostęp",
+      "maxArtworksLabel": "Maksymalna liczba prac na zgłoszenie (do {{max}})",
+      "accessCodeLabel": "Kod dostępu (opcjonalnie)",
+      "deleteContest": "Usuń konkurs",
+      "saveChanges": "Zapisz zmiany",
+      "createContest": "Utwórz konkurs",
+      "saveFailed": "Nie udało się zapisać konkursu"
+    },
+    "adminSubmissions": {
+      "loadingSubmissions": "Wczytywanie zgłoszeń…",
+      "loadingVoteCards": "Wczytywanie kart do głosowania…",
+      "submissionsCount_one": "{{count}} zgłoszenie",
+      "submissionsCount_few": "{{count}} zgłoszenia",
+      "submissionsCount_many": "{{count}} zgłoszeń",
+      "submissionsCount_other": "{{count}} zgłoszenia",
+      "voteCardsCount_one": "{{count}} karta do głosowania",
+      "voteCardsCount_few": "{{count}} karty do głosowania",
+      "voteCardsCount_many": "{{count}} kart do głosowania",
+      "voteCardsCount_other": "{{count}} karty do głosowania",
+      "voidedCount_one": "{{count}} unieważniona",
+      "voidedCount_few": "{{count}} unieważnione",
+      "voidedCount_many": "{{count}} unieważnionych",
+      "voidedCount_other": "{{count}} unieważnionej",
+      "submissionsTab": "Zgłoszenia",
+      "voteCardsTab": "Karty do głosowania",
+      "noSubmissionsYet": "Brak zgłoszeń",
+      "noVoteCardsYet": "Brak kart do głosowania",
+      "tableAlias": "Pseudonim",
+      "tableArtworks": "Prace",
+      "tableSubmitted": "Wysłano",
+      "confirmDeleteSubmission": "Usunąć to zgłoszenie i wszystkie jego prace?",
+      "tableCastAt": "Data oddania",
+      "tablePicks": "Wybory",
+      "tableStatus": "Status",
+      "voided": "unieważniona",
+      "valid": "ważna",
+      "restore": "Przywróć",
+      "void": "Unieważnij",
+      "voidReasonPrompt": "Powód (opcjonalnie)"
+    },
+    "adminSubmissionEdit": {
+      "heading": "Edytuj zgłoszenie — {{alias}}",
+      "backToSubmissions": "Powrót do zgłoszeń",
+      "author": "Autor",
+      "saveData": "Zapisz dane",
+      "artworksHeading": "Prace",
+      "save": "Zapisz",
+      "moveUp": "Przesuń w górę",
+      "moveDown": "Przesuń w dół",
+      "confirmDeleteArtwork": "Usunąć tę pracę?",
+      "replacementFileSr": "Plik zastępczy",
+      "replace": "Zastąp"
     }
   },
   "components": {
@@ -131,6 +210,19 @@
       "votingEnded": "Głosowanie zakończone",
       "starts": "Rozpoczęcie",
       "ends": "Zakończenie"
+    },
+    "contestPhaseActions": {
+      "resumeSubmissionsLabel": "Wznów zgłoszenia (+24h)",
+      "resumeSubmissionsConfirm": "Otworzyć zgłoszenia ponownie na kolejne 24 godziny? Głosowanie zostanie przesunięte tak, aby rozpocząć się po zakończeniu tego okresu.",
+      "startSubmissionsLabel": "Rozpocznij zgłoszenia teraz",
+      "startSubmissionsConfirm": "Rozpocząć fazę zgłoszeń natychmiast?",
+      "endSubmissionsStartVotingLabel": "Zakończ zgłoszenia i rozpocznij głosowanie teraz",
+      "endSubmissionsStartVotingConfirm": "Zakończyć zgłoszenia i rozpocząć głosowanie natychmiast?",
+      "endVotingLabel": "Zakończ głosowanie teraz",
+      "endVotingConfirm": "Zakończyć głosowanie natychmiast? To zamknie konkurs i ujawni wyniki.",
+      "resumeVotingLabel": "Wznów głosowanie (+24h)",
+      "resumeVotingConfirm": "Otworzyć głosowanie ponownie na kolejne 24 godziny? Konkurs stanie się ponownie aktywny, a wyniki nie będą ostateczne aż do jego zamknięcia.",
+      "updateFailed": "Nie udało się zaktualizować fazy konkursu"
     },
     "contestGalleryCard": {
       "viewGallery": "Zobacz galerię",

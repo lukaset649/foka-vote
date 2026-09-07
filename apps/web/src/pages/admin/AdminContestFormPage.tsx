@@ -1,6 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { MAX_ARTWORKS_PER_SUBMISSION_LIMIT, type AdminContestDto } from '@foka-vote/shared';
+import { errorMessage } from '../../lib/errorMessage';
 import {
   createContest,
   deleteContest,
@@ -65,6 +67,7 @@ function toFormState(contest: AdminContestDto): FormState {
 }
 
 const AdminContestFormPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEditing = id !== undefined;
   const navigate = useNavigate();
@@ -85,8 +88,8 @@ const AdminContestFormPage = () => {
         setContest(data);
         setForm(toFormState(data));
       })
-      .catch(() => {
-        setError('Failed to load contest');
+      .catch((err: unknown) => {
+        setError(errorMessage(err, t));
       })
       .finally(() => {
         setLoading(false);
@@ -125,7 +128,7 @@ const AdminContestFormPage = () => {
       }
       void navigate('/admin/contests');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save contest');
+      setError(errorMessage(err, t));
     } finally {
       setSubmitting(false);
     }
@@ -140,11 +143,7 @@ const AdminContestFormPage = () => {
     if (!id || !contest) {
       return;
     }
-    if (
-      !window.confirm(
-        `Delete "${contest.title}"? This permanently removes all its submissions, artworks and votes.`,
-      )
-    ) {
+    if (!window.confirm(t('pages.adminContestsList.confirmDelete', { title: contest.title }))) {
       return;
     }
 
@@ -152,7 +151,7 @@ const AdminContestFormPage = () => {
     deleteContest(id)
       .then(() => navigate('/admin/contests'))
       .catch(() => {
-        window.alert('Failed to delete the contest');
+        window.alert(t('pages.adminContestsList.deleteFailed'));
         setDeleting(false);
       });
   };
@@ -164,9 +163,9 @@ const AdminContestFormPage = () => {
   return (
     <form onSubmit={handleSubmit} className="pb-24">
       <PageHeader
-        title={isEditing ? 'Edit contest' : 'New contest'}
+        title={isEditing ? t('pages.adminContestForm.editContest') : t('pages.adminContestsList.newContest')}
         backTo="/admin/contests"
-        backLabel="Back to contests"
+        backLabel={t('common.backToContests')}
       >
         {isEditing && (
           <Link
@@ -174,7 +173,7 @@ const AdminContestFormPage = () => {
             className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
           >
             <i className="bi bi-ticket-perforated" aria-hidden="true" />
-            Submissions &amp; vote cards
+            {t('pages.adminContestsList.submissionsAndVoteCards')}
           </Link>
         )}
       </PageHeader>
@@ -182,21 +181,21 @@ const AdminContestFormPage = () => {
       <div className="flex flex-col gap-6">
         <Card className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            Basic info
+            {t('pages.adminContestForm.basicInfo')}
           </h2>
 
           <div>
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t('pages.adminContestForm.titleLabel')}</Label>
             <Input id="title" value={form.title} onChange={updateField('title')} required />
           </div>
 
           <div>
-            <Label htmlFor="slug">Slug (optional override)</Label>
+            <Label htmlFor="slug">{t('pages.adminContestForm.slugLabel')}</Label>
             <Input id="slug" value={form.slug} onChange={updateField('slug')} />
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('pages.adminContestForm.descriptionLabel')}</Label>
             <Textarea
               id="description"
               value={form.description}
@@ -208,7 +207,7 @@ const AdminContestFormPage = () => {
         <Card className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-              Timeline
+              {t('pages.adminContestForm.timeline')}
             </h2>
             {contest && (
               <div className="flex flex-wrap items-center gap-2">
@@ -224,7 +223,7 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="submissionStart">Submission start</Label>
+            <Label htmlFor="submissionStart">{t('pages.adminContestForm.submissionStartLabel')}</Label>
             <Input
               id="submissionStart"
               type="datetime-local"
@@ -235,7 +234,9 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="submissionDeadline">Submission deadline</Label>
+            <Label htmlFor="submissionDeadline">
+              {t('pages.adminContestForm.submissionDeadlineLabel')}
+            </Label>
             <Input
               id="submissionDeadline"
               type="datetime-local"
@@ -246,7 +247,7 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="votingStart">Voting start</Label>
+            <Label htmlFor="votingStart">{t('pages.adminContestForm.votingStartLabel')}</Label>
             <Input
               id="votingStart"
               type="datetime-local"
@@ -257,7 +258,7 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="votingEnd">Voting end</Label>
+            <Label htmlFor="votingEnd">{t('pages.adminContestForm.votingEndLabel')}</Label>
             <Input
               id="votingEnd"
               type="datetime-local"
@@ -270,12 +271,14 @@ const AdminContestFormPage = () => {
 
         <Card className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            Limits &amp; access
+            {t('pages.adminContestForm.limitsAndAccess')}
           </h2>
 
           <div>
             <Label htmlFor="maxArtworksPerSubmission">
-              Max artworks per submission (up to {MAX_ARTWORKS_PER_SUBMISSION_LIMIT})
+              {t('pages.adminContestForm.maxArtworksLabel', {
+                max: MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
+              })}
             </Label>
             <Input
               id="maxArtworksPerSubmission"
@@ -288,7 +291,7 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="accessCode">Access code (optional)</Label>
+            <Label htmlFor="accessCode">{t('pages.adminContestForm.accessCodeLabel')}</Label>
             <Input id="accessCode" value={form.accessCode} onChange={updateField('accessCode')} />
           </div>
         </Card>
@@ -307,14 +310,16 @@ const AdminContestFormPage = () => {
               variant="danger"
               onClick={handleDelete}
               disabled={deleting}
-              aria-label="Delete contest"
+              aria-label={t('pages.adminContestForm.deleteContest')}
             >
               <i className="bi bi-trash" aria-hidden="true" />
-              <span className="hidden sm:inline">Delete contest</span>
+              <span className="hidden sm:inline">{t('pages.adminContestForm.deleteContest')}</span>
             </Button>
           )}
           <Button type="submit" disabled={submitting}>
-            {isEditing ? 'Save changes' : 'Create contest'}
+            {isEditing
+              ? t('pages.adminContestForm.saveChanges')
+              : t('pages.adminContestForm.createContest')}
           </Button>
         </div>
       </ActionBar>

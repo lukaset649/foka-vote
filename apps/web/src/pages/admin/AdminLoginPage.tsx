@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { adminLogin } from '../../services/adminAuth';
 import Card from '../../components/ui/Card';
@@ -8,6 +9,7 @@ import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 
 const AdminLoginPage = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -38,11 +40,11 @@ const AdminLoginPage = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 text-center">
             <i className="bi bi-box-arrow-in-right text-2xl text-indigo-600" aria-hidden="true" />
-            <h1 className="text-lg font-semibold text-zinc-900">Admin login</h1>
+            <h1 className="text-lg font-semibold text-zinc-900">{t('pages.adminLogin.title')}</h1>
           </div>
 
           <div>
-            <Label htmlFor="admin-password">Password</Label>
+            <Label htmlFor="admin-password">{t('pages.adminLogin.passwordLabel')}</Label>
             <Input
               id="admin-password"
               type="password"
@@ -53,10 +55,10 @@ const AdminLoginPage = () => {
           </div>
 
           <Button type="submit" disabled={submitting} className="w-full">
-            Log in
+            {t('pages.adminLogin.logIn')}
           </Button>
 
-          {error && <Alert variant="error">Invalid password</Alert>}
+          {error && <Alert variant="error">{t('pages.adminLogin.invalidPassword')}</Alert>}
         </form>
       </Card>
     </div>

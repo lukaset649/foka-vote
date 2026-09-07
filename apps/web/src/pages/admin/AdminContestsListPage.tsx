@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AdminContestDto } from '@foka-vote/shared';
 import { deleteContest, fetchAdminContests } from '../../services/contests';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
@@ -12,6 +13,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 
 const AdminContestsListPage = () => {
+  const { t } = useTranslation();
   const [contests, setContests] = useState<AdminContestDto[] | null>(null);
   const [error, setError] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -37,11 +39,7 @@ const AdminContestsListPage = () => {
   }, []);
 
   const handleDelete = (contest: AdminContestDto) => {
-    if (
-      !window.confirm(
-        `Delete "${contest.title}"? This permanently removes all its submissions, artworks and votes.`,
-      )
-    ) {
+    if (!window.confirm(t('pages.adminContestsList.confirmDelete', { title: contest.title }))) {
       return;
     }
 
@@ -51,7 +49,7 @@ const AdminContestsListPage = () => {
         setContests((prev) => prev?.filter((c) => c.id !== contest.id) ?? prev);
       })
       .catch(() => {
-        window.alert('Failed to delete the contest');
+        window.alert(t('pages.adminContestsList.deleteFailed'));
       })
       .finally(() => {
         setDeletingId(null);
@@ -60,7 +58,7 @@ const AdminContestsListPage = () => {
 
   return (
     <div>
-      <PageHeader title="Contests">
+      <PageHeader title={t('pages.adminContestsList.title')}>
         <LinkButton
           to="/admin/contests/new"
           variant="primary"
@@ -68,14 +66,14 @@ const AdminContestsListPage = () => {
           className="!border-green-800 !bg-green-800 hover:!bg-green-900"
         >
           <i className="bi bi-plus-circle" aria-hidden="true" />
-          New contest
+          {t('pages.adminContestsList.newContest')}
         </LinkButton>
       </PageHeader>
 
-      {error && <Alert variant="error">Failed to load contests</Alert>}
+      {error && <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>}
       {!error && contests === null && <Spinner />}
       {contests !== null && contests.length === 0 && (
-        <EmptyState icon="bi-images" text="No contests yet" />
+        <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />
       )}
       {contests !== null && contests.length > 0 && (
         <ul className="flex flex-col gap-3">
@@ -104,7 +102,7 @@ const AdminContestsListPage = () => {
                     size="sm"
                   >
                     <i className="bi bi-ticket-perforated" aria-hidden="true" />
-                    Submissions &amp; vote cards
+                    {t('pages.adminContestsList.submissionsAndVoteCards')}
                   </LinkButton>
                   <LinkButton
                     to={`/admin/contests/${contest.id}`}
@@ -113,7 +111,7 @@ const AdminContestsListPage = () => {
                     className="sm:w-28"
                   >
                     <i className="bi bi-pencil-square" aria-hidden="true" />
-                    Edit
+                    {t('pages.submissionPreview.edit')}
                   </LinkButton>
                   <Button
                     type="button"
@@ -124,7 +122,7 @@ const AdminContestsListPage = () => {
                     className="sm:w-28"
                   >
                     <i className="bi bi-trash" aria-hidden="true" />
-                    Delete
+                    {t('common.remove')}
                   </Button>
                 </div>
               </Card>
