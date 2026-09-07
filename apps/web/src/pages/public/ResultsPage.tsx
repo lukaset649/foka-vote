@@ -50,7 +50,7 @@ const ResultsPage = () => {
           return;
         }
         setContest(contestData);
-        if (contestData.status !== 'CLOSED' && contestData.status !== 'VOTING') {
+        if (contestData.status !== 'CLOSED') {
           return undefined;
         }
         return fetchResults(slug).then((resultsData) => {
@@ -83,7 +83,7 @@ const ResultsPage = () => {
     return <Spinner />;
   }
 
-  if (contest.status !== 'CLOSED' && contest.status !== 'VOTING') {
+  if (contest.status !== 'CLOSED') {
     return (
       <div>
         <PageHeader
@@ -92,8 +92,9 @@ const ResultsPage = () => {
           backLabel="Back to the contest"
         />
         <Alert variant="info">
-          Results will be available once voting starts, on{' '}
-          {new Date(contest.votingStart).toLocaleString()}.
+          {contest.status === 'VOTING'
+            ? 'Voting is currently in progress. Results will be revealed once voting closes.'
+            : `Results will be available once voting starts, on ${new Date(contest.votingStart).toLocaleString()}.`}
         </Alert>
       </div>
     );
