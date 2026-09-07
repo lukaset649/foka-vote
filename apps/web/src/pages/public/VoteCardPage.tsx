@@ -158,12 +158,7 @@ const VoteCardPage = () => {
                 return (
                   <li
                     key={weight}
-                    className={cn(
-                      'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
-                      submission
-                        ? 'border-indigo-300 bg-indigo-50 text-indigo-900'
-                        : 'border-zinc-200 bg-zinc-50 text-zinc-500',
-                    )}
+                    className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${submission ? 'border-indigo-300 bg-indigo-50 text-indigo-900' : 'border-zinc-200 bg-zinc-50 text-zinc-500'}`}
                   >
                     <span className="font-semibold">{weight} pkt</span>
                     <span>{submission ? submission.alias : '—'}</span>
@@ -245,12 +240,7 @@ const VoteCardPage = () => {
                 <li
                   key={weight}
                   aria-label={`Slot ${weight} pkt ${pickedWeights.has(weight) ? 'filled' : 'empty'}`}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
-                    pickedWeights.has(weight)
-                      ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : 'border-zinc-300 bg-zinc-50 text-zinc-400',
-                  )}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold ${pickedWeights.has(weight) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-zinc-300 bg-zinc-50 text-zinc-400'}`}
                 >
                   {weight}
                 </li>

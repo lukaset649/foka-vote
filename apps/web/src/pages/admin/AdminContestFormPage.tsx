@@ -7,7 +7,6 @@ import {
   fetchAdminContest,
   updateContest,
 } from '../../services/contests';
-import { cn } from '../../lib/cn';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
 import ActionBar from '../../components/ui/ActionBar';
@@ -301,9 +300,7 @@ const AdminContestFormPage = () => {
             {error}
           </Alert>
         )}
-        <div
-          className={cn('flex items-center gap-3', isEditing ? 'justify-between' : 'justify-end')}
-        >
+        <div className={`flex items-center gap-3 ${isEditing ? 'justify-between' : 'justify-end'}`}>
           {isEditing && (
             <Button
               type="button"

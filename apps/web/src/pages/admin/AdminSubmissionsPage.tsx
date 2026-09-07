@@ -3,7 +3,6 @@ import { useParams } from 'react-router';
 import type { AdminSubmissionDto, VoteCardDto } from '@foka-vote/shared';
 import { deleteAdminSubmission, fetchAdminSubmissions } from '../../services/submissions';
 import { fetchAdminVoteCards, unvoidVoteCard, voidVoteCard } from '../../services/votes';
-import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
 import Alert from '../../components/ui/Alert';
 import Badge from '../../components/ui/Badge';
@@ -100,20 +99,14 @@ const AdminSubmissionsPage = () => {
         <button
           type="button"
           onClick={() => setTab('submissions')}
-          className={cn(
-            'min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors',
-            tab === 'submissions' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500',
-          )}
+          className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'submissions' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
         >
           Submissions
         </button>
         <button
           type="button"
           onClick={() => setTab('voteCards')}
-          className={cn(
-            'min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors',
-            tab === 'voteCards' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500',
-          )}
+          className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'voteCards' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
         >
           Vote cards
         </button>
