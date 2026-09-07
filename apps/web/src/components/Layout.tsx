@@ -30,9 +30,7 @@ const Layout = () => {
           </nav>
         </div>
       </header>
-      <main
-        className={`mx-auto px-4 py-6 sm:px-6 sm:py-8 ${isWide ? 'max-w-5xl' : 'max-w-3xl'}`}
-      >
+      <main className={`mx-auto px-4 py-6 sm:px-6 sm:py-8 ${isWide ? 'max-w-5xl' : 'max-w-3xl'}`}>
         <Outlet />
       </main>
     </div>

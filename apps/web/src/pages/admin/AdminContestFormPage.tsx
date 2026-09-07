@@ -301,7 +301,9 @@ const AdminContestFormPage = () => {
             {error}
           </Alert>
         )}
-        <div className={cn('flex items-center gap-3', isEditing ? 'justify-between' : 'justify-end')}>
+        <div
+          className={cn('flex items-center gap-3', isEditing ? 'justify-between' : 'justify-end')}
+        >
           {isEditing && (
             <Button
               type="button"
