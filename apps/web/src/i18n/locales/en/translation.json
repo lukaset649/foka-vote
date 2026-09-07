@@ -1,0 +1,232 @@
+{
+  "nav": {
+    "voting": "Voting",
+    "admin": "Admin"
+  },
+  "common": {
+    "timeRemaining": "{{time}} remaining",
+    "backToContests": "Back to contests",
+    "backToContest": "Back to the contest",
+    "actions": {
+      "gallery": "Gallery",
+      "submit": "Submit your work",
+      "vote": "Vote",
+      "results": "Results"
+    },
+    "cancel": "Cancel",
+    "descriptionOptional": "Description (optional)",
+    "titleOptional": "Title (optional)",
+    "remove": "Remove",
+    "points": "pts",
+    "submit": "Submit",
+    "noConfirmationDataFound": "No confirmation data found.",
+    "loading": "Loading…",
+    "back": "Back"
+  },
+  "contestStatus": {
+    "DRAFT": "Draft",
+    "SUBMISSIONS": "Submissions",
+    "VOTING": "Voting",
+    "CLOSED": "Closed"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "The submitted data is invalid",
+    "NOT_FOUND": "Not found",
+    "UNAUTHORIZED": "You need to sign in",
+    "FORBIDDEN": "You don't have permission to do this",
+    "CONFLICT": "There was a data conflict",
+    "INTERNAL_ERROR": "A server error occurred",
+    "generic": "Something went wrong, please try again"
+  },
+  "pages": {
+    "contestsList": {
+      "current": "Current",
+      "allContests": "All contests",
+      "noContestsYet": "No contests yet",
+      "failedToLoad": "Failed to load contests"
+    },
+    "contest": {
+      "failedToLoad": "Failed to load contest"
+    },
+    "accessGate": {
+      "title": "Access code required",
+      "codeLabel": "Access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
+    },
+    "submissionForm": {
+      "heading": "Submit your work — {{title}}",
+      "infoNamePublished": "Your first and last name will be published next to your work once voting closes.",
+      "infoAliasAfter": "Since then, the random alias will be displayed instead.",
+      "infoAdminOnly": "After submitting, only the admin can make changes.",
+      "nicknameLabel": "Your nickname",
+      "nicknameAssigning": "Assigning…",
+      "nicknameUnavailable": "Unavailable",
+      "nicknameHint": "Randomly assigned and shown next to your work during voting phase.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "artworksHeading": "Artworks (up to {{max}})",
+      "maxFileSize": "Max file size per photo: {{size}} MB",
+      "artworkLegend": "Artwork {{index}}",
+      "fileLabel": "File",
+      "currentlyAttached": "Currently attached: {{filename}}",
+      "addAnotherArtwork": "Add another artwork",
+      "continueToPreview": "Continue to preview",
+      "errors": {
+        "nameRequired": "First and last name are required",
+        "artworkRequired": "Attach at least one artwork",
+        "aliasPending": "Your nickname is still being assigned, please wait a moment and try again"
+      }
+    },
+    "submissionPreview": {
+      "noDataFound": "No submission data found.",
+      "goBackToForm": "Go back to the form",
+      "heading": "Preview your submission",
+      "artworkFallbackAlt": "Artwork {{index}}",
+      "edit": "Edit",
+      "uploading": "Uploading your submission…",
+      "processing": "Processing…",
+      "almostDone": "Almost done…"
+    },
+    "submissionConfirmation": {
+      "title": "Submission received",
+      "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
+    },
+    "gallery": {
+      "failedToLoad": "Failed to load gallery"
+    },
+    "voteCard": {
+      "heading": "Vote — {{title}}",
+      "failedToLoad": "Failed to load voting card",
+      "notEnoughSubmissions": "Not enough submissions to vote on yet.",
+      "slots": "Slots",
+      "alreadyVoted": "You have already voted in this contest.",
+      "viewArtworksAriaLabel": "View artworks: {{alias}}",
+      "slotAriaLabel": "Slot {{weight}} pts, {{state}}",
+      "slotFilled": "filled",
+      "slotEmpty": "empty"
+    },
+    "voteConfirmation": {
+      "title": "Vote received",
+      "recorded": "Your vote card has been recorded. It cannot be changed."
+    },
+    "results": {
+      "heading": "Results — {{title}}",
+      "failedToLoad": "Failed to load results",
+      "votingInProgress": "Voting is currently in progress. Results will be revealed once voting closes.",
+      "availableFrom": "Results will be available once voting starts, on {{date}}.",
+      "voteCardsCast_one": "{{count}} vote card cast",
+      "voteCardsCast_other": "{{count}} vote cards cast",
+      "stillInProgress": "Voting is still in progress — standings may change before the contest closes.",
+      "tablePlace": "Place",
+      "tableAuthor": "Author",
+      "tablePoints": "Points",
+      "tableBreakdown": "Breakdown",
+      "breakdownEntry": "{{count}}× {{weight}} pts"
+    },
+    "adminLogin": {
+      "title": "Admin login",
+      "passwordLabel": "Password",
+      "logIn": "Log in",
+      "invalidPassword": "Invalid password"
+    },
+    "adminContestsList": {
+      "title": "Contests",
+      "newContest": "New contest",
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes all its submissions, artworks and votes.",
+      "deleteFailed": "Failed to delete the contest",
+      "submissionsAndVoteCards": "Submissions & vote cards"
+    },
+    "adminContestForm": {
+      "editContest": "Edit contest",
+      "basicInfo": "Basic info",
+      "titleLabel": "Title",
+      "slugLabel": "Slug (optional override)",
+      "descriptionLabel": "Description",
+      "timeline": "Timeline",
+      "submissionStartLabel": "Submission start",
+      "submissionDeadlineLabel": "Submission deadline",
+      "votingStartLabel": "Voting start",
+      "votingEndLabel": "Voting end",
+      "limitsAndAccess": "Limits & access",
+      "maxArtworksLabel": "Max artworks per submission (up to {{max}})",
+      "accessCodeLabel": "Access code (optional)",
+      "deleteContest": "Delete contest",
+      "saveChanges": "Save changes",
+      "createContest": "Create contest",
+      "saveFailed": "Failed to save contest"
+    },
+    "adminSubmissions": {
+      "loadingSubmissions": "Loading submissions…",
+      "loadingVoteCards": "Loading vote cards…",
+      "submissionsCount_one": "{{count}} submission",
+      "submissionsCount_other": "{{count}} submissions",
+      "voteCardsCount_one": "{{count}} vote card",
+      "voteCardsCount_other": "{{count}} vote cards",
+      "voidedCount_one": "{{count}} voided",
+      "voidedCount_other": "{{count}} voided",
+      "submissionsTab": "Submissions",
+      "voteCardsTab": "Vote cards",
+      "noSubmissionsYet": "No submissions yet",
+      "noVoteCardsYet": "No vote cards yet",
+      "tableAlias": "Alias",
+      "tableArtworks": "Artworks",
+      "tableSubmitted": "Submitted",
+      "confirmDeleteSubmission": "Delete this submission and all its artworks?",
+      "tableCastAt": "Cast at",
+      "tablePicks": "Picks",
+      "tableStatus": "Status",
+      "voided": "voided",
+      "valid": "valid",
+      "restore": "Restore",
+      "void": "Void",
+      "voidReasonPrompt": "Reason (optional)"
+    },
+    "adminSubmissionEdit": {
+      "heading": "Edit submission — {{alias}}",
+      "backToSubmissions": "Back to submissions",
+      "author": "Author",
+      "saveData": "Save data",
+      "artworksHeading": "Artworks",
+      "save": "Save",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "confirmDeleteArtwork": "Delete this artwork?",
+      "replacementFileSr": "Replacement file",
+      "replace": "Replace"
+    }
+  },
+  "components": {
+    "contestPhaseCard": {
+      "submissionsStart": "Submissions start",
+      "votingEnded": "Voting ended",
+      "starts": "Starts",
+      "ends": "Ends"
+    },
+    "contestPhaseActions": {
+      "resumeSubmissionsLabel": "Resume submissions (+24h)",
+      "resumeSubmissionsConfirm": "Reopen submissions for 24 more hours? Voting will be pushed back to start once that window ends.",
+      "startSubmissionsLabel": "Start submissions now",
+      "startSubmissionsConfirm": "Start the submissions phase immediately?",
+      "endSubmissionsStartVotingLabel": "End submissions & start voting now",
+      "endSubmissionsStartVotingConfirm": "End submissions and start voting immediately?",
+      "endVotingLabel": "End voting now",
+      "endVotingConfirm": "End voting immediately? This closes the contest and reveals results.",
+      "resumeVotingLabel": "Resume voting (+24h)",
+      "resumeVotingConfirm": "Reopen voting for 24 more hours? The contest will become active again and results will no longer be final until it closes.",
+      "updateFailed": "Failed to update the contest phase"
+    },
+    "contestGalleryCard": {
+      "viewGallery": "View gallery",
+      "noSubmissionsYet": "No submissions yet"
+    },
+    "contestResultsCard": {
+      "viewResults": "View results",
+      "noVotesYet": "No votes cast yet",
+      "showingTopOf": "Showing the top {{shown}} of {{total}} results - see the full standings on the results page."
+    },
+    "artworkLightbox": {
+      "defaultAlt": "Artwork"
+    }
+  }
+}

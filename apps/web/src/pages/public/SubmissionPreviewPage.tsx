@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
+import { errorMessage } from '../../lib/errorMessage';
 import { ApiError } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
@@ -9,6 +11,7 @@ import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 
 const SubmissionPreviewPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,9 +38,9 @@ const SubmissionPreviewPage = () => {
   if (!draft) {
     return (
       <Alert variant="info">
-        No submission data found.{' '}
+        {t('pages.submissionPreview.noDataFound')}{' '}
         <Link to={`/contest/${slug}/submit`} className="font-medium underline">
-          Go back to the form
+          {t('pages.submissionPreview.goBackToForm')}
         </Link>
         .
       </Alert>
@@ -78,7 +81,7 @@ const SubmissionPreviewPage = () => {
         });
         return;
       }
-      setError(err instanceof Error ? err.message : 'Failed to submit');
+      setError(errorMessage(err, t));
     } finally {
       setSubmitting(false);
     }
@@ -91,7 +94,7 @@ const SubmissionPreviewPage = () => {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
-        Preview your submission
+        {t('pages.submissionPreview.heading')}
       </h1>
 
       <Card>
@@ -107,7 +110,10 @@ const SubmissionPreviewPage = () => {
             <div className="flex flex-col gap-2 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
               <img
                 src={previewUrls[index]}
-                alt={artwork.title || `Artwork ${index + 1}`}
+                alt={
+                  artwork.title ||
+                  t('pages.submissionPreview.artworkFallbackAlt', { index: index + 1 })
+                }
                 className="aspect-square w-full object-cover"
               />
               <div className="px-4 pb-4">
@@ -124,11 +130,11 @@ const SubmissionPreviewPage = () => {
       <div className="flex flex-wrap gap-3">
         <Button type="button" variant="secondary" onClick={handleBack} disabled={submitting}>
           <i className="bi bi-pencil-square" aria-hidden="true" />
-          Edit
+          {t('pages.submissionPreview.edit')}
         </Button>
         <Button type="button" variant="primary" onClick={handleSubmit} disabled={submitting}>
           <i className="bi bi-send" aria-hidden="true" />
-          Submit
+          {t('common.submit')}
         </Button>
       </div>
 
@@ -138,7 +144,9 @@ const SubmissionPreviewPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4">
           <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
             <p className="mb-3 text-center font-medium text-zinc-900">
-              {uploadProgress < 100 ? 'Uploading your submission…' : 'Processing…'}
+              {uploadProgress < 100
+                ? t('pages.submissionPreview.uploading')
+                : t('pages.submissionPreview.processing')}
             </p>
             <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
               <div
@@ -147,7 +155,9 @@ const SubmissionPreviewPage = () => {
               />
             </div>
             <p className="mt-2 text-center text-sm text-zinc-500">
-              {uploadProgress < 100 ? `${uploadProgress}%` : 'Almost done…'}
+              {uploadProgress < 100
+                ? `${uploadProgress}%`
+                : t('pages.submissionPreview.almostDone')}
             </p>
           </div>
         </div>

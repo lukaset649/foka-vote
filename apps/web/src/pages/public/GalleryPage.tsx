@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import type { SubmissionDto } from '@foka-vote/shared';
 import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
@@ -17,6 +18,7 @@ interface OpenLightbox {
 }
 
 const GalleryPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
@@ -52,7 +54,7 @@ const GalleryPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return <Alert variant="error">Failed to load gallery</Alert>;
+    return <Alert variant="error">{t('pages.gallery.failedToLoad')}</Alert>;
   }
 
   if (submissions === null) {
@@ -63,10 +65,14 @@ const GalleryPage = () => {
 
   return (
     <div>
-      <PageHeader title="Gallery" backTo={`/contest/${slug}`} backLabel="Back to the contest" />
+      <PageHeader
+        title={t('common.actions.gallery')}
+        backTo={`/contest/${slug}`}
+        backLabel={t('common.backToContest')}
+      />
 
       {submissions.length === 0 ? (
-        <EmptyState icon="bi-images" text="No submissions yet" />
+        <EmptyState icon="bi-images" text={t('components.contestGalleryCard.noSubmissionsYet')} />
       ) : (
         <ul className="flex flex-col gap-6">
           {submissions.map((submission) => (

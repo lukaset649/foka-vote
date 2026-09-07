@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import type { AdminSubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
@@ -25,6 +26,7 @@ interface ArtworkFields {
 }
 
 const AdminSubmissionEditPage = () => {
+  const { t } = useTranslation();
   const { id, submissionId } = useParams<{ id: string; submissionId: string }>();
   const contestId = id as string;
   const submissionIdValue = submissionId as string;
@@ -90,7 +92,7 @@ const AdminSubmissionEditPage = () => {
   };
 
   const handleDeleteArtwork = (artworkId: string) => {
-    if (!window.confirm('Delete this artwork?')) {
+    if (!window.confirm(t('pages.adminSubmissionEdit.confirmDeleteArtwork'))) {
       return;
     }
     deleteAdminArtwork(contestId, submissionIdValue, artworkId)
@@ -109,7 +111,7 @@ const AdminSubmissionEditPage = () => {
   };
 
   if (error) {
-    return <Alert variant="error">Something went wrong</Alert>;
+    return <Alert variant="error">{t('errors.generic')}</Alert>;
   }
 
   if (submission === null) {
@@ -121,17 +123,19 @@ const AdminSubmissionEditPage = () => {
   return (
     <div>
       <PageHeader
-        title={`Edit submission — ${submission.alias}`}
+        title={t('pages.adminSubmissionEdit.heading', { alias: submission.alias })}
         backTo={`/admin/contests/${contestId}/submissions`}
-        backLabel="Back to submissions"
+        backLabel={t('pages.adminSubmissionEdit.backToSubmissions')}
       />
 
       <div className="flex flex-col gap-6">
         <Card className="flex flex-col gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Author</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            {t('pages.adminSubmissionEdit.author')}
+          </h2>
 
           <div>
-            <Label htmlFor="firstName">First name</Label>
+            <Label htmlFor="firstName">{t('pages.submissionForm.firstNameLabel')}</Label>
             <Input
               id="firstName"
               value={firstName}
@@ -139,7 +143,7 @@ const AdminSubmissionEditPage = () => {
             />
           </div>
           <div>
-            <Label htmlFor="lastName">Last name</Label>
+            <Label htmlFor="lastName">{t('pages.submissionForm.lastNameLabel')}</Label>
             <Input
               id="lastName"
               value={lastName}
@@ -147,7 +151,9 @@ const AdminSubmissionEditPage = () => {
             />
           </div>
           <div>
-            <Label htmlFor="submission-description">Description</Label>
+            <Label htmlFor="submission-description">
+              {t('pages.adminContestForm.descriptionLabel')}
+            </Label>
             <Textarea
               id="submission-description"
               value={description}
@@ -156,12 +162,14 @@ const AdminSubmissionEditPage = () => {
           </div>
 
           <Button type="button" variant="secondary" className="w-fit" onClick={handleSaveData}>
-            Save data
+            {t('pages.adminSubmissionEdit.saveData')}
           </Button>
         </Card>
 
         <div>
-          <h2 className="mb-3 text-lg font-semibold text-zinc-900">Artworks</h2>
+          <h2 className="mb-3 text-lg font-semibold text-zinc-900">
+            {t('pages.adminSubmissionEdit.artworksHeading')}
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {artworks.map((artwork, index) => (
               <Card key={artwork.id} className="flex flex-col gap-3">
@@ -172,7 +180,9 @@ const AdminSubmissionEditPage = () => {
                 />
 
                 <div>
-                  <Label htmlFor={`title-${artwork.id}`}>Title</Label>
+                  <Label htmlFor={`title-${artwork.id}`}>
+                    {t('pages.adminContestForm.titleLabel')}
+                  </Label>
                   <Input
                     id={`title-${artwork.id}`}
                     value={artworkFields[artwork.id]?.title ?? ''}
@@ -189,7 +199,9 @@ const AdminSubmissionEditPage = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor={`description-${artwork.id}`}>Description</Label>
+                  <Label htmlFor={`description-${artwork.id}`}>
+                    {t('pages.adminContestForm.descriptionLabel')}
+                  </Label>
                   <Textarea
                     id={`description-${artwork.id}`}
                     value={artworkFields[artwork.id]?.description ?? ''}
@@ -212,7 +224,7 @@ const AdminSubmissionEditPage = () => {
                     size="sm"
                     onClick={() => handleSaveArtwork(artwork.id)}
                   >
-                    Save
+                    {t('pages.adminSubmissionEdit.save')}
                   </Button>
 
                   <Button
@@ -221,7 +233,7 @@ const AdminSubmissionEditPage = () => {
                     size="sm"
                     disabled={index === 0}
                     onClick={() => handleMove(index, -1)}
-                    aria-label="Move up"
+                    aria-label={t('pages.adminSubmissionEdit.moveUp')}
                   >
                     <i className="bi bi-arrow-up-short" aria-hidden="true" />
                   </Button>
@@ -231,7 +243,7 @@ const AdminSubmissionEditPage = () => {
                     size="sm"
                     disabled={index === artworks.length - 1}
                     onClick={() => handleMove(index, 1)}
-                    aria-label="Move down"
+                    aria-label={t('pages.adminSubmissionEdit.moveDown')}
                   >
                     <i className="bi bi-arrow-down-short" aria-hidden="true" />
                   </Button>
@@ -244,13 +256,15 @@ const AdminSubmissionEditPage = () => {
                     onClick={() => handleDeleteArtwork(artwork.id)}
                   >
                     <i className="bi bi-trash" aria-hidden="true" />
-                    Delete
+                    {t('common.remove')}
                   </Button>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 border-t border-zinc-200 pt-3">
                   <label className="flex items-center gap-2">
-                    <span className="sr-only">Replacement file</span>
+                    <span className="sr-only">
+                      {t('pages.adminSubmissionEdit.replacementFileSr')}
+                    </span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png"
@@ -270,7 +284,7 @@ const AdminSubmissionEditPage = () => {
                     onClick={() => handleReplace(artwork.id)}
                   >
                     <i className="bi bi-upload" aria-hidden="true" />
-                    Replace
+                    {t('pages.adminSubmissionEdit.replace')}
                   </Button>
                 </div>
               </Card>

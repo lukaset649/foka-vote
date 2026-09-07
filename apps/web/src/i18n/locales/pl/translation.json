@@ -1,0 +1,240 @@
+{
+  "nav": {
+    "voting": "Głosowanie",
+    "admin": "Admin"
+  },
+  "common": {
+    "timeRemaining": "Pozostało {{time}}",
+    "backToContests": "Powrót do konkursów",
+    "backToContest": "Powrót do konkursu",
+    "actions": {
+      "gallery": "Galeria",
+      "submit": "Wyślij swoją pracę",
+      "vote": "Głosuj",
+      "results": "Wyniki"
+    },
+    "cancel": "Anuluj",
+    "descriptionOptional": "Opis (opcjonalnie)",
+    "titleOptional": "Tytuł (opcjonalnie)",
+    "remove": "Usuń",
+    "points": "pkt",
+    "submit": "Wyślij",
+    "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia.",
+    "loading": "Wczytywanie…",
+    "back": "Wstecz"
+  },
+  "contestStatus": {
+    "DRAFT": "Szkic",
+    "SUBMISSIONS": "Zgłoszenia",
+    "VOTING": "Głosowanie",
+    "CLOSED": "Zakończony"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "Podane dane są nieprawidłowe",
+    "NOT_FOUND": "Nie znaleziono",
+    "UNAUTHORIZED": "Wymagane jest zalogowanie",
+    "FORBIDDEN": "Brak uprawnień do wykonania tej czynności",
+    "CONFLICT": "Wystąpił konflikt danych",
+    "INTERNAL_ERROR": "Wystąpił błąd serwera",
+    "generic": "Coś poszło nie tak, spróbuj ponownie"
+  },
+  "pages": {
+    "contestsList": {
+      "current": "Aktualne",
+      "allContests": "Wszystkie konkursy",
+      "noContestsYet": "Brak konkursów",
+      "failedToLoad": "Nie udało się wczytać konkursów"
+    },
+    "contest": {
+      "failedToLoad": "Nie udało się wczytać konkursu"
+    },
+    "accessGate": {
+      "title": "Wymagany kod dostępu",
+      "codeLabel": "Kod dostępu",
+      "submit": "Wejdź",
+      "invalidCode": "Nieprawidłowy kod dostępu"
+    },
+    "submissionForm": {
+      "heading": "Zgłoś swoją pracę — {{title}}",
+      "infoNamePublished": "Twoje imię i nazwisko zostanie opublikowane przy zgłoszeniu po zakończeniu głosowania.",
+      "infoAliasAfter": "Do tego czasu wyświetlany będzie losowy pseudonim.",
+      "infoAdminOnly": "Po wysłaniu zgłoszenia zmiany może wprowadzić już tylko administrator.",
+      "nicknameLabel": "Twój pseudonim",
+      "nicknameAssigning": "Przydzielanie…",
+      "nicknameUnavailable": "Niedostępny",
+      "nicknameHint": "Losowo przydzielany i wyświetlany przy zgłoszeniu podczas głosowania.",
+      "firstNameLabel": "Imię",
+      "lastNameLabel": "Nazwisko",
+      "artworksHeading": "Prace (maksymalnie {{max}})",
+      "maxFileSize": "Maksymalny rozmiar pliku na zdjęcie: {{size}} MB",
+      "artworkLegend": "Praca {{index}}",
+      "fileLabel": "Plik",
+      "currentlyAttached": "Aktualnie dołączono: {{filename}}",
+      "addAnotherArtwork": "Dodaj kolejną pracę",
+      "continueToPreview": "Przejdź do podglądu",
+      "errors": {
+        "nameRequired": "Imię i nazwisko są wymagane",
+        "artworkRequired": "Dołącz co najmniej jedną pracę",
+        "aliasPending": "Twój pseudonim jest jeszcze przydzielany, poczekaj chwilę i spróbuj ponownie"
+      }
+    },
+    "submissionPreview": {
+      "noDataFound": "Nie znaleziono danych zgłoszenia.",
+      "goBackToForm": "Wróć do formularza",
+      "heading": "Podgląd zgłoszenia",
+      "artworkFallbackAlt": "Praca {{index}}",
+      "edit": "Edytuj",
+      "uploading": "Przesyłanie zgłoszenia…",
+      "processing": "Przetwarzanie…",
+      "almostDone": "Prawie gotowe…"
+    },
+    "submissionConfirmation": {
+      "title": "Zgłoszenie przyjęte",
+      "submittedUnder": "Twoja praca została zgłoszona pod pseudonimem <strong>{{alias}}</strong>."
+    },
+    "gallery": {
+      "failedToLoad": "Nie udało się wczytać galerii"
+    },
+    "voteCard": {
+      "heading": "Głosuj — {{title}}",
+      "failedToLoad": "Nie udało się wczytać karty do głosowania",
+      "notEnoughSubmissions": "Za mało zgłoszeń, aby móc głosować.",
+      "slots": "Miejsca",
+      "alreadyVoted": "Twój głos w tym konkursie został już zapisany.",
+      "viewArtworksAriaLabel": "Zobacz prace: {{alias}}",
+      "slotAriaLabel": "Miejsce {{weight}} pkt, {{state}}",
+      "slotFilled": "wypełnione",
+      "slotEmpty": "puste"
+    },
+    "voteConfirmation": {
+      "title": "Głos przyjęty",
+      "recorded": "Twoja karta do głosowania została zapisana. Nie można jej już zmienić."
+    },
+    "results": {
+      "heading": "Wyniki — {{title}}",
+      "failedToLoad": "Nie udało się wczytać wyników",
+      "votingInProgress": "Głosowanie trwa. Wyniki zostaną ujawnione po jego zakończeniu.",
+      "availableFrom": "Wyniki będą dostępne po rozpoczęciu głosowania, {{date}}.",
+      "voteCardsCast_one": "{{count}} oddana karta do głosowania",
+      "voteCardsCast_few": "{{count}} oddane karty do głosowania",
+      "voteCardsCast_many": "{{count}} oddanych kart do głosowania",
+      "voteCardsCast_other": "{{count}} oddanej karty do głosowania",
+      "stillInProgress": "Głosowanie wciąż trwa — wyniki mogą się zmienić przed zakończeniem konkursu.",
+      "tablePlace": "Miejsce",
+      "tableAuthor": "Autor",
+      "tablePoints": "Punkty",
+      "tableBreakdown": "Rozkład głosów",
+      "breakdownEntry": "{{count}}× {{weight}} pkt"
+    },
+    "adminLogin": {
+      "title": "Logowanie administratora",
+      "passwordLabel": "Hasło",
+      "logIn": "Zaloguj się",
+      "invalidPassword": "Nieprawidłowe hasło"
+    },
+    "adminContestsList": {
+      "title": "Konkursy",
+      "newContest": "Nowy konkurs",
+      "confirmDelete": "Usunąć „{{title}}”? To trwale usunie wszystkie jego zgłoszenia, prace i głosy.",
+      "deleteFailed": "Nie udało się usunąć konkursu",
+      "submissionsAndVoteCards": "Zgłoszenia i karty do głosowania"
+    },
+    "adminContestForm": {
+      "editContest": "Edytuj konkurs",
+      "basicInfo": "Podstawowe informacje",
+      "titleLabel": "Tytuł",
+      "slugLabel": "Slug (opcjonalne nadpisanie)",
+      "descriptionLabel": "Opis",
+      "timeline": "Harmonogram",
+      "submissionStartLabel": "Rozpoczęcie zgłoszeń",
+      "submissionDeadlineLabel": "Termin zgłoszeń",
+      "votingStartLabel": "Rozpoczęcie głosowania",
+      "votingEndLabel": "Zakończenie głosowania",
+      "limitsAndAccess": "Limity i dostęp",
+      "maxArtworksLabel": "Maksymalna liczba prac na zgłoszenie (do {{max}})",
+      "accessCodeLabel": "Kod dostępu (opcjonalnie)",
+      "deleteContest": "Usuń konkurs",
+      "saveChanges": "Zapisz zmiany",
+      "createContest": "Utwórz konkurs",
+      "saveFailed": "Nie udało się zapisać konkursu"
+    },
+    "adminSubmissions": {
+      "loadingSubmissions": "Wczytywanie zgłoszeń…",
+      "loadingVoteCards": "Wczytywanie kart do głosowania…",
+      "submissionsCount_one": "{{count}} zgłoszenie",
+      "submissionsCount_few": "{{count}} zgłoszenia",
+      "submissionsCount_many": "{{count}} zgłoszeń",
+      "submissionsCount_other": "{{count}} zgłoszenia",
+      "voteCardsCount_one": "{{count}} karta do głosowania",
+      "voteCardsCount_few": "{{count}} karty do głosowania",
+      "voteCardsCount_many": "{{count}} kart do głosowania",
+      "voteCardsCount_other": "{{count}} karty do głosowania",
+      "voidedCount_one": "{{count}} unieważniona",
+      "voidedCount_few": "{{count}} unieważnione",
+      "voidedCount_many": "{{count}} unieważnionych",
+      "voidedCount_other": "{{count}} unieważnionej",
+      "submissionsTab": "Zgłoszenia",
+      "voteCardsTab": "Karty do głosowania",
+      "noSubmissionsYet": "Brak zgłoszeń",
+      "noVoteCardsYet": "Brak kart do głosowania",
+      "tableAlias": "Pseudonim",
+      "tableArtworks": "Prace",
+      "tableSubmitted": "Wysłano",
+      "confirmDeleteSubmission": "Usunąć to zgłoszenie i wszystkie jego prace?",
+      "tableCastAt": "Data oddania",
+      "tablePicks": "Wybory",
+      "tableStatus": "Status",
+      "voided": "unieważniona",
+      "valid": "ważna",
+      "restore": "Przywróć",
+      "void": "Unieważnij",
+      "voidReasonPrompt": "Powód (opcjonalnie)"
+    },
+    "adminSubmissionEdit": {
+      "heading": "Edytuj zgłoszenie — {{alias}}",
+      "backToSubmissions": "Powrót do zgłoszeń",
+      "author": "Autor",
+      "saveData": "Zapisz dane",
+      "artworksHeading": "Prace",
+      "save": "Zapisz",
+      "moveUp": "Przesuń w górę",
+      "moveDown": "Przesuń w dół",
+      "confirmDeleteArtwork": "Usunąć tę pracę?",
+      "replacementFileSr": "Plik zastępczy",
+      "replace": "Zastąp"
+    }
+  },
+  "components": {
+    "contestPhaseCard": {
+      "submissionsStart": "Rozpoczęcie zgłoszeń",
+      "votingEnded": "Głosowanie zakończone",
+      "starts": "Rozpoczęcie",
+      "ends": "Zakończenie"
+    },
+    "contestPhaseActions": {
+      "resumeSubmissionsLabel": "Wznów zgłoszenia (+24h)",
+      "resumeSubmissionsConfirm": "Otworzyć zgłoszenia ponownie na kolejne 24 godziny? Głosowanie zostanie przesunięte tak, aby rozpocząć się po zakończeniu tego okresu.",
+      "startSubmissionsLabel": "Rozpocznij zgłoszenia teraz",
+      "startSubmissionsConfirm": "Rozpocząć fazę zgłoszeń natychmiast?",
+      "endSubmissionsStartVotingLabel": "Zakończ zgłoszenia i rozpocznij głosowanie teraz",
+      "endSubmissionsStartVotingConfirm": "Zakończyć zgłoszenia i rozpocząć głosowanie natychmiast?",
+      "endVotingLabel": "Zakończ głosowanie teraz",
+      "endVotingConfirm": "Zakończyć głosowanie natychmiast? To zamknie konkurs i ujawni wyniki.",
+      "resumeVotingLabel": "Wznów głosowanie (+24h)",
+      "resumeVotingConfirm": "Otworzyć głosowanie ponownie na kolejne 24 godziny? Konkurs stanie się ponownie aktywny, a wyniki nie będą ostateczne aż do jego zamknięcia.",
+      "updateFailed": "Nie udało się zaktualizować fazy konkursu"
+    },
+    "contestGalleryCard": {
+      "viewGallery": "Zobacz galerię",
+      "noSubmissionsYet": "Brak zgłoszeń"
+    },
+    "contestResultsCard": {
+      "viewResults": "Zobacz wyniki",
+      "noVotesYet": "Brak oddanych głosów",
+      "showingTopOf": "Pokazano najlepsze {{shown}} z {{total}} wyników — pełna klasyfikacja jest dostępna na stronie wyników."
+    },
+    "artworkLightbox": {
+      "defaultAlt": "Praca"
+    }
+  }
+}

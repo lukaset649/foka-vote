@@ -1,6 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { MAX_ARTWORK_FILE_SIZE_MB, type ContestDto } from '@foka-vote/shared';
+import { errorMessage } from '../../lib/errorMessage';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
@@ -39,6 +41,7 @@ function emptySlot(): ArtworkSlot {
 }
 
 const SubmissionFormPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -121,7 +124,7 @@ const SubmissionFormPage = () => {
           });
           return;
         }
-        setAliasError(err instanceof Error ? err.message : 'Failed to assign a nickname');
+        setAliasError(errorMessage(err, t));
       });
 
     return () => {
@@ -155,7 +158,7 @@ const SubmissionFormPage = () => {
     setFormError(null);
 
     if (!firstName.trim() || !lastName.trim()) {
-      setFormError('First and last name are required');
+      setFormError(t('pages.submissionForm.errors.nameRequired'));
       return;
     }
 
@@ -167,12 +170,12 @@ const SubmissionFormPage = () => {
     }
 
     if (artworks.length === 0) {
-      setFormError('Attach at least one artwork');
+      setFormError(t('pages.submissionForm.errors.artworkRequired'));
       return;
     }
 
     if (!alias || !reservationId) {
-      setFormError('Your nickname is still being assigned, please wait a moment and try again');
+      setFormError(t('pages.submissionForm.errors.aliasPending'));
       return;
     }
 
@@ -189,7 +192,7 @@ const SubmissionFormPage = () => {
   };
 
   if (loadError) {
-    return <Alert variant="error">Failed to load contest</Alert>;
+    return <Alert variant="error">{t('pages.contest.failedToLoad')}</Alert>;
   }
 
   if (!contest) {
@@ -199,34 +202,37 @@ const SubmissionFormPage = () => {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl">
-        Submit your work — {contest.title}
+        {t('pages.submissionForm.heading', { title: contest.title })}
       </h1>
 
       <Alert variant="info">
-        Your first and last name will be published next to your work once voting closes.
+        {t('pages.submissionForm.infoNamePublished')}
         <br />
-        Since then, the random alias will be displayed instead.
+        {t('pages.submissionForm.infoAliasAfter')}
         <br />
-        After submitting, only the admin can make changes.
+        {t('pages.submissionForm.infoAdminOnly')}
       </Alert>
 
       <Card className="flex flex-col gap-4">
         <div>
-          <Label htmlFor="alias">Your nickname</Label>
+          <Label htmlFor="alias">{t('pages.submissionForm.nicknameLabel')}</Label>
           <Input
             id="alias"
-            value={alias || (aliasError ? 'Unavailable' : 'Assigning…')}
+            value={
+              alias ||
+              (aliasError
+                ? t('pages.submissionForm.nicknameUnavailable')
+                : t('pages.submissionForm.nicknameAssigning'))
+            }
             disabled
             className="cursor-not-allowed bg-zinc-100 text-zinc-500"
           />
-          <p className="mt-1 text-sm text-zinc-500">
-            Randomly assigned and shown next to your work during voting phase.
-          </p>
+          <p className="mt-1 text-sm text-zinc-500">{t('pages.submissionForm.nicknameHint')}</p>
           {aliasError && <p className="mt-1 text-sm text-rose-600">{aliasError}</p>}
         </div>
 
         <div>
-          <Label htmlFor="firstName">First name</Label>
+          <Label htmlFor="firstName">{t('pages.submissionForm.firstNameLabel')}</Label>
           <Input
             id="firstName"
             value={firstName}
@@ -236,7 +242,7 @@ const SubmissionFormPage = () => {
         </div>
 
         <div>
-          <Label htmlFor="lastName">Last name</Label>
+          <Label htmlFor="lastName">{t('pages.submissionForm.lastNameLabel')}</Label>
           <Input
             id="lastName"
             value={lastName}
@@ -246,7 +252,7 @@ const SubmissionFormPage = () => {
         </div>
 
         <div>
-          <Label htmlFor="description">Description (optional)</Label>
+          <Label htmlFor="description">{t('common.descriptionOptional')}</Label>
           <Textarea
             id="description"
             value={description}
@@ -257,9 +263,11 @@ const SubmissionFormPage = () => {
 
       <div className="flex flex-col gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900">Artworks (up to {maxArtworks})</h2>
+          <h2 className="text-lg font-semibold text-zinc-900">
+            {t('pages.submissionForm.artworksHeading', { max: maxArtworks })}
+          </h2>
           <p className="text-sm text-zinc-500">
-            Max file size per photo: {MAX_ARTWORK_FILE_SIZE_MB} MB
+            {t('pages.submissionForm.maxFileSize', { size: MAX_ARTWORK_FILE_SIZE_MB })}
           </p>
         </div>
 
@@ -269,12 +277,13 @@ const SubmissionFormPage = () => {
             className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6"
           >
             <legend className="px-1 text-sm font-semibold text-zinc-700">
-              Artwork {index + 1}
+              {t('pages.submissionForm.artworkLegend', { index: index + 1 })}
             </legend>
 
             <div>
               <Label htmlFor={`file-${index}`}>
-                <i className="bi bi-upload" aria-hidden="true" /> File
+                <i className="bi bi-upload" aria-hidden="true" />{' '}
+                {t('pages.submissionForm.fileLabel')}
               </Label>
               <input
                 id={`file-${index}`}
@@ -284,12 +293,14 @@ const SubmissionFormPage = () => {
                 className="block w-full text-sm text-zinc-700 file:mr-3 file:min-h-10 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
               />
               {slot.file && (
-                <p className="mt-1 text-sm text-zinc-500">Currently attached: {slot.file.name}</p>
+                <p className="mt-1 text-sm text-zinc-500">
+                  {t('pages.submissionForm.currentlyAttached', { filename: slot.file.name })}
+                </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor={`title-${index}`}>Title (optional)</Label>
+              <Label htmlFor={`title-${index}`}>{t('common.titleOptional')}</Label>
               <Input
                 id={`title-${index}`}
                 value={slot.title}
@@ -298,7 +309,9 @@ const SubmissionFormPage = () => {
             </div>
 
             <div>
-              <Label htmlFor={`artwork-description-${index}`}>Description (optional)</Label>
+              <Label htmlFor={`artwork-description-${index}`}>
+                {t('common.descriptionOptional')}
+              </Label>
               <Input
                 id={`artwork-description-${index}`}
                 value={slot.description}
@@ -315,7 +328,7 @@ const SubmissionFormPage = () => {
                 onClick={() => removeSlot(index)}
               >
                 <i className="bi bi-trash" aria-hidden="true" />
-                Remove
+                {t('common.remove')}
               </Button>
             )}
           </fieldset>
@@ -324,7 +337,7 @@ const SubmissionFormPage = () => {
         {slots.length < maxArtworks && (
           <Button type="button" variant="secondary" className="w-fit" onClick={addSlot}>
             <i className="bi bi-plus-circle" aria-hidden="true" />
-            Add another artwork
+            {t('pages.submissionForm.addAnotherArtwork')}
           </Button>
         )}
       </div>
@@ -335,11 +348,11 @@ const SubmissionFormPage = () => {
           variant="secondary"
           className="hover:!border-rose-600 hover:!bg-rose-600 hover:!text-white"
         >
-          Cancel
+          {t('common.cancel')}
         </LinkButton>
         <Button type="submit">
           <i className="bi bi-send" aria-hidden="true" />
-          Continue to preview
+          {t('pages.submissionForm.continueToPreview')}
         </Button>
       </div>
 

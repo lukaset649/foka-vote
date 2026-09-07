@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
@@ -42,6 +43,7 @@ interface ContestGalleryCardProps {
 }
 
 const ContestGalleryCard = ({ contest }: ContestGalleryCardProps) => {
+  const { t } = useTranslation();
   const [galleryPreview, setGalleryPreview] = useState<SubmissionDto[] | null>(null);
   const [lightboxSubmission, setLightboxSubmission] = useState<SubmissionDto | null>(null);
   const galleryPreviewCount = useGalleryPreviewCount();
@@ -75,9 +77,9 @@ const ContestGalleryCard = ({ contest }: ContestGalleryCardProps) => {
     <>
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-zinc-900">Gallery</h2>
+          <h2 className="text-lg font-semibold text-zinc-900">{t('common.actions.gallery')}</h2>
           <LinkButton to={`/contest/${contest.slug}/gallery`} variant="secondary" size="sm">
-            View gallery
+            {t('components.contestGalleryCard.viewGallery')}
             <i className="bi bi-arrow-right" aria-hidden="true" />
           </LinkButton>
         </div>
@@ -87,7 +89,11 @@ const ContestGalleryCard = ({ contest }: ContestGalleryCardProps) => {
             <Spinner />
           </div>
         ) : galleryPreview.length === 0 ? (
-          <EmptyState icon="bi-images" text="No submissions yet" className="mt-4" />
+          <EmptyState
+            icon="bi-images"
+            text={t('components.contestGalleryCard.noSubmissionsYet')}
+            className="mt-4"
+          />
         ) : (
           <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {galleryPreview.slice(0, galleryVisibleCount).map((submission) => (

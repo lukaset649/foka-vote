@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import type { AdminContestDto, UpdateContestDto } from '@foka-vote/shared';
 import { updateContest } from '../services/contests';
 import Button from './ui/Button';
@@ -13,7 +15,7 @@ interface PhaseAction {
   buildPayload: () => UpdateContestDto;
 }
 
-function buildResumeSubmissionsAction(contest: AdminContestDto): PhaseAction {
+function buildResumeSubmissionsAction(contest: AdminContestDto, t: TFunction): PhaseAction {
   // Preserve the contest's original voting-phase length, shifted to start after the new deadline.
   const votingDurationMs = Math.max(
     new Date(contest.votingEnd).getTime() - new Date(contest.votingStart).getTime(),
@@ -21,10 +23,9 @@ function buildResumeSubmissionsAction(contest: AdminContestDto): PhaseAction {
   );
 
   return {
-    label: 'Resume submissions (+24h)',
+    label: t('components.contestPhaseActions.resumeSubmissionsLabel'),
     icon: 'bi-arrow-counterclockwise',
-    confirmMessage:
-      'Reopen submissions for 24 more hours? Voting will be pushed back to start once that window ends.',
+    confirmMessage: t('components.contestPhaseActions.resumeSubmissionsConfirm'),
     buildPayload: () => {
       const submissionDeadline = new Date(Date.now() + RESUME_GRACE_MS);
       const votingStart = submissionDeadline;
@@ -38,50 +39,49 @@ function buildResumeSubmissionsAction(contest: AdminContestDto): PhaseAction {
   };
 }
 
-function getPhaseActions(contest: AdminContestDto): PhaseAction[] {
+function getPhaseActions(contest: AdminContestDto, t: TFunction): PhaseAction[] {
   const now = () => new Date().toISOString();
 
   switch (contest.status) {
     case 'DRAFT':
       return [
         {
-          label: 'Start submissions now',
+          label: t('components.contestPhaseActions.startSubmissionsLabel'),
           icon: 'bi-play-fill',
-          confirmMessage: 'Start the submissions phase immediately?',
+          confirmMessage: t('components.contestPhaseActions.startSubmissionsConfirm'),
           buildPayload: () => ({ submissionStart: now() }),
         },
       ];
     case 'SUBMISSIONS':
       return [
         {
-          label: 'End submissions & start voting now',
+          label: t('components.contestPhaseActions.endSubmissionsStartVotingLabel'),
           icon: 'bi-skip-forward-fill',
-          confirmMessage: 'End submissions and start voting immediately?',
+          confirmMessage: t('components.contestPhaseActions.endSubmissionsStartVotingConfirm'),
           buildPayload: () => ({ submissionDeadline: now(), votingStart: now() }),
         },
       ];
     case 'VOTING':
       return [
         {
-          label: 'End voting now',
+          label: t('components.contestPhaseActions.endVotingLabel'),
           icon: 'bi-stop-fill',
-          confirmMessage: 'End voting immediately? This closes the contest and reveals results.',
+          confirmMessage: t('components.contestPhaseActions.endVotingConfirm'),
           buildPayload: () => ({ votingEnd: now() }),
         },
-        buildResumeSubmissionsAction(contest),
+        buildResumeSubmissionsAction(contest, t),
       ];
     case 'CLOSED':
       return [
         {
-          label: 'Resume voting (+24h)',
+          label: t('components.contestPhaseActions.resumeVotingLabel'),
           icon: 'bi-arrow-clockwise',
-          confirmMessage:
-            'Reopen voting for 24 more hours? The contest will become active again and results will no longer be final until it closes.',
+          confirmMessage: t('components.contestPhaseActions.resumeVotingConfirm'),
           buildPayload: () => ({
             votingEnd: new Date(Date.now() + RESUME_GRACE_MS).toISOString(),
           }),
         },
-        buildResumeSubmissionsAction(contest),
+        buildResumeSubmissionsAction(contest, t),
       ];
   }
 }
@@ -93,8 +93,9 @@ interface ContestPhaseActionsProps {
 }
 
 const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActionsProps) => {
+  const { t } = useTranslation();
   const [pendingAction, setPendingAction] = useState<PhaseAction | null>(null);
-  const actions = getPhaseActions(contest);
+  const actions = getPhaseActions(contest, t);
 
   const handleClick = (action: PhaseAction) => {
     if (!window.confirm(action.confirmMessage)) {
@@ -105,7 +106,7 @@ const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActi
     updateContest(contest.id, action.buildPayload())
       .then(onUpdated)
       .catch(() => {
-        window.alert('Failed to update the contest phase');
+        window.alert(t('components.contestPhaseActions.updateFailed'));
       })
       .finally(() => {
         setPendingAction(null);
