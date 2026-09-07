@@ -36,6 +36,19 @@
       "votingEnded": "Głosowanie zakończone",
       "starts": "Rozpoczęcie",
       "ends": "Zakończenie"
+    },
+    "contestGalleryCard": {
+      "viewGallery": "Zobacz galerię",
+      "noSubmissionsYet": "Brak zgłoszeń"
+    },
+    "contestResultsCard": {
+      "viewResults": "Zobacz wyniki",
+      "noVotesYet": "Brak oddanych głosów",
+      "points": "pkt",
+      "showingTopOf": "Pokazano najlepsze {{shown}} z {{total}} wyników — pełna klasyfikacja jest dostępna na stronie wyników."
+    },
+    "artworkLightbox": {
+      "defaultAlt": "Praca"
     }
   }
 }

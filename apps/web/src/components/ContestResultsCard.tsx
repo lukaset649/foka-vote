@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ContestDto, ResultsDto } from '@foka-vote/shared';
 import { fetchResults } from '../services/results';
 import Card from './ui/Card';
@@ -13,6 +14,7 @@ interface ContestResultsCardProps {
 }
 
 const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
+  const { t } = useTranslation();
   const [results, setResults] = useState<ResultsDto | null>(null);
   const showResults = contest.status === 'CLOSED';
 
@@ -44,9 +46,9 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
   return (
     <Card>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-zinc-900">Results</h2>
+        <h2 className="text-lg font-semibold text-zinc-900">{t('common.actions.results')}</h2>
         <LinkButton to={`/contest/${contest.slug}/results`} variant="secondary" size="sm">
-          View results
+          {t('components.contestResultsCard.viewResults')}
           <i className="bi bi-arrow-right" aria-hidden="true" />
         </LinkButton>
       </div>
@@ -58,7 +60,11 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
       ) : (
         <>
           {topResults.length === 0 ? (
-            <EmptyState icon="bi-trophy" text="No votes cast yet" className="mt-4" />
+            <EmptyState
+              icon="bi-trophy"
+              text={t('components.contestResultsCard.noVotesYet')}
+              className="mt-4"
+            />
           ) : (
             <>
               <ol className="mt-4 flex flex-col gap-2">
@@ -76,14 +82,18 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                         ? `${entry.firstName} ${entry.lastName} (${entry.alias})`
                         : entry.alias}
                     </span>
-                    <span className="font-semibold text-indigo-600">{entry.total} pkt</span>
+                    <span className="font-semibold text-indigo-600">
+                      {entry.total} {t('components.contestResultsCard.points')}
+                    </span>
                   </li>
                 ))}
               </ol>
               {results && results.results.length > topResults.length && (
                 <p className="mt-3 text-xs text-zinc-500">
-                  Showing the top {topResults.length} of {results.results.length} results - see the
-                  full standings on the results page.
+                  {t('components.contestResultsCard.showingTopOf', {
+                    shown: topResults.length,
+                    total: results.results.length,
+                  })}
                 </p>
               )}
             </>

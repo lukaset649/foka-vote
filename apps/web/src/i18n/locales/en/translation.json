@@ -36,6 +36,19 @@
       "votingEnded": "Voting ended",
       "starts": "Starts",
       "ends": "Ends"
+    },
+    "contestGalleryCard": {
+      "viewGallery": "View gallery",
+      "noSubmissionsYet": "No submissions yet"
+    },
+    "contestResultsCard": {
+      "viewResults": "View results",
+      "noVotesYet": "No votes cast yet",
+      "points": "pts",
+      "showingTopOf": "Showing the top {{shown}} of {{total}} results - see the full standings on the results page."
+    },
+    "artworkLightbox": {
+      "defaultAlt": "Artwork"
     }
   }
 }
