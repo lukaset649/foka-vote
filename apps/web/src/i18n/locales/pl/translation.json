@@ -107,6 +107,22 @@
     "voteConfirmation": {
       "title": "Głos przyjęty",
       "recorded": "Twoja karta do głosowania została zapisana. Nie można jej już zmienić."
+    },
+    "results": {
+      "heading": "Wyniki — {{title}}",
+      "failedToLoad": "Nie udało się wczytać wyników",
+      "votingInProgress": "Głosowanie trwa. Wyniki zostaną ujawnione po jego zakończeniu.",
+      "availableFrom": "Wyniki będą dostępne po rozpoczęciu głosowania, {{date}}.",
+      "voteCardsCast_one": "{{count}} oddana karta do głosowania",
+      "voteCardsCast_few": "{{count}} oddane karty do głosowania",
+      "voteCardsCast_many": "{{count}} oddanych kart do głosowania",
+      "voteCardsCast_other": "{{count}} oddanej karty do głosowania",
+      "stillInProgress": "Głosowanie wciąż trwa — wyniki mogą się zmienić przed zakończeniem konkursu.",
+      "tablePlace": "Miejsce",
+      "tableAuthor": "Autor",
+      "tablePoints": "Punkty",
+      "tableBreakdown": "Rozkład głosów",
+      "breakdownEntry": "{{count}}× {{weight}} pkt"
     }
   },
   "components": {

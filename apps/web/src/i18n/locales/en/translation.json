@@ -107,6 +107,20 @@
     "voteConfirmation": {
       "title": "Vote received",
       "recorded": "Your vote card has been recorded. It cannot be changed."
+    },
+    "results": {
+      "heading": "Results — {{title}}",
+      "failedToLoad": "Failed to load results",
+      "votingInProgress": "Voting is currently in progress. Results will be revealed once voting closes.",
+      "availableFrom": "Results will be available once voting starts, on {{date}}.",
+      "voteCardsCast_one": "{{count}} vote card cast",
+      "voteCardsCast_other": "{{count}} vote cards cast",
+      "stillInProgress": "Voting is still in progress — standings may change before the contest closes.",
+      "tablePlace": "Place",
+      "tableAuthor": "Author",
+      "tablePoints": "Points",
+      "tableBreakdown": "Breakdown",
+      "breakdownEntry": "{{count}}× {{weight}} pts"
     }
   },
   "components": {
