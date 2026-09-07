@@ -34,8 +34,7 @@ const SubmissionConfirmationPage = () => {
         to={`/contest/${slug}`}
         className="inline-flex w-fit items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
       >
-        <i className="bi bi-arrow-left" aria-hidden="true" />{' '}
-        {t('common.backToContest')}
+        <i className="bi bi-arrow-left" aria-hidden="true" /> {t('common.backToContest')}
       </Link>
 
       <div className="flex flex-col items-center gap-2 text-center">

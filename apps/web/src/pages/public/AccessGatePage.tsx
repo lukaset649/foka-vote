@@ -59,9 +59,7 @@ const AccessGatePage = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 text-center">
             <i className="bi bi-lock text-2xl text-indigo-600" aria-hidden="true" />
-            <h1 className="text-lg font-semibold text-zinc-900">
-              {t('pages.accessGate.title')}
-            </h1>
+            <h1 className="text-lg font-semibold text-zinc-900">{t('pages.accessGate.title')}</h1>
           </div>
 
           <div>

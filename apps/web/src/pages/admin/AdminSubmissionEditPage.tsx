@@ -262,7 +262,9 @@ const AdminSubmissionEditPage = () => {
 
                 <div className="flex flex-wrap items-center gap-2 border-t border-zinc-200 pt-3">
                   <label className="flex items-center gap-2">
-                    <span className="sr-only">{t('pages.adminSubmissionEdit.replacementFileSr')}</span>
+                    <span className="sr-only">
+                      {t('pages.adminSubmissionEdit.replacementFileSr')}
+                    </span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png"

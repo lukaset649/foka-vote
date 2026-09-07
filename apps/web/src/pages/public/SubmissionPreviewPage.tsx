@@ -110,7 +110,10 @@ const SubmissionPreviewPage = () => {
             <div className="flex flex-col gap-2 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
               <img
                 src={previewUrls[index]}
-                alt={artwork.title || t('pages.submissionPreview.artworkFallbackAlt', { index: index + 1 })}
+                alt={
+                  artwork.title ||
+                  t('pages.submissionPreview.artworkFallbackAlt', { index: index + 1 })
+                }
                 className="aspect-square w-full object-cover"
               />
               <div className="px-4 pb-4">
@@ -152,7 +155,9 @@ const SubmissionPreviewPage = () => {
               />
             </div>
             <p className="mt-2 text-center text-sm text-zinc-500">
-              {uploadProgress < 100 ? `${uploadProgress}%` : t('pages.submissionPreview.almostDone')}
+              {uploadProgress < 100
+                ? `${uploadProgress}%`
+                : t('pages.submissionPreview.almostDone')}
             </p>
           </div>
         </div>

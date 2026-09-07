@@ -282,7 +282,8 @@ const SubmissionFormPage = () => {
 
             <div>
               <Label htmlFor={`file-${index}`}>
-                <i className="bi bi-upload" aria-hidden="true" /> {t('pages.submissionForm.fileLabel')}
+                <i className="bi bi-upload" aria-hidden="true" />{' '}
+                {t('pages.submissionForm.fileLabel')}
               </Label>
               <input
                 id={`file-${index}`}

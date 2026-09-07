@@ -4,8 +4,7 @@ import Card from './ui/Card';
 import Countdown from './ui/Countdown';
 
 type SingleLabelKey =
-  | 'components.contestPhaseCard.submissionsStart'
-  | 'components.contestPhaseCard.votingEnded';
+  'components.contestPhaseCard.submissionsStart' | 'components.contestPhaseCard.votingEnded';
 type RangeTitleKey = 'contestStatus.SUBMISSIONS' | 'contestStatus.VOTING';
 
 type ContestPhaseInfo =

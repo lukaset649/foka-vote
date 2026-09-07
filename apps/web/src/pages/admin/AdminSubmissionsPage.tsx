@@ -139,7 +139,9 @@ const AdminSubmissionsPage = () => {
             <TableBody>
               {submissions === null && (
                 <TableRow>
-                  <TableCell colSpan={5}>{t('pages.adminSubmissions.loadingSubmissions')}</TableCell>
+                  <TableCell colSpan={5}>
+                    {t('pages.adminSubmissions.loadingSubmissions')}
+                  </TableCell>
                 </TableRow>
               )}
               {submissions?.map((submission) => (
@@ -174,7 +176,10 @@ const AdminSubmissionsPage = () => {
 
       {tab === 'voteCards' &&
         (voteCards !== null && voteCards.length === 0 ? (
-          <EmptyState icon="bi-ticket-perforated" text={t('pages.adminSubmissions.noVoteCardsYet')} />
+          <EmptyState
+            icon="bi-ticket-perforated"
+            text={t('pages.adminSubmissions.noVoteCardsYet')}
+          />
         ) : (
           <Table>
             <TableHead>

@@ -69,11 +69,7 @@ const ContestPage = () => {
 
   return (
     <div>
-      <PageHeader
-        title={contest.title}
-        backTo="/"
-        backLabel={t('common.backToContests')}
-      >
+      <PageHeader title={contest.title} backTo="/" backLabel={t('common.backToContests')}>
         <div className="flex flex-wrap items-center gap-5">
           <ContestStatusBadge status={contest.status} />
           {contest.status === 'SUBMISSIONS' && (

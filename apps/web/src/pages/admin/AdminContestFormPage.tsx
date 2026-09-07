@@ -94,7 +94,7 @@ const AdminContestFormPage = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [id, t]);
 
   const updateField =
     (field: keyof FormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -163,7 +163,11 @@ const AdminContestFormPage = () => {
   return (
     <form onSubmit={handleSubmit} className="pb-24">
       <PageHeader
-        title={isEditing ? t('pages.adminContestForm.editContest') : t('pages.adminContestsList.newContest')}
+        title={
+          isEditing
+            ? t('pages.adminContestForm.editContest')
+            : t('pages.adminContestsList.newContest')
+        }
         backTo="/admin/contests"
         backLabel={t('common.backToContests')}
       >
@@ -223,7 +227,9 @@ const AdminContestFormPage = () => {
           </div>
 
           <div>
-            <Label htmlFor="submissionStart">{t('pages.adminContestForm.submissionStartLabel')}</Label>
+            <Label htmlFor="submissionStart">
+              {t('pages.adminContestForm.submissionStartLabel')}
+            </Label>
             <Input
               id="submissionStart"
               type="datetime-local"
