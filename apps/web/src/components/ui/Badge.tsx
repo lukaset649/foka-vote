@@ -1,4 +1,5 @@
 import type { ContestStatus } from '@foka-vote/shared';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/cn';
 
 type BadgeColor = 'zinc' | 'blue' | 'amber' | 'emerald' | 'rose';
@@ -38,8 +39,9 @@ const Badge = ({ color, children, className }: BadgeProps) => {
   );
 };
 
-export const ContestStatusBadge = ({ status }: { status: ContestStatus }) => (
-  <Badge color={contestStatusColor[status]}>{status}</Badge>
-);
+export const ContestStatusBadge = ({ status }: { status: ContestStatus }) => {
+  const { t } = useTranslation();
+  return <Badge color={contestStatusColor[status]}>{t(`contestStatus.${status}`)}</Badge>;
+};
 
 export default Badge;

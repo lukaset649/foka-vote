@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
 import type { RouteHandle } from '../routes';
@@ -5,6 +6,7 @@ import LanguageSwitcher from './ui/LanguageSwitcher';
 import LinkButton from './ui/LinkButton';
 
 const Layout = () => {
+  const { t } = useTranslation();
   const matches = useMatches();
   const isWide = matches.some((match) => (match.handle as RouteHandle | undefined)?.wide);
 
@@ -18,7 +20,7 @@ const Layout = () => {
           </Link>
           <nav className="flex items-center gap-2">
             <LinkButton to="/" variant="ghost" size="sm">
-              Voting
+              {t('nav.voting')}
             </LinkButton>
             <LinkButton
               to="/admin"
@@ -26,7 +28,7 @@ const Layout = () => {
               size="sm"
               className="hover:!border-indigo-600 hover:!bg-indigo-600 hover:!text-white"
             >
-              Admin
+              {t('nav.admin')}
             </LinkButton>
             <LanguageSwitcher />
           </nav>

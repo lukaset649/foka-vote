@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { isUnauthorizedError } from '../../services/apiClient';
@@ -13,6 +14,7 @@ import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 
 const ContestPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -58,7 +60,7 @@ const ContestPage = () => {
   }, [slug]);
 
   if (error) {
-    return <Alert variant="error">Failed to load contest</Alert>;
+    return <Alert variant="error">{t('pages.contest.failedToLoad')}</Alert>;
   }
 
   if (!contest) {
@@ -67,19 +69,23 @@ const ContestPage = () => {
 
   return (
     <div>
-      <PageHeader title={contest.title} backTo="/" backLabel="Back to contests">
+      <PageHeader
+        title={contest.title}
+        backTo="/"
+        backLabel={t('common.backToContests')}
+      >
         <div className="flex flex-wrap items-center gap-5">
           <ContestStatusBadge status={contest.status} />
           {contest.status === 'SUBMISSIONS' && (
             <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
               <i className="bi bi-send" aria-hidden="true" />
-              Submit your work
+              {t('common.actions.submit')}
             </LinkButton>
           )}
           {contest.status === 'VOTING' && (
             <LinkButton to={`/contest/${contest.slug}/vote`} variant="primary">
               <i className="bi bi-check2-square" aria-hidden="true" />
-              Vote
+              {t('common.actions.vote')}
             </LinkButton>
           )}
         </div>

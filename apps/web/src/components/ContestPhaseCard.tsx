@@ -1,12 +1,18 @@
 import type { ContestDto } from '@foka-vote/shared';
+import { useTranslation } from 'react-i18next';
 import Card from './ui/Card';
 import Countdown from './ui/Countdown';
 
+type SingleLabelKey =
+  | 'components.contestPhaseCard.submissionsStart'
+  | 'components.contestPhaseCard.votingEnded';
+type RangeTitleKey = 'contestStatus.SUBMISSIONS' | 'contestStatus.VOTING';
+
 type ContestPhaseInfo =
-  | { kind: 'single'; label: string; dateIso: string; countdownTargetIso: string | null }
+  | { kind: 'single'; labelKey: SingleLabelKey; dateIso: string; countdownTargetIso: string | null }
   | {
       kind: 'range';
-      title: string;
+      titleKey: RangeTitleKey;
       icon: string;
       startIso: string;
       endIso: string;
@@ -18,14 +24,14 @@ function getContestPhaseInfo(contest: ContestDto): ContestPhaseInfo {
     case 'DRAFT':
       return {
         kind: 'single',
-        label: 'Submissions start',
+        labelKey: 'components.contestPhaseCard.submissionsStart',
         dateIso: contest.submissionStart,
         countdownTargetIso: contest.submissionStart,
       };
     case 'SUBMISSIONS':
       return {
         kind: 'range',
-        title: 'Submissions',
+        titleKey: 'contestStatus.SUBMISSIONS',
         icon: 'bi-send',
         startIso: contest.submissionStart,
         endIso: contest.submissionDeadline,
@@ -34,7 +40,7 @@ function getContestPhaseInfo(contest: ContestDto): ContestPhaseInfo {
     case 'VOTING':
       return {
         kind: 'range',
-        title: 'Voting',
+        titleKey: 'contestStatus.VOTING',
         icon: 'bi-check2-square',
         startIso: contest.votingStart,
         endIso: contest.votingEnd,
@@ -43,7 +49,7 @@ function getContestPhaseInfo(contest: ContestDto): ContestPhaseInfo {
     case 'CLOSED':
       return {
         kind: 'single',
-        label: 'Voting ended',
+        labelKey: 'components.contestPhaseCard.votingEnded',
         dateIso: contest.votingEnd,
         countdownTargetIso: null,
       };
@@ -59,6 +65,7 @@ interface ContestPhaseCardProps {
 }
 
 const ContestPhaseCard = ({ contest }: ContestPhaseCardProps) => {
+  const { t } = useTranslation();
   const phase = getContestPhaseInfo(contest);
 
   return (
@@ -66,7 +73,7 @@ const ContestPhaseCard = ({ contest }: ContestPhaseCardProps) => {
       {phase.kind === 'single' ? (
         <>
           <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            {phase.label}
+            {t(phase.labelKey)}
           </dt>
           <dd className="mt-1 text-sm text-zinc-900">{formatDate(phase.dateIso)}</dd>
           {phase.countdownTargetIso && (
@@ -78,19 +85,21 @@ const ContestPhaseCard = ({ contest }: ContestPhaseCardProps) => {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
               <i className={`bi ${phase.icon} text-indigo-600`} aria-hidden="true" />
-              {phase.title}
+              {t(phase.titleKey)}
             </div>
             <Countdown targetIso={phase.countdownTargetIso} />
           </div>
           <dl className="mt-3 flex justify-center gap-12 text-center">
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                Starts
+                {t('components.contestPhaseCard.starts')}
               </dt>
               <dd className="mt-1 text-sm text-zinc-900">{formatDate(phase.startIso)}</dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Ends</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                {t('components.contestPhaseCard.ends')}
+              </dt>
               <dd className="mt-1 text-sm text-zinc-900">{formatDate(phase.endIso)}</dd>
             </div>
           </dl>
