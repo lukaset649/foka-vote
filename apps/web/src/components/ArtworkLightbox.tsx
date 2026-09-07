@@ -1,11 +1,9 @@
-import Lightbox from 'yet-another-react-lightbox';
+import Lightbox, { useLightboxState } from 'yet-another-react-lightbox';
 import Captions from 'yet-another-react-lightbox/plugins/captions';
-import Counter from 'yet-another-react-lightbox/plugins/counter';
 import type { ArtworkDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/captions.css';
-import 'yet-another-react-lightbox/plugins/counter.css';
 
 interface ArtworkLightboxProps {
   artworks: ArtworkDto[];
@@ -14,6 +12,26 @@ interface ArtworkLightboxProps {
   onClose: () => void;
   authorAlias?: string;
 }
+
+const CounterBadge = () => {
+  const { slides, currentIndex } = useLightboxState();
+  if (slides.length === 0) return null;
+  return (
+    <div
+      aria-hidden
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        color: 'var(--yarl__color_button, hsla(0, 0%, 100%, 0.8))',
+        lineHeight: 'var(--yarl__icon_size, 32px)',
+        padding: 'var(--yarl__button_padding, 8px)',
+        userSelect: 'none',
+      }}
+    >
+      {currentIndex + 1} / {slides.length}
+    </div>
+  );
+};
 
 const ArtworkLightbox = ({
   artworks,
@@ -37,8 +55,8 @@ const ArtworkLightbox = ({
       close={onClose}
       index={startIndex}
       slides={slides}
-      plugins={[Captions, Counter]}
-      counter={{ container: { style: { top: 'unset', bottom: 0 } } }}
+      plugins={[Captions]}
+      toolbar={{ buttons: [<CounterBadge key="counter" />, 'close'] }}
       animation={{ fade: 0, swipe: 500, navigation: 0 }}
     />
   );
