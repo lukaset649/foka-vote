@@ -6,6 +6,7 @@
   "common": {
     "timeRemaining": "{{time}} remaining",
     "backToContests": "Back to contests",
+    "backToContest": "Back to the contest",
     "actions": {
       "gallery": "Gallery",
       "submit": "Submit your work",
@@ -15,7 +16,10 @@
     "cancel": "Cancel",
     "descriptionOptional": "Description (optional)",
     "titleOptional": "Title (optional)",
-    "remove": "Remove"
+    "remove": "Remove",
+    "points": "pts",
+    "submit": "Submit",
+    "noConfirmationDataFound": "No confirmation data found."
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -78,16 +82,31 @@
       "heading": "Preview your submission",
       "artworkFallbackAlt": "Artwork {{index}}",
       "edit": "Edit",
-      "submit": "Submit",
       "uploading": "Uploading your submission…",
       "processing": "Processing…",
       "almostDone": "Almost done…"
     },
     "submissionConfirmation": {
-      "noDataFound": "No confirmation data found.",
-      "backToContest": "Back to the contest",
       "title": "Submission received",
       "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
+    },
+    "gallery": {
+      "failedToLoad": "Failed to load gallery"
+    },
+    "voteCard": {
+      "heading": "Vote — {{title}}",
+      "failedToLoad": "Failed to load voting card",
+      "notEnoughSubmissions": "Not enough submissions to vote on yet.",
+      "slots": "Slots",
+      "alreadyVoted": "You have already voted in this contest.",
+      "viewArtworksAriaLabel": "View artworks: {{alias}}",
+      "slotAriaLabel": "Slot {{weight}} pts, {{state}}",
+      "slotFilled": "filled",
+      "slotEmpty": "empty"
+    },
+    "voteConfirmation": {
+      "title": "Vote received",
+      "recorded": "Your vote card has been recorded. It cannot be changed."
     }
   },
   "components": {
@@ -104,7 +123,6 @@
     "contestResultsCard": {
       "viewResults": "View results",
       "noVotesYet": "No votes cast yet",
-      "points": "pts",
       "showingTopOf": "Showing the top {{shown}} of {{total}} results - see the full standings on the results page."
     },
     "artworkLightbox": {

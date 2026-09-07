@@ -83,7 +83,7 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                         : entry.alias}
                     </span>
                     <span className="font-semibold text-indigo-600">
-                      {entry.total} {t('components.contestResultsCard.points')}
+                      {entry.total} {t('common.points')}
                     </span>
                   </li>
                 ))}

@@ -131,7 +131,7 @@ const SubmissionPreviewPage = () => {
         </Button>
         <Button type="button" variant="primary" onClick={handleSubmit} disabled={submitting}>
           <i className="bi bi-send" aria-hidden="true" />
-          {t('pages.submissionPreview.submit')}
+          {t('common.submit')}
         </Button>
       </div>
 

@@ -6,6 +6,7 @@
   "common": {
     "timeRemaining": "Pozostało {{time}}",
     "backToContests": "Powrót do konkursów",
+    "backToContest": "Powrót do konkursu",
     "actions": {
       "gallery": "Galeria",
       "submit": "Wyślij swoją pracę",
@@ -15,7 +16,10 @@
     "cancel": "Anuluj",
     "descriptionOptional": "Opis (opcjonalnie)",
     "titleOptional": "Tytuł (opcjonalnie)",
-    "remove": "Usuń"
+    "remove": "Usuń",
+    "points": "pkt",
+    "submit": "Wyślij",
+    "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia."
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -78,16 +82,31 @@
       "heading": "Podgląd zgłoszenia",
       "artworkFallbackAlt": "Praca {{index}}",
       "edit": "Edytuj",
-      "submit": "Wyślij",
       "uploading": "Przesyłanie zgłoszenia…",
       "processing": "Przetwarzanie…",
       "almostDone": "Prawie gotowe…"
     },
     "submissionConfirmation": {
-      "noDataFound": "Nie znaleziono danych potwierdzenia.",
-      "backToContest": "Powrót do konkursu",
       "title": "Zgłoszenie przyjęte",
       "submittedUnder": "Twoja praca została zgłoszona pod pseudonimem <strong>{{alias}}</strong>."
+    },
+    "gallery": {
+      "failedToLoad": "Nie udało się wczytać galerii"
+    },
+    "voteCard": {
+      "heading": "Głosuj — {{title}}",
+      "failedToLoad": "Nie udało się wczytać karty do głosowania",
+      "notEnoughSubmissions": "Za mało zgłoszeń, aby móc głosować.",
+      "slots": "Miejsca",
+      "alreadyVoted": "Twój głos w tym konkursie został już zapisany.",
+      "viewArtworksAriaLabel": "Zobacz prace: {{alias}}",
+      "slotAriaLabel": "Miejsce {{weight}} pkt, {{state}}",
+      "slotFilled": "wypełnione",
+      "slotEmpty": "puste"
+    },
+    "voteConfirmation": {
+      "title": "Głos przyjęty",
+      "recorded": "Twoja karta do głosowania została zapisana. Nie można jej już zmienić."
     }
   },
   "components": {
@@ -104,7 +123,6 @@
     "contestResultsCard": {
       "viewResults": "Zobacz wyniki",
       "noVotesYet": "Brak oddanych głosów",
-      "points": "pkt",
       "showingTopOf": "Pokazano najlepsze {{shown}} z {{total}} wyników — pełna klasyfikacja jest dostępna na stronie wyników."
     },
     "artworkLightbox": {

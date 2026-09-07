@@ -17,9 +17,9 @@ const SubmissionConfirmationPage = () => {
   if (!state) {
     return (
       <Alert variant="info">
-        {t('pages.submissionConfirmation.noDataFound')}{' '}
+        {t('common.noConfirmationDataFound')}{' '}
         <Link to={`/contest/${slug}`} className="font-medium underline">
-          {t('pages.submissionConfirmation.backToContest')}
+          {t('common.backToContest')}
         </Link>
         .
       </Alert>
@@ -35,7 +35,7 @@ const SubmissionConfirmationPage = () => {
         className="inline-flex w-fit items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800"
       >
         <i className="bi bi-arrow-left" aria-hidden="true" />{' '}
-        {t('pages.submissionConfirmation.backToContest')}
+        {t('common.backToContest')}
       </Link>
 
       <div className="flex flex-col items-center gap-2 text-center">
