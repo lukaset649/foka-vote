@@ -11,7 +11,11 @@
       "submit": "Submit your work",
       "vote": "Vote",
       "results": "Results"
-    }
+    },
+    "cancel": "Cancel",
+    "descriptionOptional": "Description (optional)",
+    "titleOptional": "Title (optional)",
+    "remove": "Remove"
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -43,6 +47,47 @@
       "codeLabel": "Access code",
       "submit": "Enter",
       "invalidCode": "Invalid access code"
+    },
+    "submissionForm": {
+      "heading": "Submit your work — {{title}}",
+      "infoNamePublished": "Your first and last name will be published next to your work once voting closes.",
+      "infoAliasAfter": "Since then, the random alias will be displayed instead.",
+      "infoAdminOnly": "After submitting, only the admin can make changes.",
+      "nicknameLabel": "Your nickname",
+      "nicknameAssigning": "Assigning…",
+      "nicknameUnavailable": "Unavailable",
+      "nicknameHint": "Randomly assigned and shown next to your work during voting phase.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "artworksHeading": "Artworks (up to {{max}})",
+      "maxFileSize": "Max file size per photo: {{size}} MB",
+      "artworkLegend": "Artwork {{index}}",
+      "fileLabel": "File",
+      "currentlyAttached": "Currently attached: {{filename}}",
+      "addAnotherArtwork": "Add another artwork",
+      "continueToPreview": "Continue to preview",
+      "errors": {
+        "nameRequired": "First and last name are required",
+        "artworkRequired": "Attach at least one artwork",
+        "aliasPending": "Your nickname is still being assigned, please wait a moment and try again"
+      }
+    },
+    "submissionPreview": {
+      "noDataFound": "No submission data found.",
+      "goBackToForm": "Go back to the form",
+      "heading": "Preview your submission",
+      "artworkFallbackAlt": "Artwork {{index}}",
+      "edit": "Edit",
+      "submit": "Submit",
+      "uploading": "Uploading your submission…",
+      "processing": "Processing…",
+      "almostDone": "Almost done…"
+    },
+    "submissionConfirmation": {
+      "noDataFound": "No confirmation data found.",
+      "backToContest": "Back to the contest",
+      "title": "Submission received",
+      "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
     }
   },
   "components": {

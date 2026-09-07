@@ -11,7 +11,11 @@
       "submit": "Wyślij swoją pracę",
       "vote": "Głosuj",
       "results": "Wyniki"
-    }
+    },
+    "cancel": "Anuluj",
+    "descriptionOptional": "Opis (opcjonalnie)",
+    "titleOptional": "Tytuł (opcjonalnie)",
+    "remove": "Usuń"
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -43,6 +47,47 @@
       "codeLabel": "Kod dostępu",
       "submit": "Wejdź",
       "invalidCode": "Nieprawidłowy kod dostępu"
+    },
+    "submissionForm": {
+      "heading": "Zgłoś swoją pracę — {{title}}",
+      "infoNamePublished": "Twoje imię i nazwisko zostanie opublikowane przy pracy po zakończeniu głosowania.",
+      "infoAliasAfter": "Do tego czasu wyświetlany będzie losowy pseudonim.",
+      "infoAdminOnly": "Po wysłaniu zgłoszenia zmiany może wprowadzić już tylko administrator.",
+      "nicknameLabel": "Twój pseudonim",
+      "nicknameAssigning": "Przydzielanie…",
+      "nicknameUnavailable": "Niedostępny",
+      "nicknameHint": "Losowo przydzielany i wyświetlany przy pracy podczas głosowania.",
+      "firstNameLabel": "Imię",
+      "lastNameLabel": "Nazwisko",
+      "artworksHeading": "Prace (maksymalnie {{max}})",
+      "maxFileSize": "Maksymalny rozmiar pliku na zdjęcie: {{size}} MB",
+      "artworkLegend": "Praca {{index}}",
+      "fileLabel": "Plik",
+      "currentlyAttached": "Aktualnie dołączono: {{filename}}",
+      "addAnotherArtwork": "Dodaj kolejną pracę",
+      "continueToPreview": "Przejdź do podglądu",
+      "errors": {
+        "nameRequired": "Imię i nazwisko są wymagane",
+        "artworkRequired": "Dołącz co najmniej jedną pracę",
+        "aliasPending": "Twój pseudonim jest jeszcze przydzielany, poczekaj chwilę i spróbuj ponownie"
+      }
+    },
+    "submissionPreview": {
+      "noDataFound": "Nie znaleziono danych zgłoszenia.",
+      "goBackToForm": "Wróć do formularza",
+      "heading": "Podgląd zgłoszenia",
+      "artworkFallbackAlt": "Praca {{index}}",
+      "edit": "Edytuj",
+      "submit": "Wyślij",
+      "uploading": "Przesyłanie zgłoszenia…",
+      "processing": "Przetwarzanie…",
+      "almostDone": "Prawie gotowe…"
+    },
+    "submissionConfirmation": {
+      "noDataFound": "Nie znaleziono danych potwierdzenia.",
+      "backToContest": "Powrót do konkursu",
+      "title": "Zgłoszenie przyjęte",
+      "submittedUnder": "Twoja praca została zgłoszona pod pseudonimem <strong>{{alias}}</strong>."
     }
   },
   "components": {
