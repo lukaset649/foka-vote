@@ -1,1 +1,41 @@
-{}
+{
+  "nav": {
+    "voting": "Voting",
+    "admin": "Admin"
+  },
+  "common": {
+    "timeRemaining": "{{time}} remaining",
+    "backToContests": "Back to contests",
+    "actions": {
+      "gallery": "Gallery",
+      "submit": "Submit your work",
+      "vote": "Vote",
+      "results": "Results"
+    }
+  },
+  "contestStatus": {
+    "DRAFT": "Draft",
+    "SUBMISSIONS": "Submissions",
+    "VOTING": "Voting",
+    "CLOSED": "Closed"
+  },
+  "pages": {
+    "contestsList": {
+      "current": "Current",
+      "allContests": "All contests",
+      "noContestsYet": "No contests yet",
+      "failedToLoad": "Failed to load contests"
+    },
+    "contest": {
+      "failedToLoad": "Failed to load contest"
+    }
+  },
+  "components": {
+    "contestPhaseCard": {
+      "submissionsStart": "Submissions start",
+      "votingEnded": "Voting ended",
+      "starts": "Starts",
+      "ends": "Ends"
+    }
+  }
+}
