@@ -8,7 +8,7 @@ const Layout = () => {
   const isWide = matches.some((match) => (match.handle as RouteHandle | undefined)?.wide);
 
   return (
-    <div className="min-h-full bg-zinc-50 text-zinc-900">
+    <div className="min-h-dvh bg-zinc-50 text-zinc-900">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
