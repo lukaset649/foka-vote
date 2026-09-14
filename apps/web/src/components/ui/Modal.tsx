@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 
 interface ModalProps {
@@ -10,6 +10,21 @@ interface ModalProps {
 }
 
 const Modal = ({ open, onClose, children, className, ariaLabelledBy }: ModalProps) => {
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const { documentElement, body } = document;
+    const previousHtmlOverflow = documentElement.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    documentElement.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+    };
+  }, [open]);
+
   if (!open) {
     return null;
   }
