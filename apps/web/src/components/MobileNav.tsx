@@ -56,7 +56,7 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
             type="button"
             onClick={onClose}
             aria-label={t('nav.closeMenu')}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-lg text-zinc-500 transition-colors hover:bg-zinc-100"
           >
             <i className="bi bi-x-lg" aria-hidden="true" />
           </button>
@@ -68,7 +68,7 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
               to={item.to}
               variant="secondary"
               size="sm"
-              className="w-full !justify-start"
+              className="w-full !min-h-11 !justify-start !text-base"
             >
               {t(item.labelKey)}
             </LinkButton>

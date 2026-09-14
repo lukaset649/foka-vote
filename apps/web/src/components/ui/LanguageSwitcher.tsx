@@ -15,13 +15,13 @@ const LanguageSwitcher = () => {
     <button
       type="button"
       onClick={toggleLanguage}
-      className="inline-flex h-7 cursor-pointer items-center gap-0.5 rounded-md border border-zinc-300 p-0.5 text-xs font-medium sm:h-10 sm:items-stretch sm:text-sm"
+      className="inline-flex h-11 cursor-pointer items-center gap-1 rounded-md border border-zinc-300 p-1 text-sm font-medium sm:h-10 sm:items-stretch"
     >
       {SUPPORTED_LANGUAGES.map((language) => (
         <span
           key={language}
           className={cn(
-            'flex items-center justify-center rounded px-2 py-1 uppercase transition-colors sm:px-3 sm:py-0',
+            'flex items-center justify-center rounded px-3 py-2 uppercase transition-colors sm:px-3 sm:py-0',
             activeLanguage === language ? 'bg-indigo-600 text-white' : 'text-zinc-600',
           )}
         >
