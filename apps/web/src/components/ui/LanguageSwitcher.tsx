@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next';
+import { SUPPORTED_LANGUAGES } from '../../i18n/config';
 import { cn } from '../../lib/cn';
-
-const LANGUAGES = ['pl', 'en'] as const;
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const activeLanguage = LANGUAGES.includes(i18n.language as (typeof LANGUAGES)[number])
-    ? i18n.language
-    : 'pl';
+  const activeLanguage = SUPPORTED_LANGUAGES.includes(i18n.language) ? i18n.language : 'pl';
 
   return (
     <div className="flex items-center rounded-md border border-zinc-300 p-0.5 text-xs font-medium">
-      {LANGUAGES.map((language) => (
+      {SUPPORTED_LANGUAGES.map((language) => (
         <button
           key={language}
           type="button"

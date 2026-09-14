@@ -5,6 +5,8 @@ import { initReactI18next } from 'react-i18next';
 import en from './locales/en/translation.json';
 import pl from './locales/pl/translation.json';
 
+export const SUPPORTED_LANGUAGES = ['pl', 'en'];
+
 void i18next
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -14,7 +16,7 @@ void i18next
       pl: { translation: pl },
     },
     fallbackLng: 'pl',
-    supportedLngs: ['pl', 'en'],
+    supportedLngs: SUPPORTED_LANGUAGES,
     nonExplicitSupportedLngs: true,
     interpolation: {
       escapeValue: false,

@@ -208,10 +208,6 @@
     }
   },
   "components": {
-    "languageSwitcher": {
-      "pl": "Polski",
-      "en": "English"
-    },
     "contestPhaseCard": {
       "submissionsStart": "Rozpoczęcie zgłoszeń",
       "votingEnded": "Głosowanie zakończone",

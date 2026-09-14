@@ -50,7 +50,7 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
           ))}
         </nav>
         <div className="mt-auto border-t border-zinc-200 pt-4">
-          <LanguageSwitcher menuAlign="top" />
+          <LanguageSwitcher />
         </div>
       </div>
     </div>
