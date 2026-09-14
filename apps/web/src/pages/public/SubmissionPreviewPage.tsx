@@ -68,6 +68,7 @@ const SubmissionPreviewPage = () => {
           lastName: draft.lastName,
           description: draft.description,
           reservationId: draft.reservationId,
+          rulesAccepted: draft.rulesAccepted,
         },
         draft.artworks,
         (fraction) => setUploadProgress(Math.round(fraction * 100)),
