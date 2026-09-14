@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import type { SubmissionDto } from '@foka-vote/shared';
 import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
 import { contestGatePath } from '../../services/contests';
-import { fetchSubmissions } from '../../services/submissions';
+import { fetchSubmissions, submissionDisplayName } from '../../services/submissions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import Alert from '../../components/ui/Alert';
@@ -78,7 +78,9 @@ const GalleryPage = () => {
           {submissions.map((submission) => (
             <li key={submission.id}>
               <Card>
-                <h2 className="text-lg font-semibold text-zinc-900">{submission.alias}</h2>
+                <h2 className="text-lg font-semibold text-zinc-900">
+                  {submissionDisplayName(submission)}
+                </h2>
                 {submission.description && (
                   <p className="mt-1 text-sm text-zinc-600">{submission.description}</p>
                 )}
@@ -93,7 +95,7 @@ const GalleryPage = () => {
                       >
                         <img
                           src={mediaUrl(artwork.thumbUrl)}
-                          alt={artwork.title ?? submission.alias}
+                          alt={artwork.title ?? submissionDisplayName(submission)}
                           className="aspect-square w-full rounded-md border border-zinc-200 object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
                         />
                       </button>
@@ -118,7 +120,7 @@ const GalleryPage = () => {
           startIndex={lightbox.index}
           open
           onClose={() => setLightbox(null)}
-          authorAlias={openSubmission.alias}
+          authorAlias={submissionDisplayName(openSubmission)}
         />
       )}
     </div>

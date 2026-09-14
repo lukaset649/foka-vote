@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
-import { fetchSubmissions } from '../services/submissions';
+import { fetchSubmissions, submissionDisplayName } from '../services/submissions';
 import ArtworkLightbox from './ArtworkLightbox';
 import Card from './ui/Card';
 import EmptyState from './ui/EmptyState';
 import LinkButton from './ui/LinkButton';
 import Spinner from './ui/Spinner';
 
-// Mirrors the grid-cols breakpoints used by the gallery preview grid below.
-// Kept to a small column count so preview tiles stay large.
 const GALLERY_COLUMN_BREAKPOINTS: Array<{ minWidth: number; columns: number }> = [
   { minWidth: 1024, columns: 4 },
   { minWidth: 640, columns: 3 },
@@ -106,12 +104,12 @@ const ContestGalleryCard = ({ contest }: ContestGalleryCardProps) => {
                   {submission.artworks[0] && (
                     <img
                       src={mediaUrl(submission.artworks[0].thumbUrl)}
-                      alt={submission.alias}
+                      alt={submissionDisplayName(submission)}
                       className="aspect-square w-full rounded-md object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
                     />
                   )}
                   <p className="mt-1 truncate text-sm font-medium text-zinc-900">
-                    {submission.alias}
+                    {submissionDisplayName(submission)}
                   </p>
                 </button>
               </li>
@@ -136,7 +134,7 @@ const ContestGalleryCard = ({ contest }: ContestGalleryCardProps) => {
           startIndex={0}
           open
           onClose={() => setLightboxSubmission(null)}
-          authorAlias={lightboxSubmission.alias}
+          authorAlias={submissionDisplayName(lightboxSubmission)}
         />
       )}
     </>

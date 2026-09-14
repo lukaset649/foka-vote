@@ -49,10 +49,15 @@ function toArtworkDto(artwork: Artwork): ArtworkDto {
   };
 }
 
-function toSubmissionDto(submission: Submission, artworks: Artwork[]): SubmissionDto {
+function toSubmissionDto(
+  submission: Submission,
+  artworks: Artwork[],
+  includeNames: boolean,
+): SubmissionDto {
   return {
     id: submission.id,
     alias: submission.alias,
+    ...(includeNames ? { firstName: submission.firstName, lastName: submission.lastName } : {}),
     description: submission.description,
     artworks: [...artworks].sort((a, b) => a.sortOrder - b.sortOrder).map(toArtworkDto),
     createdAt: submission.createdAt.toISOString(),
@@ -233,13 +238,18 @@ export async function listSubmissions(
 
   assertContestAccess(contest, signedCookies);
 
+  const status = computeContestStatus(new Date(), contest);
+  const includeNames = status === 'CLOSED';
+
   const submissions = await prisma.submission.findMany({
     where: { contestId: contest.id },
     include: { artworks: true },
     orderBy: { createdAt: 'asc' },
   });
 
-  return submissions.map((submission) => toSubmissionDto(submission, submission.artworks));
+  return submissions.map((submission) =>
+    toSubmissionDto(submission, submission.artworks, includeNames),
+  );
 }
 
 export async function createSubmission(
@@ -296,7 +306,7 @@ export async function createSubmission(
       meta,
       input.reservationId,
     );
-    return toSubmissionDto(submission, artworks);
+    return toSubmissionDto(submission, artworks, false);
   } catch (error) {
     await cleanupProcessedFiles(processed);
     throw error;

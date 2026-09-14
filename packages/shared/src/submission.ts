@@ -13,6 +13,8 @@ export interface ArtworkDto {
 export interface SubmissionDto {
   id: string;
   alias: string;
+  firstName?: string;
+  lastName?: string;
   description: string | null;
   artworks: ArtworkDto[];
   createdAt: string;
