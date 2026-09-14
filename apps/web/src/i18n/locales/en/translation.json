@@ -1,7 +1,10 @@
 {
   "nav": {
     "voting": "Voting",
-    "admin": "Admin"
+    "admin": "Admin",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "common": {
     "timeRemaining": "{{time}} remaining",
@@ -197,6 +200,10 @@
     }
   },
   "components": {
+    "languageSwitcher": {
+      "pl": "Polski",
+      "en": "English"
+    },
     "contestPhaseCard": {
       "submissionsStart": "Submissions start",
       "votingEnded": "Voting ended",
