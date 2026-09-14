@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { NavItem } from './Layout';
 import LanguageSwitcher from './ui/LanguageSwitcher';
@@ -11,8 +12,21 @@ interface MobileNavProps {
 
 const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
   const { t } = useTranslation();
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [isVisible, setIsVisible] = useState(false);
 
-  if (!isOpen) {
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsVisible(true));
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+    setIsVisible(false);
+  }, [isOpen]);
+
+  if (!shouldRender) {
     return null;
   }
 
@@ -21,10 +35,21 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
       <button
         type="button"
         aria-label={t('nav.closeMenu')}
-        className="absolute inset-0 bg-zinc-900/40"
+        className={`absolute inset-0 bg-zinc-900/40 transition-opacity duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       />
-      <div className="absolute right-0 top-0 flex h-full w-64 max-w-[80%] flex-col gap-4 bg-white p-4 shadow-xl">
+      <div
+        className={`absolute right-0 top-0 flex h-full w-64 max-w-[80%] flex-col gap-4 bg-white p-4 shadow-xl transition-transform duration-300 ease-out ${
+          isVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        onTransitionEnd={() => {
+          if (!isOpen) {
+            setShouldRender(false);
+          }
+        }}
+      >
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold text-zinc-500">{t('nav.menu')}</span>
           <button
