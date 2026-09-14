@@ -14,8 +14,6 @@ function isCurrent(contest: ContestDto): boolean {
   return contest.status === 'SUBMISSIONS' || contest.status === 'VOTING';
 }
 
-const SQUARE_BUTTON_CLASSES = '!h-9 !w-9 shrink-0 !p-0 text-base';
-
 const ContestListItem = ({ contest }: { contest: ContestDto }) => {
   const { t } = useTranslation();
 
@@ -40,8 +38,8 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
           <LinkButton
             to={`/contest/${contest.slug}/gallery`}
             variant="secondary"
-            size="sm"
-            className={SQUARE_BUTTON_CLASSES}
+            size="icon"
+            className="shrink-0"
             aria-label={t('common.actions.gallery')}
             title={t('common.actions.gallery')}
           >
@@ -51,8 +49,8 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
             <LinkButton
               to={`/contest/${contest.slug}/submit`}
               variant="primary"
-              size="sm"
-              className={SQUARE_BUTTON_CLASSES}
+              size="icon"
+              className="shrink-0"
               aria-label={t('common.actions.submit')}
               title={t('common.actions.submit')}
             >
@@ -63,8 +61,8 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
             <LinkButton
               to={`/contest/${contest.slug}/vote`}
               variant="primary"
-              size="sm"
-              className={`${SQUARE_BUTTON_CLASSES} !border-green-800 !bg-green-800 hover:!bg-green-900`}
+              size="icon"
+              className="shrink-0 !border-green-800 !bg-green-800 hover:!bg-green-900"
               aria-label={t('common.actions.vote')}
               title={t('common.actions.vote')}
             >
@@ -75,8 +73,8 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
             <LinkButton
               to={`/contest/${contest.slug}/results`}
               variant="secondary"
-              size="sm"
-              className={`${SQUARE_BUTTON_CLASSES} !border-amber-600 !bg-amber-600 !text-white hover:!bg-amber-700`}
+              size="icon"
+              className="shrink-0 !border-amber-600 !bg-amber-600 !text-white hover:!bg-amber-700"
               aria-label={t('common.actions.results')}
               title={t('common.actions.results')}
             >

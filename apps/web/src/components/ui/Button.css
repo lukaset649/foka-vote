@@ -1,0 +1,35 @@
+@reference '../../styles.css';
+
+.btn-base {
+  @apply inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600;
+  @apply disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300;
+}
+
+.btn-secondary {
+  @apply border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 disabled:text-zinc-400;
+}
+
+.btn-danger {
+  @apply bg-rose-600 text-white hover:bg-rose-700 disabled:bg-rose-300;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-zinc-700 hover:bg-zinc-200 disabled:text-zinc-400;
+}
+
+.btn-default {
+  @apply min-h-10 px-4 py-2 text-sm;
+}
+
+.btn-sm {
+  @apply min-h-10 px-3 py-1.5 text-sm;
+}
+
+.btn-icon {
+  @apply h-11 w-11 p-0 text-lg;
+}
