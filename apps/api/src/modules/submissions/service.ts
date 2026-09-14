@@ -186,6 +186,7 @@ async function createSubmissionWithRetry(
             lastName: input.lastName,
             description: input.description ?? null,
             alias,
+            rulesAcceptedAt: new Date(),
           },
         });
 
