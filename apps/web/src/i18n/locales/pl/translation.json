@@ -24,7 +24,8 @@
     "submit": "Wyślij",
     "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia.",
     "loading": "Wczytywanie…",
-    "back": "Wstecz"
+    "back": "Wstecz",
+    "close": "Zamknij"
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -75,10 +76,12 @@
       "currentlyAttached": "Aktualnie dołączono: {{filename}}",
       "addAnotherArtwork": "Dodaj kolejną pracę",
       "continueToPreview": "Przejdź do podglądu",
+      "rulesLabel": "Akceptuję <rulesLink>regulamin konkursu</rulesLink>.",
       "errors": {
         "nameRequired": "Imię i nazwisko są wymagane",
         "artworkRequired": "Dołącz co najmniej jedną pracę",
-        "aliasPending": "Twój pseudonim jest jeszcze przydzielany, poczekaj chwilę i spróbuj ponownie"
+        "aliasPending": "Twój pseudonim jest jeszcze przydzielany, poczekaj chwilę i spróbuj ponownie",
+        "rulesRequired": "Musisz zaakceptować regulamin konkursu, aby wysłać zgłoszenie"
       }
     },
     "submissionPreview": {
@@ -238,6 +241,55 @@
     },
     "artworkLightbox": {
       "defaultAlt": "Praca"
+    },
+    "contestRulesModal": {
+      "title": "Regulamin konkursu fotograficznego Koła Naukowego Fotografii i Grafiki FO-KA",
+      "sections": [
+        {
+          "heading": "§1 Postanowienia ogólne",
+          "items": [
+            "Organizatorem konkursu jest Koło Naukowe Fotografii i Grafiki FO-KA, działające przy Uniwersytecie Komisji Edukacji Narodowej w Krakowie (UKEN), zwane dalej „Organizatorem”.",
+            "Konkurs ma charakter wewnętrzny, skierowany do członków i sympatyków Koła.",
+            "Udział w konkursie jest dobrowolny i bezpłatny. Konkurs nie ma charakteru komercyjnego i na obecną chwilę nie przewiduje nagród."
+          ]
+        },
+        {
+          "heading": "§2 Warunki uczestnictwa",
+          "items": [
+            "Warunkiem udziału jest przesłanie zgłoszenia zawierającego co najmniej jedną fotografię za pośrednictwem formularza w aplikacji konkursowej oraz akceptacja niniejszego regulaminu.",
+            "Uczestnik oświadcza, że przesłane fotografie są jego autorskimi pracami i nie naruszają praw osób trzecich, w tym praw autorskich i praw do wizerunku."
+          ]
+        },
+        {
+          "heading": "§3 Zgłaszanie prac i głosowanie",
+          "items": [
+            "Zgłoszenia przyjmowane są w terminie określonym przez Organizatora dla danej edycji konkursu. Po przesłaniu zgłoszenia zmiany może wprowadzić wyłącznie administrator.",
+            "Do czasu zakończenia głosowania prace prezentowane są pod pseudonimem przypisanym uczestnikowi. Wyniki ogłaszane są po zakończeniu głosowania."
+          ]
+        },
+        {
+          "heading": "§4 Prawa autorskie i licencja",
+          "items": [
+            "Uczestnik zachowuje pełnię praw autorskich do zgłoszonych fotografii.",
+            "Przesyłając zgłoszenie, uczestnik udziela Organizatorowi nieodpłatnej, niewyłącznej licencji na wykorzystanie zgłoszonych fotografii na stronie internetowej oraz w mediach społecznościowych Koła, w celach związanych z organizacją, promocją i dokumentacją konkursu."
+          ]
+        },
+        {
+          "heading": "§5 Dane osobowe i publikacja autorstwa",
+          "items": [
+            "Uczestnik wyraża zgodę na publikację swojego imienia i nazwiska jako autora zgłoszonej pracy po zakończeniu konkursu (zakończeniu głosowania).",
+            "Do czasu zakończenia głosowania dane osobowe uczestnika nie są publicznie ujawniane — prezentowany jest wyłącznie pseudonim.",
+            "Administratorem danych osobowych uczestników jest Organizator. Dane przetwarzane są wyłącznie w celu przeprowadzenia konkursu i publikacji wyników zgodnie z niniejszym regulaminem."
+          ]
+        },
+        {
+          "heading": "§6 Postanowienia końcowe",
+          "items": [
+            "Organizator zastrzega sobie prawo do wykluczenia zgłoszeń naruszających niniejszy regulamin lub obowiązujące przepisy prawa.",
+            "W sprawach nieuregulowanych decyzje podejmuje Organizator."
+          ]
+        }
+      ]
     }
   }
 }
