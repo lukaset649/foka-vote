@@ -74,12 +74,7 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                     className="flex items-center justify-between gap-3 text-sm"
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <span className="flex items-center gap-1 font-medium text-zinc-900">
-                        {entry.place}.
-                        {results?.final && entry.place === 1 && (
-                          <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-                        )}
-                      </span>
+                      <span className="font-medium text-zinc-900">{entry.place}.</span>
                       <span className="flex min-w-0 flex-col">
                         <span className="truncate font-medium text-zinc-900">
                           {entry.firstName ? `${entry.firstName} ${entry.lastName}` : entry.alias}
@@ -89,7 +84,10 @@ const ContestResultsCard = ({ contest }: ContestResultsCardProps) => {
                         )}
                       </span>
                     </span>
-                    <span className="shrink-0 whitespace-nowrap font-semibold text-indigo-600">
+                    <span className="flex shrink-0 items-center gap-1 whitespace-nowrap font-semibold text-indigo-600">
+                      {results?.final && entry.place === 1 && (
+                        <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
+                      )}
                       {entry.total} {t('common.points')}
                     </span>
                   </li>
