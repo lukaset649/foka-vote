@@ -15,6 +15,12 @@ export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
   return response.json() as Promise<SubmissionDto[]>;
 }
 
+export function submissionDisplayName(submission: SubmissionDto): string {
+  return submission.firstName && submission.lastName
+    ? `${submission.firstName} ${submission.lastName}`
+    : submission.alias;
+}
+
 export async function reserveAlias(slug: string): Promise<AliasReservationDto> {
   const response = await apiRequest(`/api/contests/${slug}/submissions/alias-reservations`, {
     method: 'POST',
