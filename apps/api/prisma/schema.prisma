@@ -46,13 +46,14 @@ model AliasReservation {
 }
 
 model Submission {
-  id          String   @id @default(cuid())
-  contestId   String
-  firstName   String
-  lastName    String
-  alias       String
-  description String?
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  contestId       String
+  firstName       String
+  lastName        String
+  alias           String
+  description     String?
+  rulesAcceptedAt DateTime
+  createdAt       DateTime @default(now())
 
   contest  Contest    @relation(fields: [contestId], references: [id], onDelete: Cascade)
   artworks Artwork[]
