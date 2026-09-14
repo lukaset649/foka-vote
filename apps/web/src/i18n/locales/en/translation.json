@@ -24,7 +24,8 @@
     "submit": "Submit",
     "noConfirmationDataFound": "No confirmation data found.",
     "loading": "Loading…",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close"
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -75,10 +76,12 @@
       "currentlyAttached": "Currently attached: {{filename}}",
       "addAnotherArtwork": "Add another artwork",
       "continueToPreview": "Continue to preview",
+      "rulesLabel": "I accept the <rulesLink>contest rules</rulesLink>.",
       "errors": {
         "nameRequired": "First and last name are required",
         "artworkRequired": "Attach at least one artwork",
-        "aliasPending": "Your nickname is still being assigned, please wait a moment and try again"
+        "aliasPending": "Your nickname is still being assigned, please wait a moment and try again",
+        "rulesRequired": "You must accept the contest rules to submit"
       }
     },
     "submissionPreview": {
@@ -230,6 +233,55 @@
     },
     "artworkLightbox": {
       "defaultAlt": "Artwork"
+    },
+    "contestRulesModal": {
+      "title": "Contest rules of the FO-KA Photography and Graphics Student Society",
+      "sections": [
+        {
+          "heading": "§1 General provisions",
+          "items": [
+            "The organizer of the contest is the FO-KA Photography and Graphics Student Society, operating at the University of the National Education Commission in Krakow (UKEN), hereinafter referred to as the \"Organizer\".",
+            "The contest is internal and addressed to members and supporters of the Society.",
+            "Participation in the contest is voluntary and free of charge. The contest is non-commercial and currently does not offer any prizes."
+          ]
+        },
+        {
+          "heading": "§2 Conditions of participation",
+          "items": [
+            "Participation requires submitting an entry with at least one photograph via the form in the contest application and accepting these rules.",
+            "The participant declares that the submitted photographs are their own original work and do not infringe the rights of third parties, including copyright and image rights."
+          ]
+        },
+        {
+          "heading": "§3 Submitting entries and voting",
+          "items": [
+            "Entries are accepted within the period set by the Organizer for a given edition of the contest. After submission, changes can only be made by an administrator.",
+            "Until voting closes, entries are displayed under the participant's assigned nickname. Results are announced once voting closes."
+          ]
+        },
+        {
+          "heading": "§4 Copyright and license",
+          "items": [
+            "The participant retains full copyright to the submitted photographs.",
+            "By submitting an entry, the participant grants the Organizer a free, non-exclusive license to use the submitted photographs on the Society's website and social media, for purposes related to organizing, promoting, and documenting the contest."
+          ]
+        },
+        {
+          "heading": "§5 Personal data and publication of authorship",
+          "items": [
+            "The participant agrees to the publication of their first and last name as the author of the submitted work after the contest ends (once voting closes).",
+            "Until voting closes, the participant's personal data is not publicly disclosed — only the nickname is displayed.",
+            "The Organizer is the administrator of participants' personal data. Data is processed solely for the purpose of running the contest and publishing results in accordance with these rules."
+          ]
+        },
+        {
+          "heading": "§6 Final provisions",
+          "items": [
+            "The Organizer reserves the right to exclude entries that violate these rules or applicable law.",
+            "Matters not covered by these rules are decided by the Organizer."
+          ]
+        }
+      ]
     }
   }
 }

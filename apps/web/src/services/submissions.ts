@@ -36,6 +36,7 @@ export interface CreateSubmissionData {
   lastName: string;
   description: string;
   reservationId?: string;
+  rulesAccepted: boolean;
 }
 
 export interface CreateSubmissionArtwork {
@@ -59,6 +60,7 @@ export async function createSubmission(
   if (data.reservationId) {
     formData.append('reservationId', data.reservationId);
   }
+  formData.append('rulesAccepted', String(data.rulesAccepted));
   formData.append(
     'meta',
     JSON.stringify(

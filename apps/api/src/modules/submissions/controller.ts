@@ -65,16 +65,17 @@ export async function reserveAliasHandler(request: Request, response: Response):
 
 export async function create(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const { firstName, lastName, description, meta, reservationId } = request.body as Record<
-    string,
-    unknown
-  >;
+  const { firstName, lastName, description, meta, reservationId, rulesAccepted } =
+    request.body as Record<string, unknown>;
 
   if (typeof firstName !== 'string' || firstName.length === 0) {
     throw badRequest('firstName is required');
   }
   if (typeof lastName !== 'string' || lastName.length === 0) {
     throw badRequest('lastName is required');
+  }
+  if (rulesAccepted !== 'true') {
+    throw badRequest('rulesAccepted must be accepted');
   }
 
   const files = (request.files as Express.Multer.File[] | undefined) ?? [];

@@ -25,13 +25,6 @@ export interface AdminSubmissionDto extends SubmissionDto {
   lastName: string;
 }
 
-export interface CreateSubmissionDto {
-  firstName: string;
-  lastName: string;
-  description?: string;
-  reservationId?: string;
-}
-
 export interface AliasReservationDto {
   reservationId: string;
   alias: string;
