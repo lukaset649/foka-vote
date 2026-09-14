@@ -1,11 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { MAX_ARTWORK_FILE_SIZE_MB, type ContestDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
+import ContestRulesModal from '../../components/ContestRulesModal';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -28,6 +29,7 @@ export interface SubmissionDraftState {
   artworks: SubmissionArtworkDraft[];
   alias: string;
   reservationId: string;
+  rulesAccepted: boolean;
 }
 
 interface ArtworkSlot {
@@ -63,6 +65,8 @@ const SubmissionFormPage = () => {
       : [emptySlot()],
   );
   const [formError, setFormError] = useState<string | null>(null);
+  const [rulesAccepted, setRulesAccepted] = useState(draft?.rulesAccepted ?? false);
+  const [rulesModalOpen, setRulesModalOpen] = useState(false);
 
   const [alias, setAlias] = useState(draft?.alias ?? '');
   const [reservationId, setReservationId] = useState(draft?.reservationId ?? '');
@@ -179,6 +183,11 @@ const SubmissionFormPage = () => {
       return;
     }
 
+    if (!rulesAccepted) {
+      setFormError(t('pages.submissionForm.errors.rulesRequired'));
+      return;
+    }
+
     const draft: SubmissionDraftState = {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -186,6 +195,7 @@ const SubmissionFormPage = () => {
       artworks,
       alias,
       reservationId,
+      rulesAccepted,
     };
 
     void navigate(`/contest/${slug}/submit/preview`, { state: draft });
@@ -341,6 +351,31 @@ const SubmissionFormPage = () => {
           </Button>
         )}
       </div>
+
+      <label className="flex items-start gap-2 text-sm text-zinc-700">
+        <input
+          type="checkbox"
+          checked={rulesAccepted}
+          onChange={(event) => setRulesAccepted(event.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-600"
+        />
+        <span>
+          <Trans
+            i18nKey="pages.submissionForm.rulesLabel"
+            components={{
+              rulesLink: (
+                <button
+                  type="button"
+                  onClick={() => setRulesModalOpen(true)}
+                  className="font-medium text-indigo-600 underline hover:text-indigo-800"
+                />
+              ),
+            }}
+          />
+        </span>
+      </label>
+
+      <ContestRulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} />
 
       <div className="flex flex-wrap justify-between gap-3">
         <LinkButton
