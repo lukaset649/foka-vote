@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet } from 'react-router';
 import { fetchAdminSession } from '../services/adminAuth';
 
 const RequireAdmin = () => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'checking' | 'authenticated' | 'unauthenticated'>(
     'checking',
   );
@@ -31,7 +33,7 @@ const RequireAdmin = () => {
     return (
       <div className="flex items-center justify-center gap-2 py-16 text-zinc-500">
         <i className="bi bi-arrow-repeat animate-spin text-lg" aria-hidden="true" />
-        <span>Loading…</span>
+        <span>{t('common.loading')}</span>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/cn';
 
 interface CountdownProps {
@@ -28,6 +29,7 @@ function formatRemaining(targetIso: string, now: number): string {
 }
 
 const Countdown = ({ targetIso, className }: CountdownProps) => {
+  const { t } = useTranslation();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const Countdown = ({ targetIso, className }: CountdownProps) => {
   return (
     <p className={cn('flex items-center gap-1.5 text-sm font-semibold text-indigo-600', className)}>
       <i className="bi bi-hourglass-split" aria-hidden="true" />
-      {formatRemaining(targetIso, now)} remaining
+      {t('common.timeRemaining', { time: formatRemaining(targetIso, now) })}
     </p>
   );
 };

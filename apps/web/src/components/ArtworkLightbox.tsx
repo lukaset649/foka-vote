@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Lightbox, { useLightboxState } from 'yet-another-react-lightbox';
 import Captions from 'yet-another-react-lightbox/plugins/captions';
 import type { ArtworkDto } from '@foka-vote/shared';
@@ -40,9 +41,10 @@ const ArtworkLightbox = ({
   onClose,
   authorAlias,
 }: ArtworkLightboxProps) => {
+  const { t } = useTranslation();
   const slides = artworks.map((artwork) => ({
     src: mediaUrl(artwork.previewUrl),
-    alt: artwork.title ?? authorAlias ?? 'Artwork',
+    alt: artwork.title ?? authorAlias ?? t('components.artworkLightbox.defaultAlt'),
     ...(artwork.width ? { width: artwork.width } : {}),
     ...(artwork.height ? { height: artwork.height } : {}),
     ...((artwork.title ?? authorAlias) ? { title: artwork.title ?? authorAlias } : {}),

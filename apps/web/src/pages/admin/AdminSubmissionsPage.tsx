@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import type { AdminSubmissionDto, VoteCardDto } from '@foka-vote/shared';
 import { deleteAdminSubmission, fetchAdminSubmissions } from '../../services/submissions';
@@ -20,6 +21,7 @@ import Table, {
 type Tab = 'submissions' | 'voteCards';
 
 const AdminSubmissionsPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const contestId = id as string;
 
@@ -47,7 +49,7 @@ const AdminSubmissionsPage = () => {
   }, [contestId]);
 
   const handleDelete = (submissionId: string) => {
-    if (!window.confirm('Delete this submission and all its artworks?')) {
+    if (!window.confirm(t('pages.adminSubmissions.confirmDeleteSubmission'))) {
       return;
     }
     deleteAdminSubmission(contestId, submissionId)
@@ -56,7 +58,7 @@ const AdminSubmissionsPage = () => {
   };
 
   const handleVoid = (cardId: string) => {
-    const reason = window.prompt('Reason (optional)') ?? undefined;
+    const reason = window.prompt(t('pages.adminSubmissions.voidReasonPrompt')) ?? undefined;
     voidVoteCard(contestId, cardId, reason)
       .then(loadVoteCards)
       .catch(() => setError(true));
@@ -76,23 +78,31 @@ const AdminSubmissionsPage = () => {
   return (
     <div>
       <PageHeader
-        title="Submissions & vote cards"
+        title={t('pages.adminContestsList.submissionsAndVoteCards')}
         backTo="/admin/contests"
-        backLabel="Back to contests"
+        backLabel={t('common.backToContests')}
       />
 
-      {error && <Alert variant="error">Something went wrong</Alert>}
+      {error && <Alert variant="error">{t('errors.generic')}</Alert>}
 
       <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
         <span className="inline-flex items-center gap-1 text-zinc-600">
           <i className="bi bi-person-badge" aria-hidden="true" />
-          {submissions?.length ?? '…'} submissions
+          {submissions === null
+            ? t('pages.adminSubmissions.loadingSubmissions')
+            : t('pages.adminSubmissions.submissionsCount', { count: submissions.length })}
         </span>
         <span className="inline-flex items-center gap-1 text-zinc-600">
           <i className="bi bi-ticket-perforated" aria-hidden="true" />
-          {voteCards?.length ?? '…'} vote cards
+          {voteCards === null
+            ? t('pages.adminSubmissions.loadingVoteCards')
+            : t('pages.adminSubmissions.voteCardsCount', { count: voteCards.length })}
         </span>
-        {voidedCount > 0 && <Badge color="rose">{voidedCount} voided</Badge>}
+        {voidedCount > 0 && (
+          <Badge color="rose">
+            {t('pages.adminSubmissions.voidedCount', { count: voidedCount })}
+          </Badge>
+        )}
       </div>
 
       <nav className="mb-4 inline-flex w-fit rounded-md bg-zinc-100 p-1">
@@ -101,35 +111,37 @@ const AdminSubmissionsPage = () => {
           onClick={() => setTab('submissions')}
           className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'submissions' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
         >
-          Submissions
+          {t('pages.adminSubmissions.submissionsTab')}
         </button>
         <button
           type="button"
           onClick={() => setTab('voteCards')}
           className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'voteCards' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
         >
-          Vote cards
+          {t('pages.adminSubmissions.voteCardsTab')}
         </button>
       </nav>
 
       {tab === 'submissions' &&
         (submissions !== null && submissions.length === 0 ? (
-          <EmptyState icon="bi-person-badge" text="No submissions yet" />
+          <EmptyState icon="bi-person-badge" text={t('pages.adminSubmissions.noSubmissionsYet')} />
         ) : (
           <Table>
             <TableHead>
               <TableRow>
-                <TableHeaderCell>Author</TableHeaderCell>
-                <TableHeaderCell>Alias</TableHeaderCell>
-                <TableHeaderCell>Artworks</TableHeaderCell>
-                <TableHeaderCell>Submitted</TableHeaderCell>
+                <TableHeaderCell>{t('pages.results.tableAuthor')}</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tableAlias')}</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tableArtworks')}</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tableSubmitted')}</TableHeaderCell>
                 <TableHeaderCell></TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {submissions === null && (
                 <TableRow>
-                  <TableCell colSpan={5}>Loading…</TableCell>
+                  <TableCell colSpan={5}>
+                    {t('pages.adminSubmissions.loadingSubmissions')}
+                  </TableCell>
                 </TableRow>
               )}
               {submissions?.map((submission) => (
@@ -148,11 +160,11 @@ const AdminSubmissionsPage = () => {
                         size="sm"
                       >
                         <i className="bi bi-pencil-square" aria-hidden="true" />
-                        Edit
+                        {t('pages.submissionPreview.edit')}
                       </LinkButton>
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(submission.id)}>
                         <i className="bi bi-trash" aria-hidden="true" />
-                        Delete
+                        {t('common.remove')}
                       </Button>
                     </div>
                   </TableCell>
@@ -164,21 +176,24 @@ const AdminSubmissionsPage = () => {
 
       {tab === 'voteCards' &&
         (voteCards !== null && voteCards.length === 0 ? (
-          <EmptyState icon="bi-ticket-perforated" text="No vote cards yet" />
+          <EmptyState
+            icon="bi-ticket-perforated"
+            text={t('pages.adminSubmissions.noVoteCardsYet')}
+          />
         ) : (
           <Table>
             <TableHead>
               <TableRow>
-                <TableHeaderCell>Cast at</TableHeaderCell>
-                <TableHeaderCell>Picks</TableHeaderCell>
-                <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tableCastAt')}</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tablePicks')}</TableHeaderCell>
+                <TableHeaderCell>{t('pages.adminSubmissions.tableStatus')}</TableHeaderCell>
                 <TableHeaderCell></TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {voteCards === null && (
                 <TableRow>
-                  <TableCell colSpan={4}>Loading…</TableCell>
+                  <TableCell colSpan={4}>{t('pages.adminSubmissions.loadingVoteCards')}</TableCell>
                 </TableRow>
               )}
               {voteCards?.map((card) => (
@@ -189,29 +204,30 @@ const AdminSubmissionsPage = () => {
                       .sort((a, b) => b.points - a.points)
                       .map(
                         (item) =>
-                          `${aliasBySubmissionId.get(item.submissionId) ?? item.submissionId} (${item.points} pkt)`,
+                          `${aliasBySubmissionId.get(item.submissionId) ?? item.submissionId} (${item.points} ${t('common.points')})`,
                       )
                       .join(', ')}
                   </TableCell>
                   <TableCell>
                     {card.isVoid ? (
                       <Badge color="rose">
-                        voided{card.voidReason ? ` (${card.voidReason})` : ''}
+                        {t('pages.adminSubmissions.voided')}
+                        {card.voidReason ? ` (${card.voidReason})` : ''}
                       </Badge>
                     ) : (
-                      <Badge color="emerald">valid</Badge>
+                      <Badge color="emerald">{t('pages.adminSubmissions.valid')}</Badge>
                     )}
                   </TableCell>
                   <TableCell>
                     {card.isVoid ? (
                       <Button variant="ghost" size="sm" onClick={() => handleUnvoid(card.id)}>
                         <i className="bi bi-arrow-clockwise" aria-hidden="true" />
-                        Restore
+                        {t('pages.adminSubmissions.restore')}
                       </Button>
                     ) : (
                       <Button variant="ghost" size="sm" onClick={() => handleVoid(card.id)}>
                         <i className="bi bi-ban" aria-hidden="true" />
-                        Void
+                        {t('pages.adminSubmissions.void')}
                       </Button>
                     )}
                   </TableCell>

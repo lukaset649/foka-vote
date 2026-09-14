@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ErrorCode, MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
+import { errorMessage } from '../../lib/errorMessage';
 import { ApiError, isUnauthorizedError, mediaUrl } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
@@ -17,6 +19,7 @@ import Spinner from '../../components/ui/Spinner';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 
 const VoteCardPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
@@ -61,7 +64,7 @@ const VoteCardPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return <Alert variant="error">Failed to load voting card</Alert>;
+    return <Alert variant="error">{t('pages.voteCard.failedToLoad')}</Alert>;
   }
 
   if (!contest || submissions === null || existingCard === undefined) {
@@ -123,7 +126,7 @@ const VoteCardPage = () => {
         void navigate(`/contest/${slug}/gate?redirect=${encodeURIComponent(redirect)}`);
         return;
       }
-      setSubmitError(err instanceof Error ? err.message : 'Failed to submit vote');
+      setSubmitError(errorMessage(err, t));
     } finally {
       setSubmitting(false);
     }
@@ -136,18 +139,18 @@ const VoteCardPage = () => {
   return (
     <div className={cn(showActionBar && 'pb-24')}>
       <PageHeader
-        title={`Vote — ${contest.title}`}
+        title={t('pages.voteCard.heading', { title: contest.title })}
         backTo={`/contest/${slug}`}
-        backLabel="Back to the contest"
+        backLabel={t('common.backToContest')}
       />
 
-      {slots === 0 && <Alert variant="info">Not enough submissions to vote on yet.</Alert>}
+      {slots === 0 && <Alert variant="info">{t('pages.voteCard.notEnoughSubmissions')}</Alert>}
 
       {slots > 0 && (
         <div className="flex flex-col gap-6">
           <Card>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-              Slots
+              {t('pages.voteCard.slots')}
             </h2>
             <ul className="flex flex-col gap-2">
               {activeWeights.map((weight) => {
@@ -160,7 +163,9 @@ const VoteCardPage = () => {
                     key={weight}
                     className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${submission ? 'border-indigo-300 bg-indigo-50 text-indigo-900' : 'border-zinc-200 bg-zinc-50 text-zinc-500'}`}
                   >
-                    <span className="font-semibold">{weight} pkt</span>
+                    <span className="font-semibold">
+                      {weight} {t('common.points')}
+                    </span>
                     <span>{submission ? submission.alias : '—'}</span>
                   </li>
                 );
@@ -169,7 +174,9 @@ const VoteCardPage = () => {
           </Card>
 
           <div>
-            <h2 className="mb-3 text-lg font-semibold text-zinc-900">Submissions</h2>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-900">
+              {t('contestStatus.SUBMISSIONS')}
+            </h2>
             <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {submissions.map((submission) => {
                 const points = currentPicks[submission.id];
@@ -211,7 +218,9 @@ const VoteCardPage = () => {
                       <button
                         type="button"
                         onClick={() => setGalleryFor(submission)}
-                        aria-label={`View ${submission.alias}'s artworks`}
+                        aria-label={t('pages.voteCard.viewArtworksAriaLabel', {
+                          alias: submission.alias,
+                        })}
                         className="absolute left-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         <i className="bi bi-images" aria-hidden="true" />
@@ -223,7 +232,7 @@ const VoteCardPage = () => {
             </ul>
           </div>
 
-          {readOnly && <Alert variant="info">You have already voted in this contest.</Alert>}
+          {readOnly && <Alert variant="info">{t('pages.voteCard.alreadyVoted')}</Alert>}
         </div>
       )}
 
@@ -239,7 +248,12 @@ const VoteCardPage = () => {
               {activeWeights.map((weight) => (
                 <li
                   key={weight}
-                  aria-label={`Slot ${weight} pkt ${pickedWeights.has(weight) ? 'filled' : 'empty'}`}
+                  aria-label={t('pages.voteCard.slotAriaLabel', {
+                    weight,
+                    state: pickedWeights.has(weight)
+                      ? t('pages.voteCard.slotFilled')
+                      : t('pages.voteCard.slotEmpty'),
+                  })}
                   className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold ${pickedWeights.has(weight) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-zinc-300 bg-zinc-50 text-zinc-400'}`}
                 >
                   {weight}
@@ -248,7 +262,7 @@ const VoteCardPage = () => {
             </ul>
             <Button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
               <i className="bi bi-check2-square" aria-hidden="true" />
-              Submit
+              {t('common.submit')}
             </Button>
           </div>
         </ActionBar>

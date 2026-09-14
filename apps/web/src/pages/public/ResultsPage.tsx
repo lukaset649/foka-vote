@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
 import { isUnauthorizedError } from '../../services/apiClient';
@@ -17,21 +19,22 @@ import Table, {
   TableRow,
 } from '../../components/ui/Table';
 
-function formatBreakdown(entry: ResultEntryDto): string {
+function formatBreakdown(entry: ResultEntryDto, t: TFunction): string {
   const parts: string[] = [];
   if (entry.votes3 > 0) {
-    parts.push(`${entry.votes3}× 3 pkt`);
+    parts.push(t('pages.results.breakdownEntry', { count: entry.votes3, weight: 3 }));
   }
   if (entry.votes2 > 0) {
-    parts.push(`${entry.votes2}× 2 pkt`);
+    parts.push(t('pages.results.breakdownEntry', { count: entry.votes2, weight: 2 }));
   }
   if (entry.votes1 > 0) {
-    parts.push(`${entry.votes1}× 1 pkt`);
+    parts.push(t('pages.results.breakdownEntry', { count: entry.votes1, weight: 1 }));
   }
   return parts.join(', ');
 }
 
 const ResultsPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [contest, setContest] = useState<ContestDto | null>(null);
@@ -76,7 +79,7 @@ const ResultsPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return <Alert variant="error">Failed to load results</Alert>;
+    return <Alert variant="error">{t('pages.results.failedToLoad')}</Alert>;
   }
 
   if (!contest) {
@@ -87,14 +90,16 @@ const ResultsPage = () => {
     return (
       <div>
         <PageHeader
-          title={`Results — ${contest.title}`}
+          title={t('pages.results.heading', { title: contest.title })}
           backTo={`/contest/${slug}`}
-          backLabel="Back to the contest"
+          backLabel={t('common.backToContest')}
         />
         <Alert variant="info">
           {contest.status === 'VOTING'
-            ? 'Voting is currently in progress. Results will be revealed once voting closes.'
-            : `Results will be available once voting starts, on ${new Date(contest.votingStart).toLocaleString()}.`}
+            ? t('pages.results.votingInProgress')
+            : t('pages.results.availableFrom', {
+                date: new Date(contest.votingStart).toLocaleString(),
+              })}
         </Alert>
       </div>
     );
@@ -107,32 +112,32 @@ const ResultsPage = () => {
   return (
     <div>
       <PageHeader
-        title={`Results — ${contest.title}`}
+        title={t('pages.results.heading', { title: contest.title })}
         backTo={`/contest/${slug}`}
-        backLabel="Back to the contest"
+        backLabel={t('common.backToContest')}
       >
         <span className="inline-flex items-center gap-2 text-sm text-zinc-500">
           <i className="bi bi-trophy text-amber-500" aria-hidden="true" />
-          {results.voteCardCount} vote cards cast
+          {t('pages.results.voteCardsCast', { count: results.voteCardCount })}
         </span>
       </PageHeader>
 
       {!results.final && (
         <Alert variant="info" className="mb-4">
-          Voting is still in progress — standings may change before the contest closes.
+          {t('pages.results.stillInProgress')}
         </Alert>
       )}
 
       {results.results.length === 0 ? (
-        <EmptyState icon="bi-trophy" text="No votes cast yet" />
+        <EmptyState icon="bi-trophy" text={t('components.contestResultsCard.noVotesYet')} />
       ) : (
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Place</TableHeaderCell>
-              <TableHeaderCell>Author</TableHeaderCell>
-              <TableHeaderCell>Points</TableHeaderCell>
-              <TableHeaderCell>Breakdown</TableHeaderCell>
+              <TableHeaderCell>{t('pages.results.tablePlace')}</TableHeaderCell>
+              <TableHeaderCell>{t('pages.results.tableAuthor')}</TableHeaderCell>
+              <TableHeaderCell>{t('pages.results.tablePoints')}</TableHeaderCell>
+              <TableHeaderCell>{t('pages.results.tableBreakdown')}</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -153,8 +158,10 @@ const ResultsPage = () => {
                     ? `${entry.firstName} ${entry.lastName} (${entry.alias})`
                     : entry.alias}
                 </TableCell>
-                <TableCell className="font-semibold text-indigo-600">{entry.total} pkt</TableCell>
-                <TableCell className="text-zinc-500">{formatBreakdown(entry)}</TableCell>
+                <TableCell className="font-semibold text-indigo-600">
+                  {entry.total} {t('common.points')}
+                </TableCell>
+                <TableCell className="text-zinc-500">{formatBreakdown(entry, t)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
