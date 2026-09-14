@@ -57,7 +57,7 @@ const Layout = () => {
             type="button"
             onClick={() => setIsMenuOpen(true)}
             aria-label={t('nav.openMenu')}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-zinc-300 text-lg text-zinc-600 transition-colors hover:bg-zinc-100 sm:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-md border border-zinc-300 text-xl text-zinc-600 transition-colors hover:bg-zinc-100 sm:hidden"
           >
             <i className="bi bi-list" aria-hidden="true" />
           </button>

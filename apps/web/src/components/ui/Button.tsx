@@ -1,25 +1,26 @@
 import type { ComponentPropsWithoutRef } from 'react';
 import { cn } from '../../lib/cn';
+import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
-export type ButtonSize = 'default' | 'sm';
+export type ButtonSize = 'default' | 'sm' | 'icon';
 
 interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   variant?: ButtonVariant;
   size?: ButtonSize;
 }
 
-const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300',
-  secondary:
-    'bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100 disabled:text-zinc-400',
-  danger: 'bg-rose-600 text-white hover:bg-rose-700 disabled:bg-rose-300',
-  ghost: 'bg-transparent text-zinc-700 hover:bg-zinc-200 disabled:text-zinc-400',
+const variantClassNames: Record<ButtonVariant, string> = {
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  danger: 'btn-danger',
+  ghost: 'btn-ghost',
 };
 
-const sizeClasses: Record<ButtonSize, string> = {
-  default: 'px-4 py-2 text-sm',
-  sm: 'px-3 py-1.5 text-sm',
+const sizeClassNames: Record<ButtonSize, string> = {
+  default: 'btn-default',
+  sm: 'btn-sm',
+  icon: 'btn-icon',
 };
 
 export function buttonClasses(
@@ -27,14 +28,7 @@ export function buttonClasses(
   size: ButtonSize = 'default',
   className?: string,
 ): string {
-  return cn(
-    'inline-flex min-h-10 items-center justify-center gap-2 rounded-md font-medium transition-colors',
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600',
-    'disabled:cursor-not-allowed',
-    variantClasses[variant],
-    sizeClasses[size],
-    className,
-  );
+  return cn('btn-base', variantClassNames[variant], sizeClassNames[size], className);
 }
 
 const Button = ({ variant = 'primary', size = 'default', className, ...props }: ButtonProps) => {
