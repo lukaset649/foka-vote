@@ -21,13 +21,22 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
 
   return (
     <li>
-      <Card className="flex items-center justify-between gap-3 transition-colors hover:border-indigo-300">
-        <Link to={`/contest/${contest.slug}`} className="flex min-w-0 flex-1 items-center gap-3">
+      <Card className="relative flex items-center justify-between gap-3 transition-colors hover:border-indigo-300">
+        <Link
+          to={`/contest/${contest.slug}`}
+          className="absolute inset-0 z-0 rounded-lg"
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+        <Link
+          to={`/contest/${contest.slug}`}
+          className="relative z-10 flex min-w-0 flex-1 items-center gap-3"
+        >
           <span className="truncate font-medium text-zinc-900">{contest.title}</span>
           <ContestStatusBadge status={contest.status} />
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="relative z-10 flex shrink-0 items-center gap-2">
           <LinkButton
             to={`/contest/${contest.slug}/gallery`}
             variant="secondary"
