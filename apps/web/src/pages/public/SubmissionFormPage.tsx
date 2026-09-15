@@ -378,11 +378,7 @@ const SubmissionFormPage = () => {
       <ContestRulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} />
 
       <div className="flex flex-wrap justify-between gap-3">
-        <LinkButton
-          to={`/contest/${slug}`}
-          variant="secondary"
-          className="hover:!border-rose-600 hover:!bg-rose-600 hover:!text-white"
-        >
+        <LinkButton to={`/contest/${slug}`} variant="secondaryDanger">
           {t('common.cancel')}
         </LinkButton>
         <Button type="submit">
