@@ -39,13 +39,8 @@ const Layout = () => {
               <LinkButton
                 key={item.to}
                 to={item.to}
-                variant={item.to === '/admin' ? 'secondary' : 'ghost'}
+                variant={item.to === '/admin' ? 'secondaryAccent' : 'ghost'}
                 size="sm"
-                className={
-                  item.to === '/admin'
-                    ? 'hover:!border-indigo-600 hover:!bg-indigo-600 hover:!text-white'
-                    : undefined
-                }
               >
                 {t(item.labelKey)}
               </LinkButton>
