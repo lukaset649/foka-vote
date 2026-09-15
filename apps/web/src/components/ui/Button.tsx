@@ -2,8 +2,16 @@ import type { ComponentPropsWithoutRef } from 'react';
 import { cn } from '../../lib/cn';
 import './Button.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
-export type ButtonSize = 'default' | 'sm' | 'icon';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'ghost'
+  | 'success'
+  | 'warning'
+  | 'secondaryAccent'
+  | 'secondaryDanger';
+export type ButtonSize = 'default' | 'sm' | 'icon' | 'navItem';
 
 interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   variant?: ButtonVariant;
@@ -15,12 +23,17 @@ const variantClassNames: Record<ButtonVariant, string> = {
   secondary: 'btn-secondary',
   danger: 'btn-danger',
   ghost: 'btn-ghost',
+  success: 'btn-success',
+  warning: 'btn-warning',
+  secondaryAccent: 'btn-secondary-accent',
+  secondaryDanger: 'btn-secondary-danger',
 };
 
 const sizeClassNames: Record<ButtonSize, string> = {
   default: 'btn-default',
   sm: 'btn-sm',
   icon: 'btn-icon',
+  navItem: 'btn-nav-item',
 };
 
 export function buttonClasses(
