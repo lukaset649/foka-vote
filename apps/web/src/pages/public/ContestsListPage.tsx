@@ -60,9 +60,9 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
           {contest.status === 'VOTING' && (
             <LinkButton
               to={`/contest/${contest.slug}/vote`}
-              variant="primary"
+              variant="success"
               size="icon"
-              className="shrink-0 !border-green-800 !bg-green-800 hover:!bg-green-900"
+              className="shrink-0"
               aria-label={t('common.actions.vote')}
               title={t('common.actions.vote')}
             >
@@ -72,9 +72,9 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
           {contest.status === 'CLOSED' && (
             <LinkButton
               to={`/contest/${contest.slug}/results`}
-              variant="secondary"
+              variant="warning"
               size="icon"
-              className="shrink-0 !border-amber-600 !bg-amber-600 !text-white hover:!bg-amber-700"
+              className="shrink-0"
               aria-label={t('common.actions.results')}
               title={t('common.actions.results')}
             >

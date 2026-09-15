@@ -63,13 +63,7 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
         </div>
         <nav className="flex flex-col gap-2">
           {items.map((item) => (
-            <LinkButton
-              key={item.to}
-              to={item.to}
-              variant="secondary"
-              size="sm"
-              className="w-full !min-h-11 !justify-start !text-base"
-            >
+            <LinkButton key={item.to} to={item.to} variant="secondary" size="navItem">
               {t(item.labelKey)}
             </LinkButton>
           ))}
