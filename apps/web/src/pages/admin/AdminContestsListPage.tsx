@@ -59,12 +59,7 @@ const AdminContestsListPage = () => {
   return (
     <div>
       <PageHeader title={t('pages.adminContestsList.title')}>
-        <LinkButton
-          to="/admin/contests/new"
-          variant="primary"
-          size="sm"
-          className="!border-green-800 !bg-green-800 hover:!bg-green-900"
-        >
+        <LinkButton to="/admin/contests/new" variant="success" size="sm">
           <i className="bi bi-plus-circle" aria-hidden="true" />
           {t('pages.adminContestsList.newContest')}
         </LinkButton>
