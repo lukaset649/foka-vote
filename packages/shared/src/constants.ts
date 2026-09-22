@@ -21,6 +21,10 @@ export const MAX_PENDING_PHOTOS_PER_ALBUM = 50;
 
 export const GALLERY_ALBUM_PREVIEW_COUNT = 8;
 
+// Album titles and descriptions come from anonymous visitors, so both are bounded.
+export const MAX_ALBUM_TITLE_LENGTH = 120;
+export const MAX_ALBUM_DESCRIPTION_LENGTH = 2000;
+
 // Slugs are generated from user-supplied album titles, so they must never collide with
 // the gallery's own sub-routes.
 export const RESERVED_ALBUM_SLUGS = ['new', 'gate'] as const;
