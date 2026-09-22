@@ -10,11 +10,7 @@ import type { Artwork, Submission } from '@prisma/client';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { processArtworkImage } from '../../../lib/artwork-image.js';
 import { prisma } from '../../../lib/prisma.js';
-import { MEDIA_URL_PREFIX, UPLOADS_DIR } from '../../../lib/storage.js';
-
-function mediaUrl(storedPath: string): string {
-  return `${MEDIA_URL_PREFIX}/${path.basename(storedPath)}`;
-}
+import { mediaUrl, UPLOADS_DIR } from '../../../lib/storage.js';
 
 function toAdminArtworkDto(artwork: Artwork): ArtworkDto {
   return {

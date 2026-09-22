@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { verifyAccess } from './controller.js';
+import { list, verifyAccess } from './controller.js';
 
 export const galleryRoutes = Router();
 
 galleryRoutes.post('/access', verifyAccess);
+galleryRoutes.get('/albums', list);
