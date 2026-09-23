@@ -1,8 +1,19 @@
-import type { AdminAlbumDto, ModerationStatus, UpdateAlbumDto } from '@foka-vote/shared';
+import type {
+  AdminAlbumDto,
+  AdminAlbumPhotoDto,
+  ModerationStatus,
+  UpdateAlbumDto,
+  UpdateAlbumPhotoDto,
+} from '@foka-vote/shared';
+import type { AlbumPhoto } from '@prisma/client';
 import { notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
-import { assertValidAlbumInput } from '../../gallery/service.js';
+import {
+  assertValidAlbumInput,
+  assertValidPhotoCaption,
+  toAlbumPhotoDto,
+} from '../../gallery/service.js';
 
 const standaloneAlbumSelect = {
   id: true,
@@ -240,4 +251,74 @@ export async function setContestAlbumVisibility(
 
   await prisma.contest.update({ where: { id: contestId }, data: { hiddenInGallery: hidden } });
   return getContestAlbum(contestId);
+}
+
+function toAdminAlbumPhotoDto(photo: AlbumPhoto): AdminAlbumPhotoDto {
+  return {
+    ...toAlbumPhotoDto(photo),
+    firstName: photo.firstName,
+    lastName: photo.lastName,
+    status: photo.status,
+    rulesAcceptedAt: photo.rulesAcceptedAt.toISOString(),
+  };
+}
+
+async function findAlbumPhoto(albumId: string, photoId: string): Promise<AlbumPhoto> {
+  const photo = await prisma.albumPhoto.findFirst({ where: { id: photoId, albumId } });
+  if (!photo) {
+    throw notFound('Photo not found');
+  }
+  return photo;
+}
+
+export async function listAdminAlbumPhotos(albumId: string): Promise<AdminAlbumPhotoDto[]> {
+  const album = await prisma.album.findUnique({ where: { id: albumId }, select: { id: true } });
+  if (!album) {
+    throw notFound('Album not found');
+  }
+
+  const photos = await prisma.albumPhoto.findMany({
+    where: { albumId },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  return photos.map(toAdminAlbumPhotoDto);
+}
+
+export async function setAdminAlbumPhotoStatus(
+  albumId: string,
+  photoId: string,
+  status: ModerationStatus,
+): Promise<AdminAlbumPhotoDto> {
+  await findAlbumPhoto(albumId, photoId);
+
+  const photo = await prisma.albumPhoto.update({ where: { id: photoId }, data: { status } });
+  return toAdminAlbumPhotoDto(photo);
+}
+
+export async function updateAdminAlbumPhoto(
+  albumId: string,
+  photoId: string,
+  input: UpdateAlbumPhotoDto,
+): Promise<AdminAlbumPhotoDto> {
+  const existing = await findAlbumPhoto(albumId, photoId);
+
+  const title = input.title === undefined ? existing.title : input.title.trim() || null;
+  const description =
+    input.description === undefined ? existing.description : input.description.trim() || null;
+  assertValidPhotoCaption(title, description);
+
+  const photo = await prisma.albumPhoto.update({
+    where: { id: photoId },
+    data: { title, description },
+  });
+  return toAdminAlbumPhotoDto(photo);
+}
+
+export async function deleteAdminAlbumPhoto(albumId: string, photoId: string): Promise<void> {
+  const photo = await findAlbumPhoto(albumId, photoId);
+
+  await prisma.albumPhoto.delete({ where: { id: photoId } });
+
+  await removeStoredFiles([photo.filePath, photo.previewPath, photo.thumbPath]);
 }

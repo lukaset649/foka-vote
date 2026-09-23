@@ -157,6 +157,17 @@ export function assertValidAlbumInput(title: string, description: string): void 
   }
 }
 
+export function assertValidPhotoCaption(title: string | null, description: string | null): void {
+  if (title !== null && title.length > MAX_ALBUM_TITLE_LENGTH) {
+    throw badRequest(`photo title must be at most ${MAX_ALBUM_TITLE_LENGTH} characters long`);
+  }
+  if (description !== null && description.length > MAX_ALBUM_DESCRIPTION_LENGTH) {
+    throw badRequest(
+      `photo description must be at most ${MAX_ALBUM_DESCRIPTION_LENGTH} characters long`,
+    );
+  }
+}
+
 /**
  * Albums are created by anonymous visitors, so a title someone else already used must not
  * surface as an error — the slug just gets a numeric suffix instead.
@@ -213,7 +224,7 @@ export async function createAlbum(input: CreateAlbumDto): Promise<void> {
   throw conflict('Could not allocate a unique album address, please try again');
 }
 
-function toAlbumPhotoDto(photo: AlbumPhoto): AlbumPhotoDto {
+export function toAlbumPhotoDto(photo: AlbumPhoto): AlbumPhotoDto {
   return {
     id: photo.id,
     // Album photos are never anonymised: there is no voting phase to protect.
@@ -282,6 +293,10 @@ export async function addAlbumPhotos(
   }
   if (meta.length !== files.length) {
     throw badRequest('photos metadata length must match the number of uploaded files');
+  }
+  // Checked before any image is processed, so a rejected caption leaves no orphan files.
+  for (const entry of meta) {
+    assertValidPhotoCaption(entry.title ?? null, entry.description ?? null);
   }
 
   // Anyone may upload here, so the moderation queue is capped per album.
