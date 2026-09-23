@@ -1,13 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import Lightbox, { useLightboxState } from 'yet-another-react-lightbox';
 import Captions from 'yet-another-react-lightbox/plugins/captions';
-import type { ArtworkDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/captions.css';
 
+export interface LightboxImage {
+  title: string | null;
+  description: string | null;
+  previewUrl: string;
+  width: number | null;
+  height: number | null;
+  author?: string;
+}
+
 interface ArtworkLightboxProps {
-  artworks: ArtworkDto[];
+  artworks: LightboxImage[];
   startIndex: number;
   open: boolean;
   onClose: () => void;
@@ -42,14 +50,18 @@ const ArtworkLightbox = ({
   authorAlias,
 }: ArtworkLightboxProps) => {
   const { t } = useTranslation();
-  const slides = artworks.map((artwork) => ({
-    src: mediaUrl(artwork.previewUrl),
-    alt: artwork.title ?? authorAlias ?? t('components.artworkLightbox.defaultAlt'),
-    ...(artwork.width ? { width: artwork.width } : {}),
-    ...(artwork.height ? { height: artwork.height } : {}),
-    ...((artwork.title ?? authorAlias) ? { title: artwork.title ?? authorAlias } : {}),
-    ...(artwork.description ? { description: artwork.description } : {}),
-  }));
+  const slides = artworks.map((artwork) => {
+    const caption = [artwork.description, artwork.author].filter(Boolean).join(' · ');
+
+    return {
+      src: mediaUrl(artwork.previewUrl),
+      alt: artwork.title ?? authorAlias ?? t('components.artworkLightbox.defaultAlt'),
+      ...(artwork.width ? { width: artwork.width } : {}),
+      ...(artwork.height ? { height: artwork.height } : {}),
+      ...((artwork.title ?? authorAlias) ? { title: artwork.title ?? authorAlias } : {}),
+      ...(caption ? { description: caption } : {}),
+    };
+  });
 
   return (
     <Lightbox

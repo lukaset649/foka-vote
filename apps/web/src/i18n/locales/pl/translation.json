@@ -56,6 +56,15 @@
       "noAlbumsYet": "Brak albumów",
       "failedToLoad": "Nie udało się wczytać galerii"
     },
+    "album": {
+      "title": "Album",
+      "backToGallery": "Powrót do galerii",
+      "addPhotos": "Dodaj zdjęcia",
+      "noPhotosYet": "W tym albumie nie ma jeszcze zdjęć",
+      "photoBy": "autor: {{author}}",
+      "notFound": "Taki album nie istnieje lub czeka na zatwierdzenie",
+      "failedToLoad": "Nie udało się wczytać albumu"
+    },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
     },

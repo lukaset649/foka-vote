@@ -56,6 +56,15 @@
       "noAlbumsYet": "No albums yet",
       "failedToLoad": "Failed to load the gallery"
     },
+    "album": {
+      "title": "Album",
+      "backToGallery": "Back to the gallery",
+      "addPhotos": "Add photos",
+      "noPhotosYet": "No photos in this album yet",
+      "photoBy": "by {{author}}",
+      "notFound": "This album does not exist or is still waiting for approval",
+      "failedToLoad": "Failed to load the album"
+    },
     "contest": {
       "failedToLoad": "Failed to load contest"
     },
