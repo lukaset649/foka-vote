@@ -1,15 +1,26 @@
-import type { CreateAlbumDto, GalleryAlbumDto } from '@foka-vote/shared';
+import type {
+  AlbumDetailDto,
+  AlbumPhotoDto,
+  CreateAlbumDto,
+  GalleryAlbumDto,
+} from '@foka-vote/shared';
 import {
   GALLERY_ALBUM_PREVIEW_COUNT,
   MAX_ALBUM_DESCRIPTION_LENGTH,
   MAX_ALBUM_TITLE_LENGTH,
+  MAX_PENDING_PHOTOS_PER_ALBUM,
+  MAX_PHOTOS_PER_ALBUM_UPLOAD,
   RESERVED_ALBUM_SLUGS,
 } from '@foka-vote/shared';
+import type { AlbumPhoto } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { badRequest, conflict } from '../../errors/app-error.js';
+import { badRequest, conflict, notFound } from '../../errors/app-error.js';
+import type { ArtworkImageResult } from '../../lib/artwork-image.js';
+import { processArtworkImage } from '../../lib/artwork-image.js';
+import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import { prisma } from '../../lib/prisma.js';
 import { slugify } from '../../lib/slugify.js';
-import { mediaUrl } from '../../lib/storage.js';
+import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
 import { contestAccessCookieName } from '../contests/service.js';
 
 type SignedCookies = Record<string, string | undefined>;
@@ -200,4 +211,125 @@ export async function createAlbum(input: CreateAlbumDto): Promise<void> {
   }
 
   throw conflict('Could not allocate a unique album address, please try again');
+}
+
+function toAlbumPhotoDto(photo: AlbumPhoto): AlbumPhotoDto {
+  return {
+    id: photo.id,
+    // Album photos are never anonymised: there is no voting phase to protect.
+    authorName: `${photo.firstName} ${photo.lastName}`,
+    title: photo.title,
+    description: photo.description,
+    fullUrl: mediaUrl(photo.filePath),
+    previewUrl: mediaUrl(photo.previewPath),
+    thumbUrl: mediaUrl(photo.thumbPath),
+    width: photo.width,
+    height: photo.height,
+    createdAt: photo.createdAt.toISOString(),
+  };
+}
+
+export async function getPublicAlbum(slug: string): Promise<AlbumDetailDto> {
+  const album = await prisma.album.findFirst({
+    where: { slug, status: 'APPROVED', hidden: false },
+    include: {
+      photos: { where: { status: 'APPROVED' }, orderBy: { createdAt: 'asc' } },
+    },
+  });
+
+  // An album awaiting moderation must not be distinguishable from one that never existed.
+  if (!album) {
+    throw notFound('Album not found');
+  }
+
+  return {
+    id: album.id,
+    slug: album.slug,
+    title: album.title,
+    description: album.description,
+    createdAt: album.createdAt.toISOString(),
+    photos: album.photos.map(toAlbumPhotoDto),
+  };
+}
+
+export interface AddAlbumPhotosInput {
+  firstName: string;
+  lastName: string;
+}
+
+async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
+  await removeStoredFiles(
+    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
+  );
+}
+
+export async function addAlbumPhotos(
+  slug: string,
+  input: AddAlbumPhotosInput,
+  files: Express.Multer.File[],
+  meta: ArtworkMetaInput[],
+): Promise<void> {
+  const album = await prisma.album.findFirst({
+    where: { slug, status: 'APPROVED', hidden: false },
+    select: { id: true },
+  });
+  if (!album) {
+    throw notFound('Album not found');
+  }
+
+  if (files.length < 1 || files.length > MAX_PHOTOS_PER_ALBUM_UPLOAD) {
+    throw badRequest(`Upload must include between 1 and ${MAX_PHOTOS_PER_ALBUM_UPLOAD} photos`);
+  }
+  if (meta.length !== files.length) {
+    throw badRequest('photos metadata length must match the number of uploaded files');
+  }
+
+  // Anyone may upload here, so the moderation queue is capped per album.
+  const pendingCount = await prisma.albumPhoto.count({
+    where: { albumId: album.id, status: 'PENDING' },
+  });
+  if (pendingCount + files.length > MAX_PENDING_PHOTOS_PER_ALBUM) {
+    throw conflict('This album already has too many photos awaiting approval');
+  }
+
+  const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
+
+  const processed: ArtworkImageResult[] = [];
+  let firstError: unknown;
+  for (const result of settled) {
+    if (result.status === 'fulfilled') {
+      processed.push(result.value);
+    } else if (firstError === undefined) {
+      firstError = result.reason;
+    }
+  }
+
+  if (firstError !== undefined) {
+    await removeProcessedFiles(processed);
+    throw firstError;
+  }
+
+  const rulesAcceptedAt = new Date();
+
+  try {
+    await prisma.albumPhoto.createMany({
+      data: processed.map((file, index) => ({
+        albumId: album.id,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        title: meta[index]?.title ?? null,
+        description: meta[index]?.description ?? null,
+        filePath: file.filePath,
+        previewPath: file.previewPath,
+        thumbPath: file.thumbPath,
+        width: file.width,
+        height: file.height,
+        status: 'PENDING',
+        rulesAcceptedAt,
+      })),
+    });
+  } catch (error) {
+    await removeProcessedFiles(processed);
+    throw error;
+  }
 }

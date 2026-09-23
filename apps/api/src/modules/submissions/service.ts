@@ -5,6 +5,7 @@ import type { AliasReservation, Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, notFound } from '../../errors/app-error.js';
+import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
@@ -20,11 +21,6 @@ export interface CreateSubmissionInput {
   lastName: string;
   description?: string;
   reservationId?: string;
-}
-
-export interface ArtworkMetaInput {
-  title?: string;
-  description?: string;
 }
 
 function isUniqueConstraintError(error: unknown): boolean {
