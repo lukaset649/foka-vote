@@ -45,10 +45,18 @@ export interface CreateAlbumDto {
 
 export type UpdateAlbumDto = Partial<CreateAlbumDto>;
 
-export interface AdminAlbumDto extends GalleryAlbumDto {
+export interface AdminAlbumDto {
+  kind: AlbumKind;
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  createdAt: string;
   status: ModerationStatus;
   hidden: boolean;
+  photoCount: number;
   pendingPhotoCount: number;
+  coverThumbUrl: string | null;
 }
 
 export interface AdminAlbumPhotoDto extends AlbumPhotoDto {
