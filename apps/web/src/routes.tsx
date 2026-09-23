@@ -9,6 +9,7 @@ import SubmissionFormPage from './pages/public/SubmissionFormPage';
 import SubmissionPreviewPage from './pages/public/SubmissionPreviewPage';
 import SubmissionConfirmationPage from './pages/public/SubmissionConfirmationPage';
 import GalleryPage from './pages/public/GalleryPage';
+import GalleryAlbumsPage from './pages/public/GalleryAlbumsPage';
 import VoteCardPage from './pages/public/VoteCardPage';
 import VoteConfirmationPage from './pages/public/VoteConfirmationPage';
 import ResultsPage from './pages/public/ResultsPage';
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '/', element: <ContestsListPage /> },
+      { path: '/gallery', element: <GalleryAlbumsPage /> },
       { path: '/contest/:slug', element: <ContestPage /> },
       { path: '/contest/:slug/gate', element: <AccessGatePage /> },
       { path: '/contest/:slug/submit', element: <SubmissionFormPage /> },

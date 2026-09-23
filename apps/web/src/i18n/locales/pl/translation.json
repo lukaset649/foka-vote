@@ -4,7 +4,8 @@
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Otwórz menu",
-    "closeMenu": "Zamknij menu"
+    "closeMenu": "Zamknij menu",
+    "gallery": "Galeria"
   },
   "common": {
     "timeRemaining": "Pozostało {{time}}",
@@ -48,6 +49,12 @@
       "allContests": "Wszystkie konkursy",
       "noContestsYet": "Brak konkursów",
       "failedToLoad": "Nie udało się wczytać konkursów"
+    },
+    "galleryAlbums": {
+      "title": "Galeria",
+      "createAlbum": "Utwórz album",
+      "noAlbumsYet": "Brak albumów",
+      "failedToLoad": "Nie udało się wczytać galerii"
     },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
@@ -233,6 +240,25 @@
     "contestGalleryCard": {
       "viewGallery": "Zobacz galerię",
       "noSubmissionsYet": "Brak zgłoszeń"
+    },
+    "albumCard": {
+      "kind": {
+        "CONTEST": "Konkurs",
+        "STANDALONE": "Album"
+      },
+      "viewAlbum": "Zobacz album",
+      "createdOn": "Utworzono {{date}}",
+      "submissionsCount_one": "{{count}} zgłoszenie",
+      "submissionsCount_few": "{{count}} zgłoszenia",
+      "submissionsCount_many": "{{count}} zgłoszeń",
+      "submissionsCount_other": "{{count}} zgłoszenia",
+      "photosCount_one": "{{count}} zdjęcie",
+      "photosCount_few": "{{count}} zdjęcia",
+      "photosCount_many": "{{count}} zdjęć",
+      "photosCount_other": "{{count}} zdjęcia",
+      "noPhotosYet": "Brak zdjęć",
+      "accessCodeRequired": "Ten konkurs jest chroniony kodem dostępu",
+      "enterAccessCode": "Wpisz kod"
     },
     "contestResultsCard": {
       "viewResults": "Zobacz wyniki",

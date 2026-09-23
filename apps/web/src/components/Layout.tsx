@@ -9,6 +9,7 @@ import LinkButton from './ui/LinkButton';
 
 export const NAV_ITEMS = [
   { to: '/', labelKey: 'nav.voting' },
+  { to: '/gallery', labelKey: 'nav.gallery' },
   { to: '/admin', labelKey: 'nav.admin' },
 ] as const;
 

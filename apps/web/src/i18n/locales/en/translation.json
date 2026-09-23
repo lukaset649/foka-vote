@@ -4,7 +4,8 @@
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "gallery": "Gallery"
   },
   "common": {
     "timeRemaining": "{{time}} remaining",
@@ -48,6 +49,12 @@
       "allContests": "All contests",
       "noContestsYet": "No contests yet",
       "failedToLoad": "Failed to load contests"
+    },
+    "galleryAlbums": {
+      "title": "Gallery",
+      "createAlbum": "Create an album",
+      "noAlbumsYet": "No albums yet",
+      "failedToLoad": "Failed to load the gallery"
     },
     "contest": {
       "failedToLoad": "Failed to load contest"
@@ -225,6 +232,21 @@
     "contestGalleryCard": {
       "viewGallery": "View gallery",
       "noSubmissionsYet": "No submissions yet"
+    },
+    "albumCard": {
+      "kind": {
+        "CONTEST": "Contest",
+        "STANDALONE": "Album"
+      },
+      "viewAlbum": "View album",
+      "createdOn": "Created {{date}}",
+      "submissionsCount_one": "{{count}} submission",
+      "submissionsCount_other": "{{count}} submissions",
+      "photosCount_one": "{{count}} photo",
+      "photosCount_other": "{{count}} photos",
+      "noPhotosYet": "No photos yet",
+      "accessCodeRequired": "This contest is protected with an access code",
+      "enterAccessCode": "Enter the code"
     },
     "contestResultsCard": {
       "viewResults": "View results",
