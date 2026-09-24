@@ -11,6 +11,9 @@ import SubmissionConfirmationPage from './pages/public/SubmissionConfirmationPag
 import GalleryPage from './pages/public/GalleryPage';
 import GalleryAlbumsPage from './pages/public/GalleryAlbumsPage';
 import AlbumPage from './pages/public/AlbumPage';
+import AlbumCreatePage from './pages/public/AlbumCreatePage';
+import AlbumCreateConfirmationPage from './pages/public/AlbumCreateConfirmationPage';
+import GalleryGatePage from './pages/public/GalleryGatePage';
 import VoteCardPage from './pages/public/VoteCardPage';
 import VoteConfirmationPage from './pages/public/VoteConfirmationPage';
 import ResultsPage from './pages/public/ResultsPage';
@@ -30,6 +33,9 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <ContestsListPage /> },
       { path: '/gallery', element: <GalleryAlbumsPage /> },
+      { path: '/gallery/gate', element: <GalleryGatePage /> },
+      { path: '/gallery/new', element: <AlbumCreatePage /> },
+      { path: '/gallery/new/confirmation', element: <AlbumCreateConfirmationPage /> },
       { path: '/gallery/:slug', element: <AlbumPage /> },
       { path: '/contest/:slug', element: <ContestPage /> },
       { path: '/contest/:slug/gate', element: <AccessGatePage /> },

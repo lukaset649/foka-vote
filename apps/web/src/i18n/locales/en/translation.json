@@ -65,6 +65,25 @@
       "notFound": "This album does not exist or is still waiting for approval",
       "failedToLoad": "Failed to load the album"
     },
+    "galleryGate": {
+      "title": "Access code required",
+      "codeLabel": "Gallery access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
+    },
+    "albumCreate": {
+      "title": "Create an album",
+      "moderationNotice": "The album will appear in the gallery once an administrator approves it. Photos can be added after approval.",
+      "titleLabel": "Album name",
+      "submit": "Send for approval",
+      "errors": {
+        "titleRequired": "The album name is required"
+      }
+    },
+    "albumCreateConfirmation": {
+      "title": "Album sent for approval",
+      "text": "An administrator will review it. Once approved, the album shows up in the gallery and anyone can add photos to it."
+    },
     "contest": {
       "failedToLoad": "Failed to load contest"
     },

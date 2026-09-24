@@ -65,6 +65,25 @@
       "notFound": "Taki album nie istnieje lub czeka na zatwierdzenie",
       "failedToLoad": "Nie udało się wczytać albumu"
     },
+    "galleryGate": {
+      "title": "Wymagany kod dostępu",
+      "codeLabel": "Kod dostępu do galerii",
+      "submit": "Wejdź",
+      "invalidCode": "Nieprawidłowy kod dostępu"
+    },
+    "albumCreate": {
+      "title": "Utwórz album",
+      "moderationNotice": "Album pojawi się w galerii po zatwierdzeniu przez administratora. Zdjęcia można dodawać po zatwierdzeniu.",
+      "titleLabel": "Nazwa albumu",
+      "submit": "Wyślij do zatwierdzenia",
+      "errors": {
+        "titleRequired": "Nazwa albumu jest wymagana"
+      }
+    },
+    "albumCreateConfirmation": {
+      "title": "Album wysłany do zatwierdzenia",
+      "text": "Administrator go sprawdzi. Po zatwierdzeniu album pojawi się w galerii, a każdy będzie mógł dodać do niego zdjęcia."
+    },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
     },
