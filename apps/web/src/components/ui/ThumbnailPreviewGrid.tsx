@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { cn } from '../../lib/cn';
+import ThumbnailTile from './ThumbnailTile';
 
 const GALLERY_COLUMN_BREAKPOINTS: Array<{ minWidth: number; columns: number }> = [
   { minWidth: 1024, columns: 4 },
@@ -33,6 +34,7 @@ export interface ThumbnailPreviewItem {
   alt: string;
   label?: string;
   onClick?: () => void;
+  to?: string;
 }
 
 interface ThumbnailPreviewGridProps {
@@ -58,37 +60,16 @@ const ThumbnailPreviewGrid = ({
     <ul className={cn('grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4', className)}>
       {items.slice(0, visibleCount).map((item) => (
         <li key={item.id}>
-          {item.onClick ? (
-            <button
-              type="button"
-              onClick={item.onClick}
-              className="group block w-full cursor-pointer text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              {item.thumbUrl && (
-                <img
-                  src={item.thumbUrl}
-                  alt={item.alt}
-                  className="aspect-square w-full rounded-md object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
-                />
-              )}
-              {item.label && (
-                <p className="mt-1 truncate text-sm font-medium text-zinc-900">{item.label}</p>
-              )}
-            </button>
-          ) : (
-            <>
-              {item.thumbUrl && (
-                <img
-                  src={item.thumbUrl}
-                  alt={item.alt}
-                  className="aspect-square w-full rounded-md object-cover"
-                />
-              )}
-              {item.label && (
-                <p className="mt-1 truncate text-sm font-medium text-zinc-900">{item.label}</p>
-              )}
-            </>
-          )}
+          <ThumbnailTile
+            thumbUrl={item.thumbUrl}
+            alt={item.alt}
+            {...(item.onClick ? { onClick: item.onClick } : {})}
+            {...(item.to ? { to: item.to } : {})}
+          >
+            {item.label && (
+              <p className="mt-1 truncate text-sm font-medium text-zinc-900">{item.label}</p>
+            )}
+          </ThumbnailTile>
         </li>
       ))}
 

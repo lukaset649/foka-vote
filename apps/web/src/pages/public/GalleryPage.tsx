@@ -11,6 +11,7 @@ import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
+import ThumbnailTile from '../../components/ui/ThumbnailTile';
 
 interface OpenLightbox {
   submissionId: string;
@@ -88,17 +89,12 @@ const GalleryPage = () => {
                 <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
                   {submission.artworks.map((artwork, index) => (
                     <li key={artwork.id}>
-                      <button
-                        type="button"
+                      <ThumbnailTile
+                        thumbUrl={mediaUrl(artwork.thumbUrl)}
+                        alt={artwork.title ?? submissionDisplayName(submission)}
+                        bordered
                         onClick={() => setLightbox({ submissionId: submission.id, index })}
-                        className="group block w-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      >
-                        <img
-                          src={mediaUrl(artwork.thumbUrl)}
-                          alt={artwork.title ?? submissionDisplayName(submission)}
-                          className="aspect-square w-full rounded-md border border-zinc-200 object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
-                        />
-                      </button>
+                      />
                       {artwork.title && (
                         <p className="mt-1 text-sm font-medium text-zinc-900">{artwork.title}</p>
                       )}

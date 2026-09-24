@@ -12,6 +12,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
+import ThumbnailTile from '../../components/ui/ThumbnailTile';
 
 const AlbumPage = () => {
   const { t } = useTranslation();
@@ -89,17 +90,12 @@ const AlbumPage = () => {
           <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
             {album.photos.map((photo, index) => (
               <li key={photo.id}>
-                <button
-                  type="button"
+                <ThumbnailTile
+                  thumbUrl={mediaUrl(photo.thumbUrl)}
+                  alt={photo.title ?? photo.authorName}
+                  bordered
                   onClick={() => setLightboxIndex(index)}
-                  className="group block w-full cursor-pointer text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  <img
-                    src={mediaUrl(photo.thumbUrl)}
-                    alt={photo.title ?? photo.authorName}
-                    className="aspect-square w-full rounded-md border border-zinc-200 object-cover transition-transform duration-200 group-hover:rotate-2 group-hover:scale-105"
-                  />
-                </button>
+                />
                 {photo.title && (
                   <p className="mt-1 text-sm font-medium text-zinc-900">{photo.title}</p>
                 )}

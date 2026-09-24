@@ -75,6 +75,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             id: `${album.id}-${index}`,
             thumbUrl: mediaUrl(thumbUrl),
             alt: album.title,
+            to: targetPath,
           }))}
         />
       )}
