@@ -134,6 +134,7 @@
       "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
     },
     "gallery": {
+      "heading": "Gallery: {{title}}",
       "failedToLoad": "Failed to load gallery"
     },
     "voteCard": {

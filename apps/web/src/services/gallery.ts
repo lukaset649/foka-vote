@@ -10,7 +10,9 @@ export async function fetchGalleryAlbums(): Promise<GalleryAlbumDto[]> {
 }
 
 export function albumPath(album: GalleryAlbumDto): string {
-  return album.kind === 'CONTEST' ? `/contest/${album.slug}/gallery` : `/gallery/${album.slug}`;
+  return album.kind === 'CONTEST'
+    ? `/contest/${album.slug}/gallery?from=gallery`
+    : `/gallery/${album.slug}`;
 }
 
 export async function fetchAlbum(slug: string): Promise<AlbumDetailDto> {

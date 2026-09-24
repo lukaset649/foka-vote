@@ -134,6 +134,7 @@
       "submittedUnder": "Twoja praca została zgłoszona pod pseudonimem <strong>{{alias}}</strong>."
     },
     "gallery": {
+      "heading": "Galeria: {{title}}",
       "failedToLoad": "Nie udało się wczytać galerii"
     },
     "voteCard": {

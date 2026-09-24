@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import type { SubmissionDto } from '@foka-vote/shared';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
+import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
 import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
-import { contestGatePath } from '../../services/contests';
+import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchSubmissions, submissionDisplayName } from '../../services/submissions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -22,9 +22,14 @@ const GalleryPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [contest, setContest] = useState<ContestDto | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [error, setError] = useState(false);
   const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
+
+  const cameFromGallery = searchParams.get('from') === 'gallery';
+  const currentPath = `/contest/${slug}/gallery${cameFromGallery ? '?from=gallery' : ''}`;
 
   useEffect(() => {
     if (!slug) {
@@ -32,10 +37,11 @@ const GalleryPage = () => {
     }
     let cancelled = false;
 
-    fetchSubmissions(slug)
-      .then((data) => {
+    Promise.all([fetchContest(slug), fetchSubmissions(slug)])
+      .then(([contestData, submissionsData]) => {
         if (!cancelled) {
-          setSubmissions(data);
+          setContest(contestData);
+          setSubmissions(submissionsData);
         }
       })
       .catch((err: unknown) => {
@@ -43,7 +49,7 @@ const GalleryPage = () => {
           return;
         }
         if (isUnauthorizedError(err)) {
-          void navigate(contestGatePath(slug, `/contest/${slug}/gallery`), { replace: true });
+          void navigate(contestGatePath(slug, currentPath), { replace: true });
           return;
         }
         setError(true);
@@ -52,13 +58,13 @@ const GalleryPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [slug, navigate]);
+  }, [slug, navigate, currentPath]);
 
   if (error) {
     return <Alert variant="error">{t('pages.gallery.failedToLoad')}</Alert>;
   }
 
-  if (submissions === null) {
+  if (submissions === null || contest === null) {
     return <Spinner />;
   }
 
@@ -67,9 +73,9 @@ const GalleryPage = () => {
   return (
     <div>
       <PageHeader
-        title={t('common.actions.gallery')}
-        backTo={`/contest/${slug}`}
-        backLabel={t('common.backToContest')}
+        title={t('pages.gallery.heading', { title: contest.title })}
+        backTo={cameFromGallery ? '/gallery' : `/contest/${slug}`}
+        backLabel={cameFromGallery ? t('pages.album.backToGallery') : t('common.backToContest')}
       />
 
       {submissions.length === 0 ? (
