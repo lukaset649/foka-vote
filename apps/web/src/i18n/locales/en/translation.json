@@ -84,6 +84,27 @@
       "title": "Album sent for approval",
       "text": "An administrator will review it. Once approved, the album shows up in the gallery and anyone can add photos to it."
     },
+    "albumAddPhotos": {
+      "title": "Add photos",
+      "backToAlbum": "Back to the album",
+      "infoModeration": "Photos appear in the album once an administrator approves them.",
+      "infoNamePublished": "Your first and last name will be published next to every photo you add.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "photosHeading": "Photos (up to {{max}})",
+      "photoLegend": "Photo {{index}}",
+      "addAnotherPhoto": "Add another photo",
+      "submit": "Send for approval",
+      "errors": {
+        "nameRequired": "First and last name are required",
+        "photoRequired": "Attach at least one photo",
+        "rulesRequired": "You must accept the rules to send photos"
+      }
+    },
+    "albumAddPhotosConfirmation": {
+      "title": "Photos sent for approval",
+      "text": "An administrator will review them. Approved photos show up in the album right away."
+    },
     "contest": {
       "failedToLoad": "Failed to load contest"
     },

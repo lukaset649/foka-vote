@@ -84,6 +84,27 @@
       "title": "Album wysłany do zatwierdzenia",
       "text": "Administrator go sprawdzi. Po zatwierdzeniu album pojawi się w galerii, a każdy będzie mógł dodać do niego zdjęcia."
     },
+    "albumAddPhotos": {
+      "title": "Dodaj zdjęcia",
+      "backToAlbum": "Powrót do albumu",
+      "infoModeration": "Zdjęcia pojawią się w albumie po zatwierdzeniu przez administratora.",
+      "infoNamePublished": "Twoje imię i nazwisko zostaną opublikowane przy każdym dodanym zdjęciu.",
+      "firstNameLabel": "Imię",
+      "lastNameLabel": "Nazwisko",
+      "photosHeading": "Zdjęcia (maksymalnie {{max}})",
+      "photoLegend": "Zdjęcie {{index}}",
+      "addAnotherPhoto": "Dodaj kolejne zdjęcie",
+      "submit": "Wyślij do zatwierdzenia",
+      "errors": {
+        "nameRequired": "Imię i nazwisko są wymagane",
+        "photoRequired": "Dodaj przynajmniej jedno zdjęcie",
+        "rulesRequired": "Musisz zaakceptować regulamin, aby wysłać zdjęcia"
+      }
+    },
+    "albumAddPhotosConfirmation": {
+      "title": "Zdjęcia wysłane do zatwierdzenia",
+      "text": "Administrator je sprawdzi. Zatwierdzone zdjęcia od razu pojawią się w albumie."
+    },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
     },
