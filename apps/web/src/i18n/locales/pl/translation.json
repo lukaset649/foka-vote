@@ -34,6 +34,11 @@
     "VOTING": "Głosowanie",
     "CLOSED": "Zakończony"
   },
+  "moderationStatus": {
+    "PENDING": "Czeka na zatwierdzenie",
+    "APPROVED": "Zatwierdzony",
+    "REJECTED": "Odrzucony"
+  },
   "errors": {
     "VALIDATION_FAILED": "Podane dane są nieprawidłowe",
     "NOT_FOUND": "Nie znaleziono",
@@ -201,6 +206,34 @@
       "confirmDelete": "Usunąć „{{title}}”? To trwale usunie wszystkie jego zgłoszenia, prace i głosy.",
       "deleteFailed": "Nie udało się usunąć konkursu",
       "submissionsAndVoteCards": "Zgłoszenia i karty do głosowania"
+    },
+    "adminGallery": {
+      "title": "Galeria",
+      "accessCodeLabel": "Kod dostępu do galerii",
+      "accessCodePlaceholder": "Brak kodu: każdy może tworzyć albumy i dodawać zdjęcia",
+      "accessCodeHint": "Wymagany przy tworzeniu albumu i dodawaniu zdjęć. Zmiana kodu wylogowuje wszystkich z galerii.",
+      "settingsSaved": "Ustawienia zapisane",
+      "pendingHeading": "Czekają na zatwierdzenie",
+      "noPending": "Nic nie czeka na zatwierdzenie",
+      "allAlbumsHeading": "Wszystkie albumy",
+      "approve": "Zatwierdź",
+      "reject": "Odrzuć",
+      "hide": "Ukryj",
+      "show": "Pokaż",
+      "hiddenBadge": "Ukryty",
+      "editContest": "Edytuj konkurs",
+      "pendingPhotos_one": "{{count}} zdjęcie czeka na zatwierdzenie",
+      "pendingPhotos_few": "{{count}} zdjęcia czekają na zatwierdzenie",
+      "pendingPhotos_many": "{{count}} zdjęć czeka na zatwierdzenie",
+      "pendingPhotos_other": "{{count}} zdjęcia czeka na zatwierdzenie",
+      "confirmDelete": "Usunąć album \"{{title}}\"? Trwale usuwa album wraz ze wszystkimi zdjęciami."
+    },
+    "adminAlbumEdit": {
+      "heading": "Edytuj album: {{title}}",
+      "backToGallery": "Powrót do panelu galerii",
+      "photosHeading": "Zdjęcia",
+      "slugLocked": "Adres: /gallery/{{slug}} (bez możliwości zmiany)",
+      "confirmDeletePhoto": "Usunąć to zdjęcie? Plik zostanie też skasowany z dysku."
     },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",

@@ -34,6 +34,11 @@
     "VOTING": "Voting",
     "CLOSED": "Closed"
   },
+  "moderationStatus": {
+    "PENDING": "Awaiting approval",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected"
+  },
   "errors": {
     "VALIDATION_FAILED": "The submitted data is invalid",
     "NOT_FOUND": "Not found",
@@ -199,6 +204,32 @@
       "confirmDelete": "Delete \"{{title}}\"? This permanently removes all its submissions, artworks and votes.",
       "deleteFailed": "Failed to delete the contest",
       "submissionsAndVoteCards": "Submissions & vote cards"
+    },
+    "adminGallery": {
+      "title": "Gallery",
+      "accessCodeLabel": "Gallery access code",
+      "accessCodePlaceholder": "No code: anyone can create albums and add photos",
+      "accessCodeHint": "Required to create an album and to add photos. Changing it signs everyone out of the gallery.",
+      "settingsSaved": "Settings saved",
+      "pendingHeading": "Awaiting approval",
+      "noPending": "Nothing is waiting for approval",
+      "allAlbumsHeading": "All albums",
+      "approve": "Approve",
+      "reject": "Reject",
+      "hide": "Hide",
+      "show": "Show",
+      "hiddenBadge": "Hidden",
+      "editContest": "Edit contest",
+      "pendingPhotos_one": "{{count}} photo awaiting approval",
+      "pendingPhotos_other": "{{count}} photos awaiting approval",
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos."
+    },
+    "adminAlbumEdit": {
+      "heading": "Edit album: {{title}}",
+      "backToGallery": "Back to the gallery panel",
+      "photosHeading": "Photos",
+      "slugLocked": "Address: /gallery/{{slug}} (cannot be changed)",
+      "confirmDeletePhoto": "Delete this photo? The file is removed from disk as well."
     },
     "adminContestForm": {
       "editContest": "Edit contest",
