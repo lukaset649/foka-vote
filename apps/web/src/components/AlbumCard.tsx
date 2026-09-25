@@ -41,14 +41,15 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             })}
             {!album.locked && ` · ${itemCountLabel}`}
           </p>
-          {album.description && <p className="mt-2 text-sm text-zinc-600">{album.description}</p>}
         </div>
 
-        <LinkButton to={targetPath} variant="secondary" size="sm">
+        <LinkButton to={targetPath} variant="secondary" size="sm" className="shrink-0">
           {t('components.albumCard.viewAlbum')}
           <i className="bi bi-arrow-right" aria-hidden="true" />
         </LinkButton>
       </div>
+
+      {album.description && <p className="mt-2 text-sm text-zinc-600">{album.description}</p>}
 
       {album.locked ? (
         <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-dashed border-zinc-300 py-8 text-center">
