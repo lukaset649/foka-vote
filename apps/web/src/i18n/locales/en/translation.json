@@ -4,7 +4,8 @@
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "gallery": "Gallery"
   },
   "common": {
     "timeRemaining": "{{time}} remaining",
@@ -33,6 +34,11 @@
     "VOTING": "Voting",
     "CLOSED": "Closed"
   },
+  "moderationStatus": {
+    "PENDING": "Awaiting approval",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected"
+  },
   "errors": {
     "VALIDATION_FAILED": "The submitted data is invalid",
     "NOT_FOUND": "Not found",
@@ -48,6 +54,61 @@
       "allContests": "All contests",
       "noContestsYet": "No contests yet",
       "failedToLoad": "Failed to load contests"
+    },
+    "galleryAlbums": {
+      "title": "Gallery",
+      "createAlbum": "Create an album",
+      "noAlbumsYet": "No albums yet",
+      "failedToLoad": "Failed to load the gallery"
+    },
+    "album": {
+      "title": "Album",
+      "backToGallery": "Back to the gallery",
+      "addPhotos": "Add photos",
+      "noPhotosYet": "No photos in this album yet",
+      "photoBy": "by {{author}}",
+      "notFound": "This album does not exist or is still waiting for approval",
+      "failedToLoad": "Failed to load the album"
+    },
+    "galleryGate": {
+      "title": "Access code required",
+      "codeLabel": "Gallery access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
+    },
+    "albumCreate": {
+      "title": "Create an album",
+      "moderationNotice": "The album will appear in the gallery once an administrator approves it. Photos can be added after approval.",
+      "titleLabel": "Album name",
+      "submit": "Send for approval",
+      "errors": {
+        "titleRequired": "The album name is required"
+      }
+    },
+    "albumCreateConfirmation": {
+      "title": "Album sent for approval",
+      "text": "An administrator will review it. Once approved, the album shows up in the gallery and anyone can add photos to it."
+    },
+    "albumAddPhotos": {
+      "title": "Add photos",
+      "backToAlbum": "Back to the album",
+      "infoModeration": "Photos appear in the album once an administrator approves them.",
+      "infoNamePublished": "Your first and last name will be published next to every photo you add.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "photosHeading": "Photos (up to {{max}})",
+      "photoLegend": "Photo {{index}}",
+      "addAnotherPhoto": "Add another photo",
+      "submit": "Send for approval",
+      "errors": {
+        "nameRequired": "First and last name are required",
+        "photoRequired": "Attach at least one photo",
+        "rulesRequired": "You must accept the rules to send photos"
+      }
+    },
+    "albumAddPhotosConfirmation": {
+      "title": "Photos sent for approval",
+      "text": "An administrator will review them. Approved photos show up in the album right away."
     },
     "contest": {
       "failedToLoad": "Failed to load contest"
@@ -99,6 +160,7 @@
       "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
     },
     "gallery": {
+      "heading": "Gallery: {{title}}",
       "failedToLoad": "Failed to load gallery"
     },
     "voteCard": {
@@ -142,6 +204,32 @@
       "confirmDelete": "Delete \"{{title}}\"? This permanently removes all its submissions, artworks and votes.",
       "deleteFailed": "Failed to delete the contest",
       "submissionsAndVoteCards": "Submissions & vote cards"
+    },
+    "adminGallery": {
+      "title": "Gallery",
+      "accessCodeLabel": "Gallery access code",
+      "accessCodePlaceholder": "No code: anyone can create albums and add photos",
+      "accessCodeHint": "Required to create an album and to add photos. Changing it signs everyone out of the gallery.",
+      "settingsSaved": "Settings saved",
+      "pendingHeading": "Awaiting approval",
+      "noPending": "Nothing is waiting for approval",
+      "allAlbumsHeading": "All albums",
+      "approve": "Approve",
+      "reject": "Reject",
+      "hide": "Hide",
+      "show": "Show",
+      "hiddenBadge": "Hidden",
+      "editContest": "Edit contest",
+      "pendingPhotos_one": "{{count}} photo awaiting approval",
+      "pendingPhotos_other": "{{count}} photos awaiting approval",
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos."
+    },
+    "adminAlbumEdit": {
+      "heading": "Edit album: {{title}}",
+      "backToGallery": "Back to the gallery panel",
+      "photosHeading": "Photos",
+      "slugLocked": "Address: /gallery/{{slug}} (cannot be changed)",
+      "confirmDeletePhoto": "Delete this photo? The file is removed from disk as well."
     },
     "adminContestForm": {
       "editContest": "Edit contest",
@@ -225,6 +313,21 @@
     "contestGalleryCard": {
       "viewGallery": "View gallery",
       "noSubmissionsYet": "No submissions yet"
+    },
+    "albumCard": {
+      "kind": {
+        "CONTEST": "Contest",
+        "STANDALONE": "Album"
+      },
+      "viewAlbum": "View album",
+      "createdOn": "Created {{date}}",
+      "submissionsCount_one": "{{count}} submission",
+      "submissionsCount_other": "{{count}} submissions",
+      "photosCount_one": "{{count}} photo",
+      "photosCount_other": "{{count}} photos",
+      "noPhotosYet": "No photos yet",
+      "accessCodeRequired": "This contest is protected with an access code",
+      "enterAccessCode": "Enter the code"
     },
     "contestResultsCard": {
       "viewResults": "View results",

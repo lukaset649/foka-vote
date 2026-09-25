@@ -5,12 +5,13 @@ import type { AliasReservation, Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, notFound } from '../../errors/app-error.js';
+import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
 import { prisma } from '../../lib/prisma.js';
-import { MEDIA_URL_PREFIX, UPLOADS_DIR } from '../../lib/storage.js';
+import { mediaUrl, UPLOADS_DIR } from '../../lib/storage.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
 const ALIAS_RESERVATION_TTL_MS = 20 * 60 * 1000;
@@ -22,17 +23,8 @@ export interface CreateSubmissionInput {
   reservationId?: string;
 }
 
-export interface ArtworkMetaInput {
-  title?: string;
-  description?: string;
-}
-
 function isUniqueConstraintError(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
-}
-
-function mediaUrl(storedPath: string): string {
-  return `${MEDIA_URL_PREFIX}/${path.basename(storedPath)}`;
 }
 
 function toArtworkDto(artwork: Artwork): ArtworkDto {
