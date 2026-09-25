@@ -11,7 +11,7 @@ export interface LightboxImage {
   previewUrl: string;
   width: number | null;
   height: number | null;
-  author?: string;
+  author?: string | null;
 }
 
 interface ArtworkLightboxProps {

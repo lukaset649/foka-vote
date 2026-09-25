@@ -2,6 +2,23 @@ export type AlbumKind = 'CONTEST' | 'STANDALONE';
 
 export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
+export interface GalleryPreviewImageDto {
+  id: string;
+  title: string | null;
+  description: string | null;
+  previewUrl: string;
+  width: number | null;
+  height: number | null;
+  author: string | null;
+}
+
+export interface GalleryAlbumPreviewDto {
+  id: string;
+  thumbUrl: string;
+  label: string | null;
+  images: GalleryPreviewImageDto[];
+}
+
 export interface GalleryAlbumDto {
   kind: AlbumKind;
   id: string;
@@ -9,11 +26,9 @@ export interface GalleryAlbumDto {
   title: string;
   description: string | null;
   createdAt: string;
-  /** A contest behind an access code: no preview is exposed until the code is entered. */
   locked: boolean;
-  /** Submissions for a contest album, approved photos for a standalone one. */
   itemCount: number;
-  previewThumbUrls: string[];
+  previews: GalleryAlbumPreviewDto[];
 }
 
 export interface AlbumPhotoDto {

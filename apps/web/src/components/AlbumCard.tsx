@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { GalleryAlbumDto } from '@foka-vote/shared';
+import type { GalleryAlbumDto, GalleryAlbumPreviewDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
 import { contestGatePath } from '../services/contests';
 import { albumPath } from '../services/gallery';
+import ArtworkLightbox from './ArtworkLightbox';
 import Badge from './ui/Badge';
 import Card from './ui/Card';
 import EmptyState from './ui/EmptyState';
@@ -15,6 +17,7 @@ interface AlbumCardProps {
 
 const AlbumCard = ({ album }: AlbumCardProps) => {
   const { t } = useTranslation();
+  const [openPreview, setOpenPreview] = useState<GalleryAlbumPreviewDto | null>(null);
   const targetPath = albumPath(album);
 
   const itemCountLabel =
@@ -60,7 +63,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             {t('components.albumCard.enterAccessCode')}
           </LinkButton>
         </div>
-      ) : album.previewThumbUrls.length === 0 ? (
+      ) : album.previews.length === 0 ? (
         <EmptyState
           icon="bi-images"
           text={t('components.albumCard.noPhotosYet')}
@@ -71,12 +74,22 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
           className="mt-4"
           totalCount={album.itemCount}
           overflowTo={targetPath}
-          items={album.previewThumbUrls.map((thumbUrl, index) => ({
-            id: `${album.id}-${index}`,
-            thumbUrl: mediaUrl(thumbUrl),
-            alt: album.title,
-            to: targetPath,
+          items={album.previews.map((preview) => ({
+            id: preview.id,
+            thumbUrl: mediaUrl(preview.thumbUrl),
+            alt: preview.label ?? album.title,
+            ...(preview.label ? { label: preview.label } : {}),
+            onClick: () => setOpenPreview(preview),
           }))}
+        />
+      )}
+
+      {openPreview && (
+        <ArtworkLightbox
+          artworks={openPreview.images}
+          startIndex={0}
+          open
+          onClose={() => setOpenPreview(null)}
         />
       )}
     </Card>

@@ -3,6 +3,7 @@ import type {
   AlbumPhotoDto,
   CreateAlbumDto,
   GalleryAlbumDto,
+  GalleryAlbumPreviewDto,
 } from '@foka-vote/shared';
 import {
   GALLERY_ALBUM_PREVIEW_COUNT,
@@ -17,6 +18,7 @@ import { Prisma } from '@prisma/client';
 import { badRequest, conflict, notFound } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
+import { computeContestStatus } from '../../lib/contest-status.js';
 import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import { prisma } from '../../lib/prisma.js';
 import { slugify } from '../../lib/slugify.js';
@@ -54,12 +56,30 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
       description: true,
       accessCode: true,
       createdAt: true,
-      // One thumbnail per submission, mirroring the preview on the contest page.
+      submissionStart: true,
+      submissionDeadline: true,
+      votingStart: true,
+      votingEnd: true,
       submissions: {
         orderBy: { createdAt: 'asc' },
         take: GALLERY_ALBUM_PREVIEW_COUNT,
         select: {
-          artworks: { orderBy: { sortOrder: 'asc' }, take: 1, select: { thumbPath: true } },
+          id: true,
+          alias: true,
+          firstName: true,
+          lastName: true,
+          artworks: {
+            orderBy: { sortOrder: 'asc' },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              previewPath: true,
+              thumbPath: true,
+              width: true,
+              height: true,
+            },
+          },
         },
       },
     },
@@ -74,9 +94,35 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
     submissionCounts.map((entry) => [entry.contestId, entry._count._all]),
   );
 
+  const now = new Date();
+
   return contests.map((contest) => {
     // A contest behind an access code must not leak its works before the code is entered.
     const locked = !isContestUnlocked(contest, signedCookies);
+    const revealNames = computeContestStatus(now, contest) === 'CLOSED';
+
+    const previews: GalleryAlbumPreviewDto[] = contest.submissions
+      .filter((submission) => submission.artworks.length > 0)
+      .map((submission) => {
+        const author = revealNames
+          ? `${submission.firstName} ${submission.lastName}`
+          : submission.alias;
+
+        return {
+          id: submission.id,
+          thumbUrl: mediaUrl((submission.artworks[0] as { thumbPath: string }).thumbPath),
+          label: author,
+          images: submission.artworks.map((artwork) => ({
+            id: artwork.id,
+            title: artwork.title,
+            description: artwork.description,
+            previewUrl: mediaUrl(artwork.previewPath),
+            width: artwork.width,
+            height: artwork.height,
+            author,
+          })),
+        };
+      });
 
     return {
       kind: 'CONTEST',
@@ -87,11 +133,7 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
       createdAt: contest.createdAt.toISOString(),
       locked,
       itemCount: locked ? 0 : (countByContestId.get(contest.id) ?? 0),
-      previewThumbUrls: locked
-        ? []
-        : contest.submissions.flatMap((submission) =>
-            submission.artworks.map((artwork) => mediaUrl(artwork.thumbPath)),
-          ),
+      previews: locked ? [] : previews,
     };
   });
 }
@@ -110,7 +152,17 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
         where: { status: 'APPROVED' },
         orderBy: { createdAt: 'asc' },
         take: GALLERY_ALBUM_PREVIEW_COUNT,
-        select: { thumbPath: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          firstName: true,
+          lastName: true,
+          previewPath: true,
+          thumbPath: true,
+          width: true,
+          height: true,
+        },
       },
       _count: { select: { photos: { where: { status: 'APPROVED' } } } },
     },
@@ -125,7 +177,26 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
     createdAt: album.createdAt.toISOString(),
     locked: false,
     itemCount: album._count.photos,
-    previewThumbUrls: album.photos.map((photo) => mediaUrl(photo.thumbPath)),
+    previews: album.photos.map((photo) => {
+      const author = `${photo.firstName} ${photo.lastName}`;
+
+      return {
+        id: photo.id,
+        thumbUrl: mediaUrl(photo.thumbPath),
+        label: author,
+        images: [
+          {
+            id: photo.id,
+            title: photo.title,
+            description: photo.description,
+            previewUrl: mediaUrl(photo.previewPath),
+            width: photo.width,
+            height: photo.height,
+            author,
+          },
+        ],
+      };
+    }),
   }));
 }
 
