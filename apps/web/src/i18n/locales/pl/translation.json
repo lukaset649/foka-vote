@@ -211,6 +211,11 @@
     }
   },
   "components": {
+    "updatePrompt": {
+      "message": "Dostępna jest nowa wersja aplikacji.",
+      "refresh": "Odśwież",
+      "later": "Później"
+    },
     "contestPhaseCard": {
       "submissionsStart": "Rozpoczęcie zgłoszeń",
       "votingEnded": "Głosowanie zakończone",

@@ -4,6 +4,7 @@ import { Link, Outlet, useLocation, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
 import type { RouteHandle } from '../routes';
 import MobileNav from './MobileNav';
+import UpdatePrompt from './UpdatePrompt';
 import LanguageSwitcher from './ui/LanguageSwitcher';
 import LinkButton from './ui/LinkButton';
 
@@ -58,6 +59,8 @@ const Layout = () => {
           </button>
         </div>
       </header>
+
+      <UpdatePrompt />
 
       <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} items={NAV_ITEMS} />
 

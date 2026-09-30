@@ -1,6 +1,6 @@
 {
   "nav": {
-    "voting": "Voting",
+    "voting": "Voting v2",
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Open menu",
@@ -203,6 +203,11 @@
     }
   },
   "components": {
+    "updatePrompt": {
+      "message": "A new version of the app is available.",
+      "refresh": "Refresh",
+      "later": "Later"
+    },
     "contestPhaseCard": {
       "submissionsStart": "Submissions start",
       "votingEnded": "Voting ended",
