@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { ErrorCode, MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
+import useOnlineStatus from '../../lib/useOnlineStatus';
 import { ApiError, isUnauthorizedError, mediaUrl } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
@@ -22,6 +23,7 @@ const VoteCardPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
 
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
@@ -238,6 +240,11 @@ const VoteCardPage = () => {
 
       {showActionBar && (
         <ActionBar>
+          {!isOnline && (
+            <Alert variant="info" className="mb-3">
+              {t('common.offlineSubmitHint')}
+            </Alert>
+          )}
           {submitError && (
             <Alert variant="error" className="mb-3">
               {submitError}
@@ -260,7 +267,11 @@ const VoteCardPage = () => {
                 </li>
               ))}
             </ul>
-            <Button type="button" onClick={handleSubmit} disabled={!complete || submitting}>
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!complete || submitting || !isOnline}
+            >
               <i className="bi bi-check2-square" aria-hidden="true" />
               {t('common.submit')}
             </Button>
