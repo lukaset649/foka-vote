@@ -20,8 +20,8 @@ const UpdatePrompt = () => {
           <i className="bi bi-arrow-repeat text-base" aria-hidden="true" />
           {t('components.updatePrompt.message')}
         </p>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => void updateServiceWorker(true)}>
+        <div className="flex gap-3">
+          <Button size="sm" variant="ghost" onClick={() => void updateServiceWorker(true)}>
             {t('components.updatePrompt.refresh')}
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setNeedRefresh(false)}>
