@@ -48,8 +48,13 @@ const Layout = () => {
                 {t(item.labelKey)}
               </LinkButton>
             ))}
-            <InstallButton variant="ghost" size="sm" label={t('nav.install')} />
             <LanguageSwitcher />
+            <InstallButton
+              variant="secondary"
+              size="sm"
+              label={t('nav.install')}
+              className="w-30"
+            />
           </nav>
 
           <button

@@ -8,9 +8,10 @@ interface InstallButtonProps {
   variant: ButtonVariant;
   size: ButtonSize;
   label: string;
+  className?: string;
 }
 
-const InstallButton = ({ variant, size, label }: InstallButtonProps) => {
+const InstallButton = ({ variant, size, label, className }: InstallButtonProps) => {
   const { t } = useTranslation();
   const { canPrompt, needsIosInstructions, promptInstall } = useInstallPrompt();
   const [isIosModalOpen, setIsIosModalOpen] = useState(false);
@@ -30,7 +31,13 @@ const InstallButton = ({ variant, size, label }: InstallButtonProps) => {
 
   return (
     <>
-      <Button type="button" variant={variant} size={size} onClick={handleClick}>
+      <Button
+        type="button"
+        variant={variant}
+        size={size}
+        className={className}
+        onClick={handleClick}
+      >
         <i className="bi bi-download" aria-hidden="true" />
         {label}
       </Button>
