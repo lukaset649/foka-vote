@@ -4,7 +4,9 @@
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "install": "Install",
+    "installApp": "Install app"
   },
   "common": {
     "timeRemaining": "{{time}} remaining",
@@ -205,6 +207,12 @@
     }
   },
   "components": {
+    "installInstructions": {
+      "title": "Install FOKA Vote",
+      "share": "Tap the Share button in the browser toolbar.",
+      "addToHomeScreen": "Choose “Add to Home Screen”.",
+      "confirm": "Confirm by tapping “Add”."
+    },
     "offlineBanner": {
       "message": "No internet connection. You can browse pages that are already loaded, but sending is unavailable."
     },

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import InstallButton from './InstallButton';
 import type { NavItem } from './Layout';
 import LanguageSwitcher from './ui/LanguageSwitcher';
 import LinkButton from './ui/LinkButton';
@@ -67,6 +68,7 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
               {t(item.labelKey)}
             </LinkButton>
           ))}
+          <InstallButton variant="secondary" size="navItem" label={t('nav.installApp')} />
         </nav>
         <div className="mt-auto border-t border-zinc-200 pt-4">
           <LanguageSwitcher />

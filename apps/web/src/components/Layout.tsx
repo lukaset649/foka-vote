@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
 import type { RouteHandle } from '../routes';
+import InstallButton from './InstallButton';
 import MobileNav from './MobileNav';
 import OfflineBanner from './OfflineBanner';
 import UpdatePrompt from './UpdatePrompt';
@@ -47,6 +48,7 @@ const Layout = () => {
                 {t(item.labelKey)}
               </LinkButton>
             ))}
+            <InstallButton variant="ghost" size="sm" label={t('nav.install')} />
             <LanguageSwitcher />
           </nav>
 

@@ -4,7 +4,9 @@
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Otwórz menu",
-    "closeMenu": "Zamknij menu"
+    "closeMenu": "Zamknij menu",
+    "install": "Zainstaluj",
+    "installApp": "Zainstaluj aplikację"
   },
   "common": {
     "timeRemaining": "Pozostało {{time}}",
@@ -213,6 +215,12 @@
     }
   },
   "components": {
+    "installInstructions": {
+      "title": "Zainstaluj FOKA Vote",
+      "share": "Stuknij przycisk Udostępnij na pasku przeglądarki.",
+      "addToHomeScreen": "Wybierz „Do ekranu początkowego”.",
+      "confirm": "Potwierdź, stukając „Dodaj”."
+    },
     "offlineBanner": {
       "message": "Brak połączenia z internetem. Możesz przeglądać wczytane strony, ale wysyłanie jest niedostępne."
     },
