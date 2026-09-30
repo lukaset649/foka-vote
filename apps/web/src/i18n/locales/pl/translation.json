@@ -25,7 +25,8 @@
     "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia.",
     "loading": "Wczytywanie…",
     "back": "Wstecz",
-    "close": "Zamknij"
+    "close": "Zamknij",
+    "offlineSubmitHint": "Wysyłanie będzie możliwe po odzyskaniu połączenia z internetem."
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -212,6 +213,9 @@
     }
   },
   "components": {
+    "offlineBanner": {
+      "message": "Brak połączenia z internetem. Możesz przeglądać wczytane strony, ale wysyłanie jest niedostępne."
+    },
     "updatePrompt": {
       "message": "Dostępna jest nowa wersja aplikacji.",
       "refresh": "Odśwież",

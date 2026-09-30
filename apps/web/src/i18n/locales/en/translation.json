@@ -25,7 +25,8 @@
     "noConfirmationDataFound": "No confirmation data found.",
     "loading": "Loading…",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "offlineSubmitHint": "Sending will be possible once your internet connection is back."
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -204,6 +205,9 @@
     }
   },
   "components": {
+    "offlineBanner": {
+      "message": "No internet connection. You can browse pages that are already loaded, but sending is unavailable."
+    },
     "updatePrompt": {
       "message": "A new version of the app is available.",
       "refresh": "Refresh",
