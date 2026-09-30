@@ -40,7 +40,8 @@
     "FORBIDDEN": "You don't have permission to do this",
     "CONFLICT": "There was a data conflict",
     "INTERNAL_ERROR": "A server error occurred",
-    "generic": "Something went wrong, please try again"
+    "generic": "Something went wrong, please try again",
+    "network": "No internet connection. Check your connection and try again"
   },
   "pages": {
     "contestsList": {

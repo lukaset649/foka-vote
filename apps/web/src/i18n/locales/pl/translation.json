@@ -40,7 +40,8 @@
     "FORBIDDEN": "Brak uprawnień do wykonania tej czynności",
     "CONFLICT": "Wystąpił konflikt danych",
     "INTERNAL_ERROR": "Wystąpił błąd serwera",
-    "generic": "Coś poszło nie tak, spróbuj ponownie"
+    "generic": "Coś poszło nie tak, spróbuj ponownie",
+    "network": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie"
   },
   "pages": {
     "contestsList": {
