@@ -3,10 +3,19 @@ import type { ErrorResponseBody } from '@foka-vote/shared';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export class NetworkError extends Error {
+  constructor() {
+    super('Network error');
+    this.name = 'NetworkError';
+  }
+}
+
 export function apiRequest(path: string, init?: RequestInit): Promise<Response> {
   return fetch(`${API_URL}${path}`, {
     credentials: 'include',
     ...init,
+  }).catch(() => {
+    throw new NetworkError();
   });
 }
 
@@ -27,7 +36,7 @@ export function apiUploadWithProgress(
     xhr.onload = () => {
       resolve(new Response(xhr.responseText, { status: xhr.status, statusText: xhr.statusText }));
     };
-    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onerror = () => reject(new NetworkError());
     xhr.send(formData);
   });
 }

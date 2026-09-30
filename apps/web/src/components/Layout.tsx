@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
 import type { RouteHandle } from '../routes';
+import InstallButton from './InstallButton';
 import MobileNav from './MobileNav';
+import OfflineBanner from './OfflineBanner';
+import UpdatePrompt from './UpdatePrompt';
 import LanguageSwitcher from './ui/LanguageSwitcher';
 import LinkButton from './ui/LinkButton';
 
@@ -46,6 +49,12 @@ const Layout = () => {
               </LinkButton>
             ))}
             <LanguageSwitcher />
+            <InstallButton
+              variant="secondary"
+              size="sm"
+              label={t('nav.install')}
+              className="w-30"
+            />
           </nav>
 
           <button
@@ -58,6 +67,9 @@ const Layout = () => {
           </button>
         </div>
       </header>
+
+      <UpdatePrompt />
+      <OfflineBanner />
 
       <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} items={NAV_ITEMS} />
 

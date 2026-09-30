@@ -22,17 +22,17 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "typescript": "^5.9.2",
-    "eslint": "^8.47.0",
-    "@typescript-eslint/parser": "^6.10.0",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "prettier": "^3.0.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.7.1",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-import-resolver-typescript": "^3.7.1"
+    "prettier": "^3.0.0",
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=22"
