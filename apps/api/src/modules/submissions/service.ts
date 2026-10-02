@@ -4,7 +4,7 @@ import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/
 import type { AliasReservation, Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { assertContestAccess } from '../contests/service.js';
-import { badRequest, conflict, notFound } from '../../errors/app-error.js';
+import { badRequest, conflict, forbidden, notFound } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
@@ -240,6 +240,9 @@ export async function listSubmissions(
   assertContestAccess(contest, signedCookies);
 
   const status = computeContestStatus(new Date(), contest);
+  if (status !== 'VOTING' && status !== 'CLOSED') {
+    throw forbidden('Submissions are not visible until the submission phase ends');
+  }
   const includeNames = status === 'CLOSED';
 
   const submissions = await prisma.submission.findMany({
