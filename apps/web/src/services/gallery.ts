@@ -1,7 +1,6 @@
 import type {
   AdminAlbumDto,
   AdminAlbumPhotoDto,
-  AdminGallerySettingsDto,
   AlbumDetailDto,
   CreateAlbumDto,
   GalleryAlbumDto,
@@ -33,29 +32,18 @@ export async function fetchAlbum(slug: string): Promise<AlbumDetailDto> {
   return response.json() as Promise<AlbumDetailDto>;
 }
 
-export function galleryGatePath(redirectTo: string): string {
-  return `/gallery/gate?redirect=${encodeURIComponent(redirectTo)}`;
+export function albumGatePath(slug: string, redirectTo: string): string {
+  return `/gallery/${slug}/gate?redirect=${encodeURIComponent(redirectTo)}`;
 }
 
-export async function verifyGalleryAccessCode(code: string): Promise<void> {
-  const response = await apiRequest('/api/gallery/access', {
+export async function verifyAlbumAccessCode(slug: string, code: string): Promise<void> {
+  const response = await apiRequest(`/api/gallery/albums/${slug}/access`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
   });
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to verify access code');
-  }
-}
-
-export async function createAlbum(input: CreateAlbumDto): Promise<void> {
-  const response = await apiRequest('/api/gallery/albums', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
-  });
-  if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to create album');
   }
 }
 
@@ -96,34 +84,24 @@ export async function addAlbumPhotos(
   }
 }
 
-export async function fetchAdminGallerySettings(): Promise<AdminGallerySettingsDto> {
-  const response = await apiRequest('/api/admin/gallery/settings');
-  if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to fetch gallery settings');
-  }
-  return response.json() as Promise<AdminGallerySettingsDto>;
-}
-
-export async function updateAdminGallerySettings(
-  accessCode: string | null,
-): Promise<AdminGallerySettingsDto> {
-  const response = await apiRequest('/api/admin/gallery/settings', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ accessCode }),
-  });
-  if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to update gallery settings');
-  }
-  return response.json() as Promise<AdminGallerySettingsDto>;
-}
-
 export async function fetchAdminAlbums(): Promise<AdminAlbumDto[]> {
   const response = await apiRequest('/api/admin/gallery/albums');
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch albums');
   }
   return response.json() as Promise<AdminAlbumDto[]>;
+}
+
+export async function createAdminAlbum(input: CreateAlbumDto): Promise<AdminAlbumDto> {
+  const response = await apiRequest('/api/admin/gallery/albums', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw await apiErrorFrom(response, 'Failed to create album');
+  }
+  return response.json() as Promise<AdminAlbumDto>;
 }
 
 export async function fetchAdminAlbum(id: string): Promise<AdminAlbumDto> {
@@ -142,21 +120,6 @@ export async function updateAdminAlbum(id: string, input: UpdateAlbumDto): Promi
   });
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to update album');
-  }
-  return response.json() as Promise<AdminAlbumDto>;
-}
-
-export async function setAdminAlbumStatus(
-  id: string,
-  status: ModerationStatus,
-): Promise<AdminAlbumDto> {
-  const response = await apiRequest(`/api/admin/gallery/albums/${id}/status`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-  if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to update album status');
   }
   return response.json() as Promise<AdminAlbumDto>;
 }

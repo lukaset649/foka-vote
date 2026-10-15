@@ -50,12 +50,15 @@ export interface AlbumDetailDto {
   title: string;
   description: string | null;
   createdAt: string;
+  hasAccessCode: boolean;
+  canUpload: boolean;
   photos: AlbumPhotoDto[];
 }
 
 export interface CreateAlbumDto {
   title: string;
   description?: string;
+  accessCode?: string;
 }
 
 export type UpdateAlbumDto = Partial<CreateAlbumDto>;
@@ -67,7 +70,7 @@ export interface AdminAlbumDto {
   title: string;
   description: string | null;
   createdAt: string;
-  status: ModerationStatus;
+  accessCode: string | null;
   hidden: boolean;
   photoCount: number;
   pendingPhotoCount: number;
@@ -87,6 +90,3 @@ export interface UpdateAlbumPhotoDto {
 }
 
 /** Admin-only: the gallery access code is never exposed through the public API. */
-export interface AdminGallerySettingsDto {
-  accessCode: string | null;
-}
