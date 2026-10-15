@@ -61,7 +61,6 @@
     },
     "galleryAlbums": {
       "title": "Gallery",
-      "createAlbum": "Create an album",
       "noAlbumsYet": "No albums yet",
       "failedToLoad": "Failed to load the gallery"
     },
@@ -74,27 +73,9 @@
       "notFound": "This album does not exist or is still waiting for approval",
       "failedToLoad": "Failed to load the album"
     },
-    "galleryGate": {
-      "title": "Access code required",
-      "codeLabel": "Gallery access code",
-      "submit": "Enter",
-      "invalidCode": "Invalid access code"
-    },
-    "albumCreate": {
-      "title": "Create an album",
-      "moderationNotice": "The album will appear in the gallery once an administrator approves it. Photos can be added after approval.",
-      "titleLabel": "Album name",
-      "submit": "Send for approval",
-      "errors": {
-        "titleRequired": "The album name is required"
-      }
-    },
-    "albumCreateConfirmation": {
-      "title": "Album sent for approval",
-      "text": "An administrator will review it. Once approved, the album shows up in the gallery and anyone can add photos to it."
-    },
     "albumAddPhotos": {
       "title": "Add photos",
+      "heading": "Add photos: {{title}}",
       "backToAlbum": "Back to the album",
       "infoModeration": "Photos appear in the album once an administrator approves them.",
       "infoNamePublished": "Your first and last name will be published next to every photo you add.",
@@ -211,22 +192,23 @@
     },
     "adminGallery": {
       "title": "Gallery",
-      "accessCodeLabel": "Gallery access code",
-      "accessCodePlaceholder": "No code: anyone can create albums and add photos",
-      "accessCodeHint": "Required to create an album and to add photos. Changing it signs everyone out of the gallery.",
-      "settingsSaved": "Settings saved",
-      "pendingHeading": "Awaiting approval",
-      "noPending": "Nothing is waiting for approval",
+      "accessCodeLabel": "Access code for sending photos (optional)",
+      "accessCodePlaceholder": "No code: anyone can send photos",
+      "accessCodeHint": "Required to send photos to this album. Photos always wait for approval.",
       "allAlbumsHeading": "All albums",
-      "approve": "Approve",
-      "reject": "Reject",
       "hide": "Hide",
       "show": "Show",
       "hiddenBadge": "Hidden",
       "editContest": "Edit contest",
       "pendingPhotos_one": "{{count}} photo awaiting approval",
       "pendingPhotos_other": "{{count}} photos awaiting approval",
-      "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos."
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos.",
+      "newAlbumHeading": "New album",
+      "titleLabel": "Album name",
+      "createAlbum": "Create album",
+      "codeBadge": "Code: {{code}}",
+      "approve": "Approve",
+      "reject": "Reject"
     },
     "adminAlbumEdit": {
       "heading": "Edit album: {{title}}",
@@ -292,6 +274,12 @@
       "confirmDeleteArtwork": "Delete this artwork?",
       "replacementFileSr": "Replacement file",
       "replace": "Replace"
+    },
+    "albumGate": {
+      "title": "Access code required",
+      "codeLabel": "Album access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
     }
   },
   "components": {

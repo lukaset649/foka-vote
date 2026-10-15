@@ -61,7 +61,6 @@
     },
     "galleryAlbums": {
       "title": "Galeria",
-      "createAlbum": "Utwórz album",
       "noAlbumsYet": "Brak albumów",
       "failedToLoad": "Nie udało się wczytać galerii"
     },
@@ -74,27 +73,9 @@
       "notFound": "Taki album nie istnieje lub czeka na zatwierdzenie",
       "failedToLoad": "Nie udało się wczytać albumu"
     },
-    "galleryGate": {
-      "title": "Wymagany kod dostępu",
-      "codeLabel": "Kod dostępu do galerii",
-      "submit": "Wejdź",
-      "invalidCode": "Nieprawidłowy kod dostępu"
-    },
-    "albumCreate": {
-      "title": "Utwórz album",
-      "moderationNotice": "Album pojawi się w galerii po zatwierdzeniu przez administratora. Zdjęcia można dodawać po zatwierdzeniu.",
-      "titleLabel": "Nazwa albumu",
-      "submit": "Wyślij do zatwierdzenia",
-      "errors": {
-        "titleRequired": "Nazwa albumu jest wymagana"
-      }
-    },
-    "albumCreateConfirmation": {
-      "title": "Album wysłany do zatwierdzenia",
-      "text": "Administrator go sprawdzi. Po zatwierdzeniu album pojawi się w galerii, a każdy będzie mógł dodać do niego zdjęcia."
-    },
     "albumAddPhotos": {
       "title": "Dodaj zdjęcia",
+      "heading": "Dodaj zdjęcia: {{title}}",
       "backToAlbum": "Powrót do albumu",
       "infoModeration": "Zdjęcia pojawią się w albumie po zatwierdzeniu przez administratora.",
       "infoNamePublished": "Twoje imię i nazwisko zostaną opublikowane przy każdym dodanym zdjęciu.",
@@ -213,15 +194,10 @@
     },
     "adminGallery": {
       "title": "Galeria",
-      "accessCodeLabel": "Kod dostępu do galerii",
-      "accessCodePlaceholder": "Brak kodu: każdy może tworzyć albumy i dodawać zdjęcia",
-      "accessCodeHint": "Wymagany przy tworzeniu albumu i dodawaniu zdjęć. Zmiana kodu wylogowuje wszystkich z galerii.",
-      "settingsSaved": "Ustawienia zapisane",
-      "pendingHeading": "Czekają na zatwierdzenie",
-      "noPending": "Nic nie czeka na zatwierdzenie",
+      "accessCodeLabel": "Kod dostępu do wysyłania zdjęć (opcjonalnie)",
+      "accessCodePlaceholder": "Brak kodu: każdy może wysłać zdjęcia",
+      "accessCodeHint": "Wymagany przy wysyłaniu zdjęć do tego albumu. Zdjęcia zawsze czekają na zatwierdzenie.",
       "allAlbumsHeading": "Wszystkie albumy",
-      "approve": "Zatwierdź",
-      "reject": "Odrzuć",
       "hide": "Ukryj",
       "show": "Pokaż",
       "hiddenBadge": "Ukryty",
@@ -230,7 +206,13 @@
       "pendingPhotos_few": "{{count}} zdjęcia czekają na zatwierdzenie",
       "pendingPhotos_many": "{{count}} zdjęć czeka na zatwierdzenie",
       "pendingPhotos_other": "{{count}} zdjęcia czeka na zatwierdzenie",
-      "confirmDelete": "Usunąć album \"{{title}}\"? Trwale usuwa album wraz ze wszystkimi zdjęciami."
+      "confirmDelete": "Usunąć album \"{{title}}\"? Trwale usuwa album wraz ze wszystkimi zdjęciami.",
+      "newAlbumHeading": "Nowy album",
+      "titleLabel": "Nazwa albumu",
+      "createAlbum": "Utwórz album",
+      "codeBadge": "Kod: {{code}}",
+      "approve": "Zatwierdź",
+      "reject": "Odrzuć"
     },
     "adminAlbumEdit": {
       "heading": "Edytuj album: {{title}}",
@@ -302,6 +284,12 @@
       "confirmDeleteArtwork": "Usunąć tę pracę?",
       "replacementFileSr": "Plik zastępczy",
       "replace": "Zastąp"
+    },
+    "albumGate": {
+      "title": "Wymagany kod dostępu",
+      "codeLabel": "Kod dostępu do albumu",
+      "submit": "Wejdź",
+      "invalidCode": "Nieprawidłowy kod dostępu"
     }
   },
   "components": {
