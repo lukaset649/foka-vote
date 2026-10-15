@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { fetchContests } from '../../services/contests';
+import { fetchContests, isGalleryVisible } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
@@ -35,16 +35,18 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
         </Link>
 
         <div className="relative z-10 flex shrink-0 items-center gap-2">
-          <LinkButton
-            to={`/contest/${contest.slug}/gallery`}
-            variant="secondary"
-            size="icon"
-            className="shrink-0"
-            aria-label={t('common.actions.gallery')}
-            title={t('common.actions.gallery')}
-          >
-            <i className="bi bi-images" aria-hidden="true" />
-          </LinkButton>
+          {isGalleryVisible(contest.status) && (
+            <LinkButton
+              to={`/contest/${contest.slug}/gallery`}
+              variant="secondary"
+              size="icon"
+              className="shrink-0"
+              aria-label={t('common.actions.gallery')}
+              title={t('common.actions.gallery')}
+            >
+              <i className="bi bi-images" aria-hidden="true" />
+            </LinkButton>
+          )}
           {contest.status === 'SUBMISSIONS' && (
             <LinkButton
               to={`/contest/${contest.slug}/submit`}

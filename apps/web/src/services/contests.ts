@@ -1,6 +1,7 @@
 import type {
   AdminContestDto,
   ContestDto,
+  ContestStatus,
   CreateContestDto,
   UpdateContestDto,
 } from '@foka-vote/shared';
@@ -8,6 +9,10 @@ import { apiErrorFrom, apiRequest } from './apiClient';
 
 export function contestGatePath(slug: string, redirectTo: string): string {
   return `/contest/${slug}/gate?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
+export function isGalleryVisible(status: ContestStatus): boolean {
+  return status === 'VOTING' || status === 'CLOSED';
 }
 
 export async function fetchContests(): Promise<ContestDto[]> {

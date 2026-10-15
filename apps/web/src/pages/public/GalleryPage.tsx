@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
 import { isUnauthorizedError, mediaUrl } from '../../services/apiClient';
-import { contestGatePath, fetchContest } from '../../services/contests';
+import { contestGatePath, fetchContest, isGalleryVisible } from '../../services/contests';
 import { fetchSubmissions, submissionDisplayName } from '../../services/submissions';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
@@ -37,8 +37,16 @@ const GalleryPage = () => {
     }
     let cancelled = false;
 
-    Promise.all([fetchContest(slug), fetchSubmissions(slug)])
-      .then(([contestData, submissionsData]) => {
+    fetchContest(slug)
+      .then(async (contestData) => {
+        if (cancelled) {
+          return;
+        }
+        if (!isGalleryVisible(contestData.status)) {
+          void navigate(`/contest/${slug}`, { replace: true });
+          return;
+        }
+        const submissionsData = await fetchSubmissions(slug);
         if (!cancelled) {
           setContest(contestData);
           setSubmissions(submissionsData);

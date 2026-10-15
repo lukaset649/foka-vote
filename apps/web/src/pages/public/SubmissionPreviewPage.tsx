@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
+import useOnlineStatus from '../../lib/useOnlineStatus';
 import { ApiError } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
@@ -17,6 +18,7 @@ const SubmissionPreviewPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const draft = (location.state as SubmissionDraftState | null) ?? null;
+  const isOnline = useOnlineStatus();
 
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -134,12 +136,18 @@ const SubmissionPreviewPage = () => {
           <i className="bi bi-pencil-square" aria-hidden="true" />
           {t('pages.submissionPreview.edit')}
         </Button>
-        <Button type="button" variant="primary" onClick={handleSubmit} disabled={submitting}>
+        <Button
+          type="button"
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={submitting || !isOnline}
+        >
           <i className="bi bi-send" aria-hidden="true" />
           {t('common.submit')}
         </Button>
       </div>
 
+      {!isOnline && <Alert variant="info">{t('common.offlineSubmitHint')}</Alert>}
       {error && <Alert variant="error">{error}</Alert>}
 
       <Modal open={submitting} className="max-w-sm p-6">

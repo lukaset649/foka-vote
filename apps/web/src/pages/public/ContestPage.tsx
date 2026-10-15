@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { isUnauthorizedError } from '../../services/apiClient';
-import { contestGatePath, fetchContest, verifyContestAccessCode } from '../../services/contests';
+import {
+  contestGatePath,
+  fetchContest,
+  isGalleryVisible,
+  verifyContestAccessCode,
+} from '../../services/contests';
 import ContestGalleryCard from '../../components/ContestGalleryCard';
 import ContestPhaseCard from '../../components/ContestPhaseCard';
 import ContestResultsCard from '../../components/ContestResultsCard';
@@ -92,7 +97,7 @@ const ContestPage = () => {
 
         <ContestPhaseCard contest={contest} />
         <ContestResultsCard contest={contest} />
-        <ContestGalleryCard contest={contest} />
+        {isGalleryVisible(contest.status) && <ContestGalleryCard contest={contest} />}
       </div>
     </div>
   );

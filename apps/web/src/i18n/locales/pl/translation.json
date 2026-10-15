@@ -5,7 +5,9 @@
     "menu": "Menu",
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
-    "gallery": "Galeria"
+    "gallery": "Galeria",
+    "install": "Zainstaluj",
+    "installApp": "Zainstaluj aplikację"
   },
   "common": {
     "timeRemaining": "Pozostało {{time}}",
@@ -26,7 +28,8 @@
     "noConfirmationDataFound": "Nie znaleziono danych potwierdzenia.",
     "loading": "Wczytywanie…",
     "back": "Wstecz",
-    "close": "Zamknij"
+    "close": "Zamknij",
+    "offlineSubmitHint": "Wysyłanie będzie możliwe po odzyskaniu połączenia z internetem."
   },
   "contestStatus": {
     "DRAFT": "Szkic",
@@ -46,7 +49,8 @@
     "FORBIDDEN": "Brak uprawnień do wykonania tej czynności",
     "CONFLICT": "Wystąpił konflikt danych",
     "INTERNAL_ERROR": "Wystąpił błąd serwera",
-    "generic": "Coś poszło nie tak, spróbuj ponownie"
+    "generic": "Coś poszło nie tak, spróbuj ponownie",
+    "network": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie"
   },
   "pages": {
     "contestsList": {
@@ -301,6 +305,20 @@
     }
   },
   "components": {
+    "installInstructions": {
+      "title": "Zainstaluj FOKA Vote",
+      "share": "Stuknij przycisk Udostępnij na pasku przeglądarki.",
+      "addToHomeScreen": "Wybierz „Do ekranu początkowego”.",
+      "confirm": "Potwierdź, stukając „Dodaj”."
+    },
+    "offlineBanner": {
+      "message": "Brak połączenia z internetem. Możesz przeglądać wczytane strony, ale wysyłanie jest niedostępne."
+    },
+    "updatePrompt": {
+      "message": "Dostępna jest nowa wersja aplikacji.",
+      "refresh": "Odśwież",
+      "later": "Później"
+    },
     "contestPhaseCard": {
       "submissionsStart": "Rozpoczęcie zgłoszeń",
       "votingEnded": "Głosowanie zakończone",

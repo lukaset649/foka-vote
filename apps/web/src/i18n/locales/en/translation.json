@@ -5,7 +5,9 @@
     "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "install": "Install",
+    "installApp": "Install app"
   },
   "common": {
     "timeRemaining": "{{time}} remaining",
@@ -26,7 +28,8 @@
     "noConfirmationDataFound": "No confirmation data found.",
     "loading": "Loading…",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "offlineSubmitHint": "Sending will be possible once your internet connection is back."
   },
   "contestStatus": {
     "DRAFT": "Draft",
@@ -46,7 +49,8 @@
     "FORBIDDEN": "You don't have permission to do this",
     "CONFLICT": "There was a data conflict",
     "INTERNAL_ERROR": "A server error occurred",
-    "generic": "Something went wrong, please try again"
+    "generic": "Something went wrong, please try again",
+    "network": "No internet connection. Check your connection and try again"
   },
   "pages": {
     "contestsList": {
@@ -291,6 +295,20 @@
     }
   },
   "components": {
+    "installInstructions": {
+      "title": "Install FOKA Vote",
+      "share": "Tap the Share button in the browser toolbar.",
+      "addToHomeScreen": "Choose “Add to Home Screen”.",
+      "confirm": "Confirm by tapping “Add”."
+    },
+    "offlineBanner": {
+      "message": "No internet connection. You can browse pages that are already loaded, but sending is unavailable."
+    },
+    "updatePrompt": {
+      "message": "A new version of the app is available.",
+      "refresh": "Refresh",
+      "later": "Later"
+    },
     "contestPhaseCard": {
       "submissionsStart": "Submissions start",
       "votingEnded": "Voting ended",

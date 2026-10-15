@@ -32,6 +32,7 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     'react/react-in-jsx-scope': 'off',
+    'import/no-unresolved': ['error', { ignore: ['^virtual:'] }],
   },
   overrides: [
     {
