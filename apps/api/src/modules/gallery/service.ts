@@ -96,46 +96,50 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
 
   const now = new Date();
 
-  return contests.map((contest) => {
-    // A contest behind an access code must not leak its works before the code is entered.
-    const locked = !isContestUnlocked(contest, signedCookies);
-    const revealNames = computeContestStatus(now, contest) === 'CLOSED';
+  return contests
+    .filter((contest) => {
+      const status = computeContestStatus(now, contest);
+      return status === 'VOTING' || status === 'CLOSED';
+    })
+    .map((contest) => {
+      const locked = !isContestUnlocked(contest, signedCookies);
+      const revealNames = computeContestStatus(now, contest) === 'CLOSED';
 
-    const previews: GalleryAlbumPreviewDto[] = contest.submissions
-      .filter((submission) => submission.artworks.length > 0)
-      .map((submission) => {
-        const author = revealNames
-          ? `${submission.firstName} ${submission.lastName}`
-          : submission.alias;
+      const previews: GalleryAlbumPreviewDto[] = contest.submissions
+        .filter((submission) => submission.artworks.length > 0)
+        .map((submission) => {
+          const author = revealNames
+            ? `${submission.firstName} ${submission.lastName}`
+            : submission.alias;
 
-        return {
-          id: submission.id,
-          thumbUrl: mediaUrl((submission.artworks[0] as { thumbPath: string }).thumbPath),
-          label: author,
-          images: submission.artworks.map((artwork) => ({
-            id: artwork.id,
-            title: artwork.title,
-            description: artwork.description,
-            previewUrl: mediaUrl(artwork.previewPath),
-            width: artwork.width,
-            height: artwork.height,
-            author,
-          })),
-        };
-      });
+          return {
+            id: submission.id,
+            thumbUrl: mediaUrl((submission.artworks[0] as { thumbPath: string }).thumbPath),
+            label: author,
+            images: submission.artworks.map((artwork) => ({
+              id: artwork.id,
+              title: artwork.title,
+              description: artwork.description,
+              previewUrl: mediaUrl(artwork.previewPath),
+              width: artwork.width,
+              height: artwork.height,
+              author,
+            })),
+          };
+        });
 
-    return {
-      kind: 'CONTEST',
-      id: contest.id,
-      slug: contest.slug,
-      title: contest.title,
-      description: contest.description,
-      createdAt: contest.createdAt.toISOString(),
-      locked,
-      itemCount: locked ? 0 : (countByContestId.get(contest.id) ?? 0),
-      previews: locked ? [] : previews,
-    };
-  });
+      return {
+        kind: 'CONTEST',
+        id: contest.id,
+        slug: contest.slug,
+        title: contest.title,
+        description: contest.description,
+        createdAt: contest.createdAt.toISOString(),
+        locked,
+        itemCount: locked ? 0 : (countByContestId.get(contest.id) ?? 0),
+        previews: locked ? [] : previews,
+      };
+    });
 }
 
 async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
