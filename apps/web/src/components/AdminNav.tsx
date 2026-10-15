@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 import LinkButton from './ui/LinkButton';
+import SegmentedTabs from './ui/SegmentedTabs';
 
 const SECTIONS = [
   {
@@ -28,18 +29,14 @@ const AdminNav = () => {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
-        <nav className="flex flex-wrap gap-2">
-          {SECTIONS.map((section) => (
-            <LinkButton
-              key={section.key}
-              to={section.to}
-              variant={section === activeSection ? 'primary' : 'ghost'}
-              size="sm"
-            >
-              {t(section.labelKey)}
-            </LinkButton>
-          ))}
-        </nav>
+        <SegmentedTabs
+          activeKey={activeSection.key}
+          items={SECTIONS.map((section) => ({
+            key: section.key,
+            label: t(section.labelKey),
+            to: section.to,
+          }))}
+        />
 
         <LinkButton to={activeSection.createTo} variant="success" size="sm">
           <i className="bi bi-plus-circle" aria-hidden="true" />

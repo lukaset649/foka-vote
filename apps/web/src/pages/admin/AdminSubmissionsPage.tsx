@@ -10,6 +10,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import LinkButton from '../../components/ui/LinkButton';
 import EmptyState from '../../components/ui/EmptyState';
+import SegmentedTabs from '../../components/ui/SegmentedTabs';
 import Table, {
   TableBody,
   TableCell,
@@ -105,22 +106,22 @@ const AdminSubmissionsPage = () => {
         )}
       </div>
 
-      <nav className="mb-4 inline-flex w-fit rounded-md bg-zinc-100 p-1">
-        <button
-          type="button"
-          onClick={() => setTab('submissions')}
-          className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'submissions' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
-        >
-          {t('pages.adminSubmissions.submissionsTab')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('voteCards')}
-          className={`min-h-8 rounded px-3 py-1 text-sm font-medium transition-colors ${tab === 'voteCards' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'}`}
-        >
-          {t('pages.adminSubmissions.voteCardsTab')}
-        </button>
-      </nav>
+      <SegmentedTabs
+        className="mb-4"
+        activeKey={tab}
+        items={[
+          {
+            key: 'submissions',
+            label: t('pages.adminSubmissions.submissionsTab'),
+            onClick: () => setTab('submissions'),
+          },
+          {
+            key: 'voteCards',
+            label: t('pages.adminSubmissions.voteCardsTab'),
+            onClick: () => setTab('voteCards'),
+          },
+        ]}
+      />
 
       {tab === 'submissions' &&
         (submissions !== null && submissions.length === 0 ? (
