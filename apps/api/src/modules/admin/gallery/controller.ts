@@ -1,10 +1,5 @@
 import type { Request, Response } from 'express';
-import type {
-  CreateAlbumDto,
-  ModerationStatus,
-  UpdateAlbumDto,
-  UpdateAlbumPhotoDto,
-} from '@foka-vote/shared';
+import type { CreateAlbumDto, UpdateAlbumDto, UpdateAlbumPhotoDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import {
   createAdminAlbum,
@@ -13,14 +8,11 @@ import {
   getAdminAlbum,
   listAdminAlbumPhotos,
   listAdminAlbums,
-  setAdminAlbumPhotoStatus,
   setAdminAlbumVisibility,
   setContestAlbumVisibility,
   updateAdminAlbum,
   updateAdminAlbumPhoto,
 } from './service.js';
-
-const DECIDABLE_STATUSES: ModerationStatus[] = ['APPROVED', 'REJECTED'];
 
 function requireIdParam(request: Request, name: 'id' | 'contestId' | 'photoId'): string {
   const value = request.params[name];
@@ -28,14 +20,6 @@ function requireIdParam(request: Request, name: 'id' | 'contestId' | 'photoId'):
     throw badRequest(`${name} is required`);
   }
   return value;
-}
-
-function parseDecidableStatus(body: unknown): ModerationStatus {
-  const { status } = (body ?? {}) as Record<string, unknown>;
-  if (typeof status !== 'string' || !DECIDABLE_STATUSES.includes(status as ModerationStatus)) {
-    throw badRequest(`status must be one of: ${DECIDABLE_STATUSES.join(', ')}`);
-  }
-  return status as ModerationStatus;
 }
 
 function parseHidden(body: unknown): boolean {
@@ -119,15 +103,6 @@ export async function setContestVisibility(request: Request, response: Response)
 export async function listPhotos(request: Request, response: Response): Promise<void> {
   const photos = await listAdminAlbumPhotos(requireIdParam(request, 'id'));
   response.json(photos);
-}
-
-export async function setPhotoStatus(request: Request, response: Response): Promise<void> {
-  const photo = await setAdminAlbumPhotoStatus(
-    requireIdParam(request, 'id'),
-    requireIdParam(request, 'photoId'),
-    parseDecidableStatus(request.body),
-  );
-  response.json(photo);
 }
 
 export async function updatePhoto(request: Request, response: Response): Promise<void> {

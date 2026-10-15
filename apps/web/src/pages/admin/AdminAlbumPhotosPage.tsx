@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import type { AdminAlbumDto, AdminAlbumPhotoDto, ModerationStatus } from '@foka-vote/shared';
+import type { AdminAlbumDto, AdminAlbumPhotoDto } from '@foka-vote/shared';
 import { MAX_ALBUM_DESCRIPTION_LENGTH, MAX_ALBUM_TITLE_LENGTH } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import { mediaUrl } from '../../services/apiClient';
@@ -9,12 +9,10 @@ import {
   deleteAdminAlbumPhoto,
   fetchAdminAlbum,
   fetchAdminAlbumPhotos,
-  setAdminAlbumPhotoStatus,
   updateAdminAlbumPhoto,
 } from '../../services/gallery';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Alert from '../../components/ui/Alert';
-import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import EmptyState from '../../components/ui/EmptyState';
@@ -23,12 +21,6 @@ import Label from '../../components/ui/Label';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 import ThumbnailTile from '../../components/ui/ThumbnailTile';
-
-const statusColors = {
-  PENDING: 'amber',
-  APPROVED: 'emerald',
-  REJECTED: 'rose',
-} as const;
 
 const AdminAlbumPhotosPage = () => {
   const { t } = useTranslation();
@@ -77,17 +69,6 @@ const AdminAlbumPhotosPage = () => {
 
   const replacePhoto = (updated: AdminAlbumPhotoDto) => {
     setPhotos((prev) => prev?.map((photo) => (photo.id === updated.id ? updated : photo)) ?? prev);
-  };
-
-  const changeStatus = (photoId: string, status: ModerationStatus) => {
-    if (!id) {
-      return;
-    }
-    setBusyPhotoId(photoId);
-    setAdminAlbumPhotoStatus(id, photoId, status)
-      .then(replacePhoto)
-      .catch((err: unknown) => window.alert(errorMessage(err, t)))
-      .finally(() => setBusyPhotoId(null));
   };
 
   const saveCaption = (photoId: string) => {
@@ -158,9 +139,6 @@ const AdminAlbumPhotosPage = () => {
                   <div className="flex min-w-0 flex-1 flex-col gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium text-zinc-900">{photo.authorName}</span>
-                      <Badge color={statusColors[photo.status]}>
-                        {t(`moderationStatus.${photo.status}`)}
-                      </Badge>
                       <span className="text-sm text-zinc-500">
                         {new Date(photo.createdAt).toLocaleString()}
                       </span>
@@ -218,30 +196,6 @@ const AdminAlbumPhotosPage = () => {
                         <i className="bi bi-save" aria-hidden="true" />
                         {t('pages.adminSubmissionEdit.save')}
                       </Button>
-                      {photo.status !== 'APPROVED' && (
-                        <Button
-                          type="button"
-                          variant="success"
-                          size="sm"
-                          disabled={busyPhotoId === photo.id}
-                          onClick={() => changeStatus(photo.id, 'APPROVED')}
-                        >
-                          <i className="bi bi-check2" aria-hidden="true" />
-                          {t('pages.adminGallery.approve')}
-                        </Button>
-                      )}
-                      {photo.status !== 'REJECTED' && (
-                        <Button
-                          type="button"
-                          variant="secondaryDanger"
-                          size="sm"
-                          disabled={busyPhotoId === photo.id}
-                          onClick={() => changeStatus(photo.id, 'REJECTED')}
-                        >
-                          <i className="bi bi-x-lg" aria-hidden="true" />
-                          {t('pages.adminGallery.reject')}
-                        </Button>
-                      )}
                       <Button
                         type="button"
                         variant="danger"

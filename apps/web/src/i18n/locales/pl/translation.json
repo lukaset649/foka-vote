@@ -37,11 +37,6 @@
     "VOTING": "Głosowanie",
     "CLOSED": "Zakończony"
   },
-  "moderationStatus": {
-    "PENDING": "Czeka na zatwierdzenie",
-    "APPROVED": "Zatwierdzony",
-    "REJECTED": "Odrzucony"
-  },
   "errors": {
     "VALIDATION_FAILED": "Podane dane są nieprawidłowe",
     "NOT_FOUND": "Nie znaleziono",
@@ -77,7 +72,6 @@
       "title": "Dodaj zdjęcia",
       "heading": "Dodaj zdjęcia: {{title}}",
       "backToAlbum": "Powrót do albumu",
-      "infoModeration": "Zdjęcia pojawią się w albumie po zatwierdzeniu przez administratora.",
       "infoNamePublished": "Twoje imię i nazwisko zostaną opublikowane przy każdym dodanym zdjęciu.",
       "firstNameLabel": "Imię",
       "lastNameLabel": "Nazwisko",
@@ -90,10 +84,6 @@
         "photoRequired": "Dodaj przynajmniej jedno zdjęcie",
         "rulesRequired": "Musisz zaakceptować regulamin, aby wysłać zdjęcia"
       }
-    },
-    "albumAddPhotosConfirmation": {
-      "title": "Zdjęcia wysłane do zatwierdzenia",
-      "text": "Administrator je sprawdzi. Zatwierdzone zdjęcia od razu pojawią się w albumie."
     },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
@@ -197,24 +187,16 @@
       "accessCodeLabel": "Kod dostępu do wysyłania zdjęć (opcjonalnie)",
       "accessCodePlaceholder": "Brak kodu: każdy może wysłać zdjęcia",
       "accessCodeHint": "Wymagany przy wysyłaniu zdjęć do tego albumu. Zdjęcia zawsze czekają na zatwierdzenie.",
-      "allAlbumsHeading": "Wszystkie albumy",
       "hide": "Ukryj",
       "show": "Pokaż",
       "hiddenBadge": "Ukryty",
       "editContest": "Edytuj konkurs",
-      "pendingPhotos_one": "{{count}} zdjęcie czeka na zatwierdzenie",
-      "pendingPhotos_few": "{{count}} zdjęcia czekają na zatwierdzenie",
-      "pendingPhotos_many": "{{count}} zdjęć czeka na zatwierdzenie",
-      "pendingPhotos_other": "{{count}} zdjęcia czeka na zatwierdzenie",
       "confirmDelete": "Usunąć album \"{{title}}\"? Trwale usuwa album wraz ze wszystkimi zdjęciami.",
       "newAlbumHeading": "Nowy album",
       "titleLabel": "Nazwa albumu",
       "createAlbum": "Utwórz album",
       "codeBadge": "Kod: {{code}}",
-      "approve": "Zatwierdź",
-      "reject": "Odrzuć",
-      "photos": "Zdjęcia",
-      "backToContests": "Konkursy"
+      "photos": "Zdjęcia"
     },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",

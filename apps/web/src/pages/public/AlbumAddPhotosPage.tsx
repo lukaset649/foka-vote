@@ -128,7 +128,7 @@ const AlbumAddPhotosPage = () => {
         photos,
         (fraction) => setUploadProgress(Math.round(fraction * 100)),
       );
-      void navigate(`${albumPath}/add-photos/confirmation`, { replace: true });
+      void navigate(albumPath, { replace: true });
     } catch (err) {
       if (isUnauthorizedError(err)) {
         void navigate(albumGatePath(slug, `${albumPath}/add-photos`), { replace: true });
@@ -161,11 +161,7 @@ const AlbumAddPhotosPage = () => {
         backLabel={t('pages.albumAddPhotos.backToAlbum')}
       />
 
-      <Alert variant="info">
-        {t('pages.albumAddPhotos.infoModeration')}
-        <br />
-        {t('pages.albumAddPhotos.infoNamePublished')}
-      </Alert>
+      <Alert variant="info">{t('pages.albumAddPhotos.infoNamePublished')}</Alert>
 
       <Card className="flex flex-col gap-4">
         <div>

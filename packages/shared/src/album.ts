@@ -1,7 +1,5 @@
 export type AlbumKind = 'CONTEST' | 'STANDALONE';
 
-export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-
 export interface GalleryPreviewImageDto {
   id: string;
   title: string | null;
@@ -73,14 +71,12 @@ export interface AdminAlbumDto {
   accessCode: string | null;
   hidden: boolean;
   photoCount: number;
-  pendingPhotoCount: number;
   coverThumbUrl: string | null;
 }
 
 export interface AdminAlbumPhotoDto extends AlbumPhotoDto {
   firstName: string;
   lastName: string;
-  status: ModerationStatus;
   rulesAcceptedAt: string;
 }
 

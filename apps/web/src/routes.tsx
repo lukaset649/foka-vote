@@ -14,7 +14,6 @@ import GalleryAlbumsPage from './pages/public/GalleryAlbumsPage';
 import AlbumPage from './pages/public/AlbumPage';
 import AlbumGatePage from './pages/public/AlbumGatePage';
 import AlbumAddPhotosPage from './pages/public/AlbumAddPhotosPage';
-import AlbumAddPhotosConfirmationPage from './pages/public/AlbumAddPhotosConfirmationPage';
 import VoteCardPage from './pages/public/VoteCardPage';
 import VoteConfirmationPage from './pages/public/VoteConfirmationPage';
 import ResultsPage from './pages/public/ResultsPage';
@@ -40,10 +39,6 @@ export const router = createBrowserRouter([
       { path: '/gallery/:slug', element: <AlbumPage /> },
       { path: '/gallery/:slug/gate', element: <AlbumGatePage /> },
       { path: '/gallery/:slug/add-photos', element: <AlbumAddPhotosPage /> },
-      {
-        path: '/gallery/:slug/add-photos/confirmation',
-        element: <AlbumAddPhotosConfirmationPage />,
-      },
       { path: '/contest/:slug', element: <ContestPage /> },
       { path: '/contest/:slug/gate', element: <AccessGatePage /> },
       { path: '/contest/:slug/submit', element: <SubmissionFormPage /> },

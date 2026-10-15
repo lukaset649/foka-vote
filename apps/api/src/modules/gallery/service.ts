@@ -8,11 +8,10 @@ import {
   GALLERY_ALBUM_PREVIEW_COUNT,
   MAX_ALBUM_DESCRIPTION_LENGTH,
   MAX_ALBUM_TITLE_LENGTH,
-  MAX_PENDING_PHOTOS_PER_ALBUM,
   MAX_PHOTOS_PER_ALBUM_UPLOAD,
 } from '@foka-vote/shared';
 import type { AlbumPhoto } from '@prisma/client';
-import { badRequest, conflict, notFound, unauthorized } from '../../errors/app-error.js';
+import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
@@ -151,7 +150,6 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
       description: true,
       createdAt: true,
       photos: {
-        where: { status: 'APPROVED' },
         orderBy: { createdAt: 'asc' },
         take: GALLERY_ALBUM_PREVIEW_COUNT,
         select: {
@@ -166,7 +164,7 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
           height: true,
         },
       },
-      _count: { select: { photos: { where: { status: 'APPROVED' } } } },
+      _count: { select: { photos: true } },
     },
   });
 
@@ -289,11 +287,10 @@ export async function getPublicAlbum(
   const album = await prisma.album.findFirst({
     where: { slug, hidden: false },
     include: {
-      photos: { where: { status: 'APPROVED' }, orderBy: { createdAt: 'asc' } },
+      photos: { orderBy: { createdAt: 'asc' } },
     },
   });
 
-  // An album awaiting moderation must not be distinguishable from one that never existed.
   if (!album) {
     throw notFound('Album not found');
   }
@@ -351,14 +348,6 @@ export async function addAlbumPhotos(
     assertValidPhotoCaption(entry.title ?? null, entry.description ?? null);
   }
 
-  // Anyone may upload here, so the moderation queue is capped per album.
-  const pendingCount = await prisma.albumPhoto.count({
-    where: { albumId: album.id, status: 'PENDING' },
-  });
-  if (pendingCount + files.length > MAX_PENDING_PHOTOS_PER_ALBUM) {
-    throw conflict('This album already has too many photos awaiting approval');
-  }
-
   const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
 
   const processed: ArtworkImageResult[] = [];
@@ -391,7 +380,6 @@ export async function addAlbumPhotos(
         thumbPath: file.thumbPath,
         width: file.width,
         height: file.height,
-        status: 'PENDING',
         rulesAcceptedAt,
       })),
     });

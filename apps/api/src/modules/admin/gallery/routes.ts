@@ -7,7 +7,6 @@ import {
   remove,
   removePhoto,
   setContestVisibility,
-  setPhotoStatus,
   setVisibility,
   update,
   updatePhoto,
@@ -24,7 +23,6 @@ adminGalleryRoutes.delete('/albums/:id', remove);
 
 adminGalleryRoutes.get('/albums/:id/photos', listPhotos);
 adminGalleryRoutes.patch('/albums/:id/photos/:photoId', updatePhoto);
-adminGalleryRoutes.patch('/albums/:id/photos/:photoId/status', setPhotoStatus);
 adminGalleryRoutes.delete('/albums/:id/photos/:photoId', removePhoto);
 
 adminGalleryRoutes.patch('/contests/:contestId/visibility', setContestVisibility);

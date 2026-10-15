@@ -15,9 +15,6 @@ export const MAX_ARTWORKS_PER_SUBMISSION_LIMIT = 15;
 // Kept at or below MAX_ARTWORKS_PER_SUBMISSION_LIMIT so album uploads stay within the
 // same reverse proxy body limit the submission form already fits into.
 export const MAX_PHOTOS_PER_ALBUM_UPLOAD = 15;
-// Anyone may add photos to an approved album, so a queue cap keeps a single album from
-// filling the disk while it waits for moderation.
-export const MAX_PENDING_PHOTOS_PER_ALBUM = 50;
 
 export const GALLERY_ALBUM_PREVIEW_COUNT = 8;
 

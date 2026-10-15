@@ -14,12 +14,6 @@ enum ContestStatus {
   CLOSED
 }
 
-enum ModerationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
 model Contest {
   id                       String        @id @default(cuid())
   slug                     String        @unique
@@ -135,7 +129,7 @@ model Album {
 }
 
 model AlbumPhoto {
-  id              String           @id @default(cuid())
+  id              String   @id @default(cuid())
   albumId         String
   firstName       String
   lastName        String
@@ -146,12 +140,11 @@ model AlbumPhoto {
   thumbPath       String
   width           Int?
   height          Int?
-  status          ModerationStatus @default(PENDING)
   rulesAcceptedAt DateTime
-  createdAt       DateTime         @default(now())
+  createdAt       DateTime @default(now())
 
   album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
-  @@index([albumId, status, createdAt])
+  @@index([albumId, createdAt])
 }
 

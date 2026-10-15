@@ -80,9 +80,6 @@ const AdminGalleryPage = () => {
 
       {albums !== null && (
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-            {t('pages.adminGallery.allAlbumsHeading')}
-          </h2>
           <ul className="flex flex-col gap-3">
             {albums.map((album) => (
               <li key={`${album.kind}-${album.id}`}>
@@ -107,10 +104,6 @@ const AdminGalleryPage = () => {
                       {album.kind === 'CONTEST'
                         ? t('components.albumCard.submissionsCount', { count: album.photoCount })
                         : t('components.albumCard.photosCount', { count: album.photoCount })}
-                      {album.pendingPhotoCount > 0 &&
-                        ` · ${t('pages.adminGallery.pendingPhotos', {
-                          count: album.pendingPhotoCount,
-                        })}`}
                     </p>
                   </div>
 

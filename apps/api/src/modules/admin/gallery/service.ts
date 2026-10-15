@@ -2,7 +2,6 @@ import type {
   AdminAlbumDto,
   AdminAlbumPhotoDto,
   CreateAlbumDto,
-  ModerationStatus,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
@@ -43,12 +42,7 @@ interface StandaloneAlbumRow {
   photos: { thumbPath: string }[];
 }
 
-interface StatusCount {
-  status: ModerationStatus;
-  count: number;
-}
-
-function toAdminAlbumDto(album: StandaloneAlbumRow, counts: StatusCount[]): AdminAlbumDto {
+function toAdminAlbumDto(album: StandaloneAlbumRow, photoCount: number): AdminAlbumDto {
   const coverThumbPath = album.photos[0]?.thumbPath;
 
   return {
@@ -60,8 +54,7 @@ function toAdminAlbumDto(album: StandaloneAlbumRow, counts: StatusCount[]): Admi
     createdAt: album.createdAt.toISOString(),
     accessCode: album.accessCode,
     hidden: album.hidden,
-    photoCount: counts.reduce((total, entry) => total + entry.count, 0),
-    pendingPhotoCount: counts.find((entry) => entry.status === 'PENDING')?.count ?? 0,
+    photoCount,
     coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
   };
 }
@@ -113,7 +106,6 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
       accessCode: contest.accessCode,
       hidden: contest.hiddenInGallery,
       photoCount: countByContestId.get(contest.id) ?? 0,
-      pendingPhotoCount: 0,
       coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
     };
   });
@@ -126,18 +118,12 @@ async function listStandaloneAlbums(): Promise<AdminAlbumDto[]> {
   });
 
   const photoCounts = await prisma.albumPhoto.groupBy({
-    by: ['albumId', 'status'],
+    by: ['albumId'],
     _count: { _all: true },
   });
+  const countByAlbumId = new Map(photoCounts.map((entry) => [entry.albumId, entry._count._all]));
 
-  return albums.map((album) =>
-    toAdminAlbumDto(
-      album,
-      photoCounts
-        .filter((entry) => entry.albumId === album.id)
-        .map((entry) => ({ status: entry.status, count: entry._count._all })),
-    ),
-  );
+  return albums.map((album) => toAdminAlbumDto(album, countByAlbumId.get(album.id) ?? 0));
 }
 
 async function getStandaloneAlbum(id: string): Promise<AdminAlbumDto> {
@@ -146,16 +132,9 @@ async function getStandaloneAlbum(id: string): Promise<AdminAlbumDto> {
     throw notFound('Album not found');
   }
 
-  const counts = await prisma.albumPhoto.groupBy({
-    by: ['status'],
-    where: { albumId: id },
-    _count: { _all: true },
-  });
+  const photoCount = await prisma.albumPhoto.count({ where: { albumId: id } });
 
-  return toAdminAlbumDto(
-    album,
-    counts.map((entry) => ({ status: entry.status, count: entry._count._all })),
-  );
+  return toAdminAlbumDto(album, photoCount);
 }
 
 async function getContestAlbum(contestId: string): Promise<AdminAlbumDto> {
@@ -294,7 +273,6 @@ function toAdminAlbumPhotoDto(photo: AlbumPhoto): AdminAlbumPhotoDto {
     ...toAlbumPhotoDto(photo),
     firstName: photo.firstName,
     lastName: photo.lastName,
-    status: photo.status,
     rulesAcceptedAt: photo.rulesAcceptedAt.toISOString(),
   };
 }
@@ -319,17 +297,6 @@ export async function listAdminAlbumPhotos(albumId: string): Promise<AdminAlbumP
   });
 
   return photos.map(toAdminAlbumPhotoDto);
-}
-
-export async function setAdminAlbumPhotoStatus(
-  albumId: string,
-  photoId: string,
-  status: ModerationStatus,
-): Promise<AdminAlbumPhotoDto> {
-  await findAlbumPhoto(albumId, photoId);
-
-  const photo = await prisma.albumPhoto.update({ where: { id: photoId }, data: { status } });
-  return toAdminAlbumPhotoDto(photo);
 }
 
 export async function updateAdminAlbumPhoto(

@@ -37,11 +37,6 @@
     "VOTING": "Voting",
     "CLOSED": "Closed"
   },
-  "moderationStatus": {
-    "PENDING": "Awaiting approval",
-    "APPROVED": "Approved",
-    "REJECTED": "Rejected"
-  },
   "errors": {
     "VALIDATION_FAILED": "The submitted data is invalid",
     "NOT_FOUND": "Not found",
@@ -77,7 +72,6 @@
       "title": "Add photos",
       "heading": "Add photos: {{title}}",
       "backToAlbum": "Back to the album",
-      "infoModeration": "Photos appear in the album once an administrator approves them.",
       "infoNamePublished": "Your first and last name will be published next to every photo you add.",
       "firstNameLabel": "First name",
       "lastNameLabel": "Last name",
@@ -90,10 +84,6 @@
         "photoRequired": "Attach at least one photo",
         "rulesRequired": "You must accept the rules to send photos"
       }
-    },
-    "albumAddPhotosConfirmation": {
-      "title": "Photos sent for approval",
-      "text": "An administrator will review them. Approved photos show up in the album right away."
     },
     "contest": {
       "failedToLoad": "Failed to load contest"
@@ -195,22 +185,16 @@
       "accessCodeLabel": "Access code for sending photos (optional)",
       "accessCodePlaceholder": "No code: anyone can send photos",
       "accessCodeHint": "Required to send photos to this album. Photos always wait for approval.",
-      "allAlbumsHeading": "All albums",
       "hide": "Hide",
       "show": "Show",
       "hiddenBadge": "Hidden",
       "editContest": "Edit contest",
-      "pendingPhotos_one": "{{count}} photo awaiting approval",
-      "pendingPhotos_other": "{{count}} photos awaiting approval",
       "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos.",
       "newAlbumHeading": "New album",
       "titleLabel": "Album name",
       "createAlbum": "Create album",
       "codeBadge": "Code: {{code}}",
-      "approve": "Approve",
-      "reject": "Reject",
-      "photos": "Photos",
-      "backToContests": "Contests"
+      "photos": "Photos"
     },
     "adminContestForm": {
       "editContest": "Edit contest",

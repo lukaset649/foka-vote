@@ -4,7 +4,6 @@ import type {
   AlbumDetailDto,
   CreateAlbumDto,
   GalleryAlbumDto,
-  ModerationStatus,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
@@ -164,25 +163,6 @@ export async function fetchAdminAlbumPhotos(albumId: string): Promise<AdminAlbum
     throw await apiErrorFrom(response, 'Failed to fetch photos');
   }
   return response.json() as Promise<AdminAlbumPhotoDto[]>;
-}
-
-export async function setAdminAlbumPhotoStatus(
-  albumId: string,
-  photoId: string,
-  status: ModerationStatus,
-): Promise<AdminAlbumPhotoDto> {
-  const response = await apiRequest(
-    `/api/admin/gallery/albums/${albumId}/photos/${photoId}/status`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    },
-  );
-  if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to update photo status');
-  }
-  return response.json() as Promise<AdminAlbumPhotoDto>;
 }
 
 export async function updateAdminAlbumPhoto(
