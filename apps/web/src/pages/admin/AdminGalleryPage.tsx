@@ -1,10 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AdminAlbumDto } from '@foka-vote/shared';
-import { MAX_ALBUM_DESCRIPTION_LENGTH, MAX_ALBUM_TITLE_LENGTH } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import {
-  createAdminAlbum,
   deleteAdminAlbum,
   fetchAdminAlbums,
   setAdminAlbumVisibility,
@@ -14,24 +12,15 @@ import Alert from '../../components/ui/Alert';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import Input from '../../components/ui/Input';
-import Label from '../../components/ui/Label';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
-import Textarea from '../../components/ui/Textarea';
 
 const AdminGalleryPage = () => {
   const { t } = useTranslation();
   const [albums, setAlbums] = useState<AdminAlbumDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [accessCode, setAccessCode] = useState('');
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,27 +44,6 @@ const AdminGalleryPage = () => {
 
   const replaceAlbum = (updated: AdminAlbumDto) => {
     setAlbums((prev) => prev?.map((album) => (album.id === updated.id ? updated : album)) ?? prev);
-  };
-
-  const handleCreate = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setCreating(true);
-    setCreateError(null);
-
-    createAdminAlbum({
-      title: title.trim(),
-      ...(description.trim() ? { description: description.trim() } : {}),
-      ...(accessCode.trim() ? { accessCode: accessCode.trim() } : {}),
-    })
-      .then((album) => {
-        setAlbums((prev) => (prev ? [album, ...prev] : [album]));
-        setTitle('');
-        setDescription('');
-        setAccessCode('');
-      })
-      .catch((err: unknown) => setCreateError(errorMessage(err, t)))
-      .finally(() => setCreating(false));
   };
 
   const toggleVisibility = (album: AdminAlbumDto) => {
@@ -106,54 +74,6 @@ const AdminGalleryPage = () => {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t('pages.adminGallery.title')} />
-
-      <Card>
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-zinc-900">
-            {t('pages.adminGallery.newAlbumHeading')}
-          </h2>
-
-          <div>
-            <Label htmlFor="album-title">{t('pages.adminGallery.titleLabel')}</Label>
-            <Input
-              id="album-title"
-              value={title}
-              maxLength={MAX_ALBUM_TITLE_LENGTH}
-              onChange={(event) => setTitle(event.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="album-description">{t('common.descriptionOptional')}</Label>
-            <Textarea
-              id="album-description"
-              rows={3}
-              value={description}
-              maxLength={MAX_ALBUM_DESCRIPTION_LENGTH}
-              onChange={(event) => setDescription(event.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="album-access-code">{t('pages.adminGallery.accessCodeLabel')}</Label>
-            <Input
-              id="album-access-code"
-              value={accessCode}
-              onChange={(event) => setAccessCode(event.target.value)}
-              placeholder={t('pages.adminGallery.accessCodePlaceholder')}
-            />
-            <p className="mt-1 text-sm text-zinc-500">{t('pages.adminGallery.accessCodeHint')}</p>
-          </div>
-
-          <Button type="submit" size="sm" className="w-fit" disabled={creating}>
-            <i className="bi bi-plus-circle" aria-hidden="true" />
-            {t('pages.adminGallery.createAlbum')}
-          </Button>
-
-          {createError && <Alert variant="error">{createError}</Alert>}
-        </form>
-      </Card>
 
       {loadError && <Alert variant="error">{t('pages.galleryAlbums.failedToLoad')}</Alert>}
       {!loadError && albums === null && <Spinner />}
@@ -217,9 +137,18 @@ const AdminGalleryPage = () => {
                     ) : (
                       <>
                         <LinkButton
+                          to={`/admin/gallery/albums/${album.id}/photos`}
+                          variant="secondary"
+                          size="sm"
+                        >
+                          <i className="bi bi-images" aria-hidden="true" />
+                          {t('pages.adminGallery.photos')}
+                        </LinkButton>
+                        <LinkButton
                           to={`/admin/gallery/albums/${album.id}`}
                           variant="primary"
                           size="sm"
+                          className="sm:w-28"
                         >
                           <i className="bi bi-pencil-square" aria-hidden="true" />
                           {t('pages.submissionPreview.edit')}
@@ -228,6 +157,7 @@ const AdminGalleryPage = () => {
                           type="button"
                           variant="danger"
                           size="sm"
+                          className="sm:w-28"
                           disabled={busyId === album.id}
                           onClick={() => handleDelete(album)}
                         >

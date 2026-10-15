@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import type { AdminAlbumDto, AdminAlbumPhotoDto, ModerationStatus } from '@foka-vote/shared';
 import { MAX_ALBUM_DESCRIPTION_LENGTH, MAX_ALBUM_TITLE_LENGTH } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
@@ -10,7 +10,6 @@ import {
   fetchAdminAlbum,
   fetchAdminAlbumPhotos,
   setAdminAlbumPhotoStatus,
-  updateAdminAlbum,
   updateAdminAlbumPhoto,
 } from '../../services/gallery';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
@@ -23,7 +22,6 @@ import Input from '../../components/ui/Input';
 import Label from '../../components/ui/Label';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
-import Textarea from '../../components/ui/Textarea';
 import ThumbnailTile from '../../components/ui/ThumbnailTile';
 
 const statusColors = {
@@ -32,20 +30,13 @@ const statusColors = {
   REJECTED: 'rose',
 } as const;
 
-const AdminAlbumEditPage = () => {
+const AdminAlbumPhotosPage = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const [album, setAlbum] = useState<AdminAlbumDto | null>(null);
   const [photos, setPhotos] = useState<AdminAlbumPhotoDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
-
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [accessCode, setAccessCode] = useState('');
-  const [savingAlbum, setSavingAlbum] = useState(false);
-  const [albumError, setAlbumError] = useState<string | null>(null);
 
   const [drafts, setDrafts] = useState<Record<string, { title: string; description: string }>>({});
   const [busyPhotoId, setBusyPhotoId] = useState<string | null>(null);
@@ -63,9 +54,6 @@ const AdminAlbumEditPage = () => {
           return;
         }
         setAlbum(albumData);
-        setTitle(albumData.title);
-        setDescription(albumData.description ?? '');
-        setAccessCode(albumData.accessCode ?? '');
         setPhotos(photoData);
         setDrafts(
           Object.fromEntries(
@@ -86,30 +74,6 @@ const AdminAlbumEditPage = () => {
       cancelled = true;
     };
   }, [id]);
-
-  const handleSaveAlbum = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!id) {
-      return;
-    }
-
-    setSavingAlbum(true);
-    setAlbumError(null);
-
-    updateAdminAlbum(id, {
-      title: title.trim(),
-      description: description.trim(),
-      accessCode: accessCode.trim(),
-    })
-      .then((updated) => {
-        setAlbum(updated);
-        setTitle(updated.title);
-        setDescription(updated.description ?? '');
-        setAccessCode(updated.accessCode ?? '');
-      })
-      .catch((err: unknown) => setAlbumError(errorMessage(err, t)))
-      .finally(() => setSavingAlbum(false));
-  };
 
   const replacePhoto = (updated: AdminAlbumPhotoDto) => {
     setPhotos((prev) => prev?.map((photo) => (photo.id === updated.id ? updated : photo)) ?? prev);
@@ -143,7 +107,7 @@ const AdminAlbumEditPage = () => {
   };
 
   const removePhoto = (photoId: string) => {
-    if (!id || !window.confirm(t('pages.adminAlbumEdit.confirmDeletePhoto'))) {
+    if (!id || !window.confirm(t('pages.adminAlbumPhotos.confirmDeletePhoto'))) {
       return;
     }
 
@@ -165,56 +129,14 @@ const AdminAlbumEditPage = () => {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={t('pages.adminAlbumEdit.heading', { title: album.title })}
-        backTo="/admin/gallery"
-        backLabel={t('pages.adminAlbumEdit.backToGallery')}
+        title={t('pages.adminAlbumPhotos.heading', { title: album.title })}
+        backTo={`/admin/gallery/albums/${album.id}`}
+        backLabel={t('pages.adminAlbumPhotos.backToAlbum')}
       />
-
-      <Card>
-        <form onSubmit={handleSaveAlbum} className="flex flex-col gap-4">
-          <div>
-            <Label htmlFor="album-title">{t('pages.adminGallery.titleLabel')}</Label>
-            <Input
-              id="album-title"
-              value={title}
-              maxLength={MAX_ALBUM_TITLE_LENGTH}
-              onChange={(event) => setTitle(event.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="album-description">{t('common.descriptionOptional')}</Label>
-            <Textarea
-              id="album-description"
-              rows={3}
-              value={description}
-              maxLength={MAX_ALBUM_DESCRIPTION_LENGTH}
-              onChange={(event) => setDescription(event.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="album-access-code">{t('pages.adminGallery.accessCodeLabel')}</Label>
-            <Input
-              id="album-access-code"
-              value={accessCode}
-              onChange={(event) => setAccessCode(event.target.value)}
-              placeholder={t('pages.adminGallery.accessCodePlaceholder')}
-            />
-            <p className="mt-1 text-sm text-zinc-500">{t('pages.adminGallery.accessCodeHint')}</p>
-          </div>
-          <p className="text-sm text-zinc-500">
-            {t('pages.adminAlbumEdit.slugLocked', { slug: album.slug })}
-          </p>
-          <Button type="submit" size="sm" className="w-fit" disabled={savingAlbum}>
-            {t('pages.adminContestForm.saveChanges')}
-          </Button>
-          {albumError && <Alert variant="error">{albumError}</Alert>}
-        </form>
-      </Card>
 
       <section>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-          {t('pages.adminAlbumEdit.photosHeading')}
+          {t('pages.adminAlbumPhotos.photosHeading')}
         </h2>
 
         {photos.length === 0 ? (
@@ -354,19 +276,8 @@ const AdminAlbumEditPage = () => {
           onClose={() => setLightboxIndex(null)}
         />
       )}
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="w-fit"
-        onClick={() => void navigate('/admin/gallery')}
-      >
-        <i className="bi bi-arrow-left" aria-hidden="true" />
-        {t('pages.adminAlbumEdit.backToGallery')}
-      </Button>
     </div>
   );
 };
 
-export default AdminAlbumEditPage;
+export default AdminAlbumPhotosPage;

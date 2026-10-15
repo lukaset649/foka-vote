@@ -58,18 +58,7 @@ const AdminContestsListPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('pages.adminContestsList.title')}>
-        <div className="flex flex-wrap gap-2">
-          <LinkButton to="/admin/gallery" variant="secondary" size="sm">
-            <i className="bi bi-images" aria-hidden="true" />
-            {t('pages.adminGallery.title')}
-          </LinkButton>
-          <LinkButton to="/admin/contests/new" variant="success" size="sm">
-            <i className="bi bi-plus-circle" aria-hidden="true" />
-            {t('pages.adminContestsList.newContest')}
-          </LinkButton>
-        </div>
-      </PageHeader>
+      <PageHeader title={t('pages.adminContestsList.title')} />
 
       {error && <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>}
       {!error && contests === null && <Spinner />}

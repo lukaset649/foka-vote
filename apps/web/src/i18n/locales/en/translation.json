@@ -208,14 +208,9 @@
       "createAlbum": "Create album",
       "codeBadge": "Code: {{code}}",
       "approve": "Approve",
-      "reject": "Reject"
-    },
-    "adminAlbumEdit": {
-      "heading": "Edit album: {{title}}",
-      "backToGallery": "Back to the gallery panel",
-      "photosHeading": "Photos",
-      "slugLocked": "Address: /gallery/{{slug}} (cannot be changed)",
-      "confirmDeletePhoto": "Delete this photo? The file is removed from disk as well."
+      "reject": "Reject",
+      "photos": "Photos",
+      "backToContests": "Contests"
     },
     "adminContestForm": {
       "editContest": "Edit contest",
@@ -280,6 +275,18 @@
       "codeLabel": "Album access code",
       "submit": "Enter",
       "invalidCode": "Invalid access code"
+    },
+    "adminAlbumForm": {
+      "editAlbum": "Edit album",
+      "backToGallery": "Back to the gallery panel",
+      "deleteAlbum": "Delete album",
+      "slugLocked": "Address: /gallery/{{slug}} (cannot be changed)"
+    },
+    "adminAlbumPhotos": {
+      "heading": "Photos: {{title}}",
+      "backToAlbum": "Back to the album",
+      "photosHeading": "Photos",
+      "confirmDeletePhoto": "Delete this photo? The file is removed from disk as well."
     }
   },
   "components": {

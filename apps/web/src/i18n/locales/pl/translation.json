@@ -212,14 +212,9 @@
       "createAlbum": "Utwórz album",
       "codeBadge": "Kod: {{code}}",
       "approve": "Zatwierdź",
-      "reject": "Odrzuć"
-    },
-    "adminAlbumEdit": {
-      "heading": "Edytuj album: {{title}}",
-      "backToGallery": "Powrót do panelu galerii",
-      "photosHeading": "Zdjęcia",
-      "slugLocked": "Adres: /gallery/{{slug}} (bez możliwości zmiany)",
-      "confirmDeletePhoto": "Usunąć to zdjęcie? Plik zostanie też skasowany z dysku."
+      "reject": "Odrzuć",
+      "photos": "Zdjęcia",
+      "backToContests": "Konkursy"
     },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",
@@ -290,6 +285,18 @@
       "codeLabel": "Kod dostępu do albumu",
       "submit": "Wejdź",
       "invalidCode": "Nieprawidłowy kod dostępu"
+    },
+    "adminAlbumForm": {
+      "editAlbum": "Edytuj album",
+      "backToGallery": "Powrót do panelu galerii",
+      "deleteAlbum": "Usuń album",
+      "slugLocked": "Adres: /gallery/{{slug}} (bez możliwości zmiany)"
+    },
+    "adminAlbumPhotos": {
+      "heading": "Zdjęcia: {{title}}",
+      "backToAlbum": "Powrót do albumu",
+      "photosHeading": "Zdjęcia",
+      "confirmDeletePhoto": "Usunąć to zdjęcie? Plik zostanie też skasowany z dysku."
     }
   },
   "components": {

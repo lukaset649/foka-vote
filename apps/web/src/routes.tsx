@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 
 import Layout from './components/Layout';
 import RequireAdmin from './components/RequireAdmin';
+import AdminNav from './components/AdminNav';
 import ContestsListPage from './pages/public/ContestsListPage';
 import ContestPage from './pages/public/ContestPage';
 import AccessGatePage from './pages/public/AccessGatePage';
@@ -23,7 +24,8 @@ import AdminContestFormPage from './pages/admin/AdminContestFormPage';
 import AdminSubmissionsPage from './pages/admin/AdminSubmissionsPage';
 import AdminSubmissionEditPage from './pages/admin/AdminSubmissionEditPage';
 import AdminGalleryPage from './pages/admin/AdminGalleryPage';
-import AdminAlbumEditPage from './pages/admin/AdminAlbumEditPage';
+import AdminAlbumFormPage from './pages/admin/AdminAlbumFormPage';
+import AdminAlbumPhotosPage from './pages/admin/AdminAlbumPhotosPage';
 
 export interface RouteHandle {
   wide?: boolean;
@@ -56,20 +58,27 @@ export const router = createBrowserRouter([
       {
         element: <RequireAdmin />,
         children: [
-          { path: '/admin/contests', element: <AdminContestsListPage /> },
-          { path: '/admin/contests/new', element: <AdminContestFormPage /> },
-          { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
           {
-            path: '/admin/contests/:id/submissions',
-            element: <AdminSubmissionsPage />,
-            handle: { wide: true } satisfies RouteHandle,
+            element: <AdminNav />,
+            children: [
+              { path: '/admin/contests', element: <AdminContestsListPage /> },
+              { path: '/admin/contests/new', element: <AdminContestFormPage /> },
+              { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
+              {
+                path: '/admin/contests/:id/submissions',
+                element: <AdminSubmissionsPage />,
+                handle: { wide: true } satisfies RouteHandle,
+              },
+              {
+                path: '/admin/contests/:id/submissions/:submissionId',
+                element: <AdminSubmissionEditPage />,
+              },
+              { path: '/admin/gallery', element: <AdminGalleryPage /> },
+              { path: '/admin/gallery/albums/new', element: <AdminAlbumFormPage /> },
+              { path: '/admin/gallery/albums/:id', element: <AdminAlbumFormPage /> },
+              { path: '/admin/gallery/albums/:id/photos', element: <AdminAlbumPhotosPage /> },
+            ],
           },
-          {
-            path: '/admin/contests/:id/submissions/:submissionId',
-            element: <AdminSubmissionEditPage />,
-          },
-          { path: '/admin/gallery', element: <AdminGalleryPage /> },
-          { path: '/admin/gallery/albums/:id', element: <AdminAlbumEditPage /> },
         ],
       },
     ],
