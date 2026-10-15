@@ -24,7 +24,6 @@ export interface GalleryAlbumDto {
   title: string;
   description: string | null;
   createdAt: string;
-  locked: boolean;
   itemCount: number;
   previews: GalleryAlbumPreviewDto[];
 }

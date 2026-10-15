@@ -19,10 +19,8 @@ function requireSlugParam(request: Request): string {
   return slug;
 }
 
-export async function list(request: Request, response: Response): Promise<void> {
-  const albums = await listGalleryAlbums(
-    request.signedCookies as Record<string, string | undefined>,
-  );
+export async function list(_request: Request, response: Response): Promise<void> {
+  const albums = await listGalleryAlbums();
   response.json(albums);
 }
 

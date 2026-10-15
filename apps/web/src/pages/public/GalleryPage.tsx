@@ -56,10 +56,6 @@ const GalleryPage = () => {
         if (cancelled) {
           return;
         }
-        if (isUnauthorizedError(err)) {
-          void navigate(contestGatePath(slug, currentPath), { replace: true });
-          return;
-        }
         setError(true);
       });
 

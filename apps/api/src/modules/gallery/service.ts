@@ -18,7 +18,6 @@ import { computeContestStatus } from '../../lib/contest-status.js';
 import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import { prisma } from '../../lib/prisma.js';
 import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
-import { contestAccessCookieName } from '../contests/service.js';
 
 type SignedCookies = Record<string, string | undefined>;
 
@@ -28,21 +27,11 @@ export function albumAccessCookieName(albumId: string): string {
   return `album_access_${albumId}`;
 }
 
-function isContestUnlocked(
-  contest: { id: string; accessCode: string | null },
-  signedCookies: SignedCookies,
-): boolean {
-  return (
-    contest.accessCode === null ||
-    signedCookies[contestAccessCookieName(contest.id)] === contest.accessCode
-  );
-}
-
 /**
  * Contest albums have no rows of their own, they are projected from the contests, so the
  * album's title, description and date always come straight from the contest itself.
  */
-async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryAlbumDto[]> {
+async function listContestAlbums(): Promise<GalleryAlbumDto[]> {
   const contests = await prisma.contest.findMany({
     where: { hiddenInGallery: false },
     orderBy: { createdAt: 'desc' },
@@ -51,7 +40,6 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
       slug: true,
       title: true,
       description: true,
-      accessCode: true,
       createdAt: true,
       submissionStart: true,
       submissionDeadline: true,
@@ -99,7 +87,6 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
       return status === 'VOTING' || status === 'CLOSED';
     })
     .map((contest) => {
-      const locked = !isContestUnlocked(contest, signedCookies);
       const revealNames = computeContestStatus(now, contest) === 'CLOSED';
 
       const previews: GalleryAlbumPreviewDto[] = contest.submissions
@@ -132,9 +119,8 @@ async function listContestAlbums(signedCookies: SignedCookies): Promise<GalleryA
         title: contest.title,
         description: contest.description,
         createdAt: contest.createdAt.toISOString(),
-        locked,
-        itemCount: locked ? 0 : (countByContestId.get(contest.id) ?? 0),
-        previews: locked ? [] : previews,
+        itemCount: countByContestId.get(contest.id) ?? 0,
+        previews,
       };
     });
 }
@@ -175,7 +161,6 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
     title: album.title,
     description: album.description,
     createdAt: album.createdAt.toISOString(),
-    locked: false,
     itemCount: album._count.photos,
     previews: album.photos.map((photo) => {
       const author = `${photo.firstName} ${photo.lastName}`;
@@ -200,9 +185,9 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
   }));
 }
 
-export async function listGalleryAlbums(signedCookies: SignedCookies): Promise<GalleryAlbumDto[]> {
+export async function listGalleryAlbums(): Promise<GalleryAlbumDto[]> {
   const [contestAlbums, standaloneAlbums] = await Promise.all([
-    listContestAlbums(signedCookies),
+    listContestAlbums(),
     listStandaloneAlbums(),
   ]);
 

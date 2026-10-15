@@ -17,10 +17,7 @@ function optionalString(value: unknown): string | undefined {
 
 export async function list(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const submissions = await listSubmissions(
-    slug,
-    request.signedCookies as Record<string, string | undefined>,
-  );
+  const submissions = await listSubmissions(slug);
   response.json(submissions);
 }
 

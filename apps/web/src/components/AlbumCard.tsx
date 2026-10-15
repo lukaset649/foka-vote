@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GalleryAlbumDto, GalleryAlbumPreviewDto } from '@foka-vote/shared';
 import { mediaUrl } from '../services/apiClient';
-import { contestGatePath } from '../services/contests';
 import { albumPath } from '../services/gallery';
 import ArtworkLightbox from './ArtworkLightbox';
 import Badge from './ui/Badge';
@@ -39,7 +38,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             {t('components.albumCard.createdOn', {
               date: new Date(album.createdAt).toLocaleDateString(),
             })}
-            {!album.locked && ` · ${itemCountLabel}`}
+            {` · ${itemCountLabel}`}
           </p>
         </div>
 
@@ -51,20 +50,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
 
       {album.description && <p className="mt-2 text-sm text-zinc-600">{album.description}</p>}
 
-      {album.locked ? (
-        <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-dashed border-zinc-300 py-8 text-center">
-          <i className="bi bi-lock text-2xl text-zinc-500" aria-hidden="true" />
-          <p className="text-sm text-zinc-500">{t('components.albumCard.accessCodeRequired')}</p>
-          <LinkButton
-            to={contestGatePath(album.slug, targetPath)}
-            variant="secondary"
-            size="sm"
-            className="mt-1"
-          >
-            {t('components.albumCard.enterAccessCode')}
-          </LinkButton>
-        </div>
-      ) : album.previews.length === 0 ? (
+      {album.previews.length === 0 ? (
         <EmptyState
           icon="bi-images"
           text={t('components.albumCard.noPhotosYet')}

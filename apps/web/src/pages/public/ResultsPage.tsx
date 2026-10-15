@@ -66,10 +66,6 @@ const ResultsPage = () => {
         if (cancelled) {
           return;
         }
-        if (isUnauthorizedError(err)) {
-          void navigate(contestGatePath(slug, `/contest/${slug}/results`), { replace: true });
-          return;
-        }
         setError(true);
       });
 

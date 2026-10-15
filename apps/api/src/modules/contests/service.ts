@@ -47,15 +47,11 @@ export async function listPublicContests(): Promise<ContestDto[]> {
   return contests.map(toPublicContestDto);
 }
 
-export async function getPublicContestBySlug(
-  slug: string,
-  signedCookies: Record<string, string | undefined>,
-): Promise<ContestDto> {
+export async function getPublicContestBySlug(slug: string): Promise<ContestDto> {
   const contest = await prisma.contest.findUnique({ where: { slug } });
   if (!contest) {
     throw notFound('Contest not found');
   }
-  assertContestAccess(contest, signedCookies);
   return toPublicContestDto(contest);
 }
 
