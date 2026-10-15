@@ -121,17 +121,17 @@ model Alias {
 // A gallery album that is not tied to a contest. Contest albums are derived from the
 // Contest rows themselves, so they deliberately have no row here.
 model Album {
-  id          String           @id @default(cuid())
-  slug        String           @unique
+  id          String   @id @default(cuid())
+  slug        String   @unique
   title       String
   description String?
-  status      ModerationStatus @default(PENDING)
-  hidden      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  accessCode  String?
+  hidden      Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
   photos AlbumPhoto[]
 
-  @@index([status, hidden, createdAt])
+  @@index([hidden, createdAt])
 }
 
 model AlbumPhoto {
@@ -155,7 +155,3 @@ model AlbumPhoto {
   @@index([albumId, status, createdAt])
 }
 
-model Setting {
-  key   String @id
-  value String
-}
