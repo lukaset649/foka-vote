@@ -1,10 +1,11 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { MAX_ARTWORK_FILE_SIZE_MB, MAX_PHOTOS_PER_ALBUM_UPLOAD } from '@foka-vote/shared';
+import type { AlbumDetailDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import { isUnauthorizedError } from '../../services/apiClient';
-import { addAlbumPhotos, galleryGatePath } from '../../services/gallery';
+import { addAlbumPhotos, albumGatePath, fetchAlbum } from '../../services/gallery';
 import ContestRulesModal from '../../components/ContestRulesModal';
 import Alert from '../../components/ui/Alert';
 import Button from '../../components/ui/Button';
@@ -14,6 +15,7 @@ import Label from '../../components/ui/Label';
 import LinkButton from '../../components/ui/LinkButton';
 import Modal from '../../components/ui/Modal';
 import PageHeader from '../../components/ui/PageHeader';
+import Spinner from '../../components/ui/Spinner';
 
 interface PhotoSlot {
   file: File | null;
@@ -30,6 +32,8 @@ const AlbumAddPhotosPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
+  const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [slots, setSlots] = useState<PhotoSlot[]>([emptySlot()]);
@@ -40,6 +44,35 @@ const AlbumAddPhotosPage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const albumPath = `/gallery/${slug}`;
+
+  useEffect(() => {
+    if (!slug) {
+      return;
+    }
+    let cancelled = false;
+
+    fetchAlbum(slug)
+      .then((data) => {
+        if (cancelled) {
+          return;
+        }
+        // The code is checked before the form opens, not only when photos are sent.
+        if (!data.canUpload) {
+          void navigate(albumGatePath(slug, `${albumPath}/add-photos`), { replace: true });
+          return;
+        }
+        setAlbum(data);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, navigate, albumPath]);
 
   const updateSlot = (index: number, patch: Partial<PhotoSlot>) => {
     setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, ...patch } : slot)));
@@ -98,7 +131,7 @@ const AlbumAddPhotosPage = () => {
       void navigate(`${albumPath}/add-photos/confirmation`, { replace: true });
     } catch (err) {
       if (isUnauthorizedError(err)) {
-        void navigate(galleryGatePath(`${albumPath}/add-photos`), { replace: true });
+        void navigate(albumGatePath(slug, `${albumPath}/add-photos`), { replace: true });
         return;
       }
       setFormError(errorMessage(err, t));
@@ -112,10 +145,18 @@ const AlbumAddPhotosPage = () => {
     void submit();
   };
 
+  if (loadError) {
+    return <Alert variant="error">{t('pages.album.failedToLoad')}</Alert>;
+  }
+
+  if (album === null) {
+    return <Spinner />;
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <PageHeader
-        title={t('pages.albumAddPhotos.title')}
+        title={t('pages.albumAddPhotos.heading', { title: album.title })}
         backTo={albumPath}
         backLabel={t('pages.albumAddPhotos.backToAlbum')}
       />

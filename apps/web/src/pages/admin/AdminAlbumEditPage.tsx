@@ -43,6 +43,7 @@ const AdminAlbumEditPage = () => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [accessCode, setAccessCode] = useState('');
   const [savingAlbum, setSavingAlbum] = useState(false);
   const [albumError, setAlbumError] = useState<string | null>(null);
 
@@ -64,6 +65,7 @@ const AdminAlbumEditPage = () => {
         setAlbum(albumData);
         setTitle(albumData.title);
         setDescription(albumData.description ?? '');
+        setAccessCode(albumData.accessCode ?? '');
         setPhotos(photoData);
         setDrafts(
           Object.fromEntries(
@@ -94,11 +96,16 @@ const AdminAlbumEditPage = () => {
     setSavingAlbum(true);
     setAlbumError(null);
 
-    updateAdminAlbum(id, { title: title.trim(), description: description.trim() })
+    updateAdminAlbum(id, {
+      title: title.trim(),
+      description: description.trim(),
+      accessCode: accessCode.trim(),
+    })
       .then((updated) => {
         setAlbum(updated);
         setTitle(updated.title);
         setDescription(updated.description ?? '');
+        setAccessCode(updated.accessCode ?? '');
       })
       .catch((err: unknown) => setAlbumError(errorMessage(err, t)))
       .finally(() => setSavingAlbum(false));
@@ -166,7 +173,7 @@ const AdminAlbumEditPage = () => {
       <Card>
         <form onSubmit={handleSaveAlbum} className="flex flex-col gap-4">
           <div>
-            <Label htmlFor="album-title">{t('pages.albumCreate.titleLabel')}</Label>
+            <Label htmlFor="album-title">{t('pages.adminGallery.titleLabel')}</Label>
             <Input
               id="album-title"
               value={title}
@@ -184,6 +191,16 @@ const AdminAlbumEditPage = () => {
               maxLength={MAX_ALBUM_DESCRIPTION_LENGTH}
               onChange={(event) => setDescription(event.target.value)}
             />
+          </div>
+          <div>
+            <Label htmlFor="album-access-code">{t('pages.adminGallery.accessCodeLabel')}</Label>
+            <Input
+              id="album-access-code"
+              value={accessCode}
+              onChange={(event) => setAccessCode(event.target.value)}
+              placeholder={t('pages.adminGallery.accessCodePlaceholder')}
+            />
+            <p className="mt-1 text-sm text-zinc-500">{t('pages.adminGallery.accessCodeHint')}</p>
           </div>
           <p className="text-sm text-zinc-500">
             {t('pages.adminAlbumEdit.slugLocked', { slug: album.slug })}

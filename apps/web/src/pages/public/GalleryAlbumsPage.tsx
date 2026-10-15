@@ -5,7 +5,6 @@ import { fetchGalleryAlbums } from '../../services/gallery';
 import AlbumCard from '../../components/AlbumCard';
 import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
-import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 
@@ -40,12 +39,7 @@ const GalleryAlbumsPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('pages.galleryAlbums.title')}>
-        <LinkButton to="/gallery/new" variant="primary" size="sm">
-          <i className="bi bi-plus-lg" aria-hidden="true" />
-          {t('pages.galleryAlbums.createAlbum')}
-        </LinkButton>
-      </PageHeader>
+      <PageHeader title={t('pages.galleryAlbums.title')} />
 
       {albums === null ? (
         <Spinner />
