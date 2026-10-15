@@ -1,15 +1,19 @@
 import type { Request, Response } from 'express';
-import type { ModerationStatus, UpdateAlbumDto, UpdateAlbumPhotoDto } from '@foka-vote/shared';
+import type {
+  CreateAlbumDto,
+  ModerationStatus,
+  UpdateAlbumDto,
+  UpdateAlbumPhotoDto,
+} from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
-import { getGallerySettings, setGalleryAccessCode } from '../../gallery/settings.service.js';
 import {
+  createAdminAlbum,
   deleteAdminAlbum,
   deleteAdminAlbumPhoto,
   getAdminAlbum,
   listAdminAlbumPhotos,
   listAdminAlbums,
   setAdminAlbumPhotoStatus,
-  setAdminAlbumStatus,
   setAdminAlbumVisibility,
   setContestAlbumVisibility,
   updateAdminAlbum,
@@ -42,27 +46,6 @@ function parseHidden(body: unknown): boolean {
   return hidden;
 }
 
-export async function getSettings(_request: Request, response: Response): Promise<void> {
-  const settings = await getGallerySettings();
-  response.json(settings);
-}
-
-export async function updateSettings(request: Request, response: Response): Promise<void> {
-  const { accessCode } = request.body as Record<string, unknown>;
-
-  if (accessCode === undefined) {
-    throw badRequest('accessCode is required');
-  }
-  if (accessCode !== null && typeof accessCode !== 'string') {
-    throw badRequest('accessCode must be a string or null');
-  }
-
-  await setGalleryAccessCode(accessCode);
-
-  const settings = await getGallerySettings();
-  response.json(settings);
-}
-
 export async function list(_request: Request, response: Response): Promise<void> {
   const albums = await listAdminAlbums();
   response.json(albums);
@@ -73,8 +56,8 @@ export async function getOne(request: Request, response: Response): Promise<void
   response.json(album);
 }
 
-export async function update(request: Request, response: Response): Promise<void> {
-  const { title, description } = request.body as Record<string, unknown>;
+function parseAlbumFields(body: unknown): UpdateAlbumDto {
+  const { title, description, accessCode } = (body ?? {}) as Record<string, unknown>;
 
   if (title !== undefined && typeof title !== 'string') {
     throw badRequest('title must be a string');
@@ -82,26 +65,32 @@ export async function update(request: Request, response: Response): Promise<void
   if (description !== undefined && typeof description !== 'string') {
     throw badRequest('description must be a string');
   }
-
-  const input: UpdateAlbumDto = {
-    ...(title !== undefined ? { title } : {}),
-    ...(description !== undefined ? { description } : {}),
-  };
-
-  const album = await updateAdminAlbum(requireIdParam(request, 'id'), input);
-  response.json(album);
-}
-
-export async function setStatus(request: Request, response: Response): Promise<void> {
-  const { status } = request.body as Record<string, unknown>;
-
-  if (typeof status !== 'string' || !DECIDABLE_STATUSES.includes(status as ModerationStatus)) {
-    throw badRequest(`status must be one of: ${DECIDABLE_STATUSES.join(', ')}`);
+  if (accessCode !== undefined && typeof accessCode !== 'string') {
+    throw badRequest('accessCode must be a string');
   }
 
-  const album = await setAdminAlbumStatus(
+  return {
+    ...(title !== undefined ? { title } : {}),
+    ...(description !== undefined ? { description } : {}),
+    ...(accessCode !== undefined ? { accessCode } : {}),
+  };
+}
+
+export async function create(request: Request, response: Response): Promise<void> {
+  const input = parseAlbumFields(request.body);
+
+  if (input.title === undefined) {
+    throw badRequest('title is required');
+  }
+
+  const album = await createAdminAlbum(input as CreateAlbumDto);
+  response.status(201).json(album);
+}
+
+export async function update(request: Request, response: Response): Promise<void> {
+  const album = await updateAdminAlbum(
     requireIdParam(request, 'id'),
-    status as ModerationStatus,
+    parseAlbumFields(request.body),
   );
   response.json(album);
 }

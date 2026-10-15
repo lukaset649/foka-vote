@@ -1,13 +1,16 @@
 import type {
   AdminAlbumDto,
   AdminAlbumPhotoDto,
+  CreateAlbumDto,
   ModerationStatus,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
+import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
 import type { AlbumPhoto } from '@prisma/client';
-import { notFound } from '../../../errors/app-error.js';
+import { conflict, notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
+import { slugify } from '../../../lib/slugify.js';
 import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
 import {
   assertValidAlbumInput,
@@ -15,13 +18,15 @@ import {
   toAlbumPhotoDto,
 } from '../../gallery/service.js';
 
+const FALLBACK_ALBUM_SLUG = 'album';
+
 const standaloneAlbumSelect = {
   id: true,
   slug: true,
   title: true,
   description: true,
   createdAt: true,
-  status: true,
+  accessCode: true,
   hidden: true,
   // Any status: a brand new album only has photos that are still waiting for approval.
   photos: { orderBy: { createdAt: 'asc' }, take: 1, select: { thumbPath: true } },
@@ -33,7 +38,7 @@ interface StandaloneAlbumRow {
   title: string;
   description: string | null;
   createdAt: Date;
-  status: ModerationStatus;
+  accessCode: string | null;
   hidden: boolean;
   photos: { thumbPath: string }[];
 }
@@ -53,7 +58,7 @@ function toAdminAlbumDto(album: StandaloneAlbumRow, counts: StatusCount[]): Admi
     title: album.title,
     description: album.description,
     createdAt: album.createdAt.toISOString(),
-    status: album.status,
+    accessCode: album.accessCode,
     hidden: album.hidden,
     photoCount: counts.reduce((total, entry) => total + entry.count, 0),
     pendingPhotoCount: counts.find((entry) => entry.status === 'PENDING')?.count ?? 0,
@@ -75,6 +80,7 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
       title: true,
       description: true,
       createdAt: true,
+      accessCode: true,
       hiddenInGallery: true,
       submissions: {
         orderBy: { createdAt: 'asc' },
@@ -104,8 +110,7 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
       title: contest.title,
       description: contest.description,
       createdAt: contest.createdAt.toISOString(),
-      // The contest itself is the moderation record; only visibility is steerable here.
-      status: 'APPROVED',
+      accessCode: contest.accessCode,
       hidden: contest.hiddenInGallery,
       photoCount: countByContestId.get(contest.id) ?? 0,
       pendingPhotoCount: 0,
@@ -177,6 +182,44 @@ export async function getAdminAlbum(id: string): Promise<AdminAlbumDto> {
   return getStandaloneAlbum(id);
 }
 
+async function pickAlbumSlug(title: string): Promise<string> {
+  const base = slugify(title) || FALLBACK_ALBUM_SLUG;
+  const existing = await prisma.album.findMany({
+    where: { slug: { startsWith: base } },
+    select: { slug: true },
+  });
+  const taken = new Set<string>([...existing.map((album) => album.slug), ...RESERVED_ALBUM_SLUGS]);
+
+  if (!taken.has(base)) {
+    return base;
+  }
+  for (let suffix = 2; suffix <= taken.size + 2; suffix++) {
+    const candidate = `${base}-${suffix}`;
+    if (!taken.has(candidate)) {
+      return candidate;
+    }
+  }
+  throw conflict('Could not allocate a unique album address');
+}
+
+export async function createAdminAlbum(input: CreateAlbumDto): Promise<AdminAlbumDto> {
+  const title = input.title.trim();
+  const description = input.description?.trim() ?? '';
+  const accessCode = input.accessCode?.trim() ?? '';
+  assertValidAlbumInput(title, description);
+
+  const album = await prisma.album.create({
+    data: {
+      slug: await pickAlbumSlug(title),
+      title,
+      description: description.length > 0 ? description : null,
+      accessCode: accessCode.length > 0 ? accessCode : null,
+    },
+  });
+
+  return getStandaloneAlbum(album.id);
+}
+
 export async function updateAdminAlbum(id: string, input: UpdateAlbumDto): Promise<AdminAlbumDto> {
   const existing = await prisma.album.findUnique({ where: { id } });
   if (!existing) {
@@ -186,27 +229,20 @@ export async function updateAdminAlbum(id: string, input: UpdateAlbumDto): Promi
   const title = input.title === undefined ? existing.title : input.title.trim();
   const description =
     input.description === undefined ? (existing.description ?? '') : input.description.trim();
+  const accessCode =
+    input.accessCode === undefined ? (existing.accessCode ?? '') : input.accessCode.trim();
   assertValidAlbumInput(title, description);
 
   // The slug is left untouched on purpose: links to the album are already in the wild.
   await prisma.album.update({
     where: { id },
-    data: { title, description: description.length > 0 ? description : null },
+    data: {
+      title,
+      description: description.length > 0 ? description : null,
+      accessCode: accessCode.length > 0 ? accessCode : null,
+    },
   });
 
-  return getStandaloneAlbum(id);
-}
-
-export async function setAdminAlbumStatus(
-  id: string,
-  status: ModerationStatus,
-): Promise<AdminAlbumDto> {
-  const existing = await prisma.album.findUnique({ where: { id }, select: { id: true } });
-  if (!existing) {
-    throw notFound('Album not found');
-  }
-
-  await prisma.album.update({ where: { id }, data: { status } });
   return getStandaloneAlbum(id);
 }
 

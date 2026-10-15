@@ -1,29 +1,24 @@
 import { Router } from 'express';
 import {
+  create,
   getOne,
-  getSettings,
   list,
   listPhotos,
   remove,
   removePhoto,
   setContestVisibility,
   setPhotoStatus,
-  setStatus,
   setVisibility,
   update,
   updatePhoto,
-  updateSettings,
 } from './controller.js';
 
 export const adminGalleryRoutes = Router();
 
-adminGalleryRoutes.get('/settings', getSettings);
-adminGalleryRoutes.patch('/settings', updateSettings);
-
 adminGalleryRoutes.get('/albums', list);
+adminGalleryRoutes.post('/albums', create);
 adminGalleryRoutes.get('/albums/:id', getOne);
 adminGalleryRoutes.patch('/albums/:id', update);
-adminGalleryRoutes.patch('/albums/:id/status', setStatus);
 adminGalleryRoutes.patch('/albums/:id/visibility', setVisibility);
 adminGalleryRoutes.delete('/albums/:id', remove);
 
