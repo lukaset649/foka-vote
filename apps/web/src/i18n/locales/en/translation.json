@@ -96,7 +96,7 @@
       "invalidCode": "Invalid access code"
     },
     "submissionForm": {
-      "heading": "Submit your work — {{title}}",
+      "heading": "Submit your work: {{title}}",
       "infoNamePublished": "Your first and last name will be published next to your work once voting closes.",
       "infoAliasAfter": "Since then, the random alias will be displayed instead.",
       "infoAdminOnly": "After submitting, only the admin can make changes.",
@@ -140,7 +140,7 @@
       "failedToLoad": "Failed to load gallery"
     },
     "voteCard": {
-      "heading": "Vote — {{title}}",
+      "heading": "Vote: {{title}}",
       "failedToLoad": "Failed to load voting card",
       "notEnoughSubmissions": "Not enough submissions to vote on yet.",
       "slots": "Slots",
@@ -155,13 +155,13 @@
       "recorded": "Your vote card has been recorded. It cannot be changed."
     },
     "results": {
-      "heading": "Results — {{title}}",
+      "heading": "Results: {{title}}",
       "failedToLoad": "Failed to load results",
       "votingInProgress": "Voting is currently in progress. Results will be revealed once voting closes.",
       "availableFrom": "Results will be available once voting starts, on {{date}}.",
       "voteCardsCast_one": "{{count}} vote card cast",
       "voteCardsCast_other": "{{count}} vote cards cast",
-      "stillInProgress": "Voting is still in progress — standings may change before the contest closes.",
+      "stillInProgress": "Voting is still in progress, standings may change before the contest closes.",
       "tablePlace": "Place",
       "tableAuthor": "Author",
       "tablePoints": "Points",
@@ -243,7 +243,7 @@
       "voidReasonPrompt": "Reason (optional)"
     },
     "adminSubmissionEdit": {
-      "heading": "Edit submission — {{alias}}",
+      "heading": "Edit submission: {{alias}}",
       "backToSubmissions": "Back to submissions",
       "author": "Author",
       "saveData": "Save data",
@@ -330,7 +330,7 @@
     "contestResultsCard": {
       "viewResults": "View results",
       "noVotesYet": "No votes cast yet",
-      "showingTopOf": "Showing the top {{shown}} of {{total}} results - see the full standings on the results page."
+      "showingTopOf": "Showing the top {{shown}} of {{total}} results, see the full standings on the results page."
     },
     "artworkLightbox": {
       "defaultAlt": "Artwork"
@@ -371,7 +371,7 @@
           "heading": "§5 Personal data and publication of authorship",
           "items": [
             "The participant agrees to the publication of their first and last name as the author of the submitted work after the contest ends (once voting closes).",
-            "Until voting closes, the participant's personal data is not publicly disclosed — only the nickname is displayed.",
+            "Until voting closes, the participant's personal data is not publicly disclosed: only the nickname is displayed.",
             "The Organizer is the administrator of participants' personal data. Data is processed solely for the purpose of running the contest and publishing results in accordance with these rules."
           ]
         },
