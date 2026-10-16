@@ -1,6 +1,26 @@
 # FOKA Vote
 
-Internal tool for a photography club's contests: anonymous submissions, weighted 3/2/1 voting, public results. Easy access without accounts or login.
+Internal tool for a photography club: contests with anonymous submissions, weighted 3/2/1 voting and public results, plus a gallery of albums. Easy access without accounts or login.
+
+## Gallery
+
+`/gallery` lists two kinds of album:
+
+- **contest album**: projected from a contest, has no row of its own, and links to that contest's existing gallery. It shows up once voting starts, because submissions stay hidden until the submission phase ends.
+- **standalone album**: created by an admin in the panel, available right away. Anyone can send photos to it and they appear immediately.
+
+Photos carry the author's first and last name, which is published next to every photo.
+
+## Access codes
+
+Both codes are optional and set by an admin. Browsing is always open.
+
+| Code         | Set in                          | Blocks                       |
+| ------------ | ------------------------------- | ---------------------------- |
+| contest code | contest form                    | submitting a work, voting    |
+| album code   | album form in the gallery panel | sending photos to that album |
+
+A code is verified once and remembered in a signed cookie. Changing the code invalidates the cookies issued for the old one.
 
 ## Local start with Docker
 
