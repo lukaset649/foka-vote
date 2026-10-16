@@ -45,11 +45,11 @@ npm run dev:web           # terminal 2
 
 ## Commands
 
-- `npm run dev:api` / `npm run dev:web` — start a single app in dev mode
-- `npm run build` — build all workspaces (`shared` → `api` → `web`)
-- `npm run typecheck` — typecheck all workspaces
-- `npm run lint` / `npm run lint:fix` — ESLint over the whole repo
-- `npm run format` / `npm run format:check` — Prettier over the whole repo
+- `npm run dev:api` / `npm run dev:web`: start a single app in dev mode
+- `npm run build`: build all workspaces (`shared` → `api` → `web`)
+- `npm run typecheck`: typecheck all workspaces
+- `npm run lint` / `npm run lint:fix`: ESLint over the whole repo
+- `npm run format` / `npm run format:check`: Prettier over the whole repo
 
 ## Structure
 
@@ -63,14 +63,14 @@ npm workspaces monorepo:
 
 Copy `.env.example` to `.env` and adjust as needed. `.env` is git-ignored.
 
-| Variable       | Required | Default                 | Meaning                                 |
-| -------------- | -------- | ----------------------- | --------------------------------------- |
-| `NODE_ENV`     | no       | `development`           | `development` \| `production` \| `test` |
-| `PORT`         | no       | `3000`                  | API listen port                         |
-| `HOST`         | no       | `127.0.0.1`             | API listen host                         |
-| `WEB_ORIGIN`   | no       | `http://localhost:5173` | Allowed CORS origin for the web app     |
-| `LOG_LEVEL`    | no       | `info`                  | `debug` \| `info` \| `warn` \| `error`  |
-| `DATABASE_URL` | **yes**  | —                       | PostgreSQL connection string            |
-| `ADMIN_PASSWORD_HASH` | **yes** | —               | Admin password hash — generate with `npm run admin:hash-password -w apps/api -- '<password>'` |
-| `COOKIE_SECRET` | **yes** | —                     | Secret for signing session cookies, min. 32 characters |
-| `VITE_API_URL` | no       | `http://localhost:3000` | API base URL used by the web app        |
+| Variable              | Required | Default                 | Meaning                                                                                      |
+| --------------------- | -------- | ----------------------- | -------------------------------------------------------------------------------------------- |
+| `NODE_ENV`            | no       | `development`           | `development` \| `production` \| `test`                                                      |
+| `PORT`                | no       | `3000`                  | API listen port                                                                              |
+| `HOST`                | no       | `127.0.0.1`             | API listen host                                                                              |
+| `WEB_ORIGIN`          | no       | `http://localhost:5173` | Allowed CORS origin for the web app                                                          |
+| `LOG_LEVEL`           | no       | `info`                  | `debug` \| `info` \| `warn` \| `error`                                                       |
+| `DATABASE_URL`        | **yes**  | none                    | PostgreSQL connection string                                                                 |
+| `ADMIN_PASSWORD_HASH` | **yes**  | none                    | Admin password hash, generate with `npm run admin:hash-password -w apps/api -- '<password>'` |
+| `COOKIE_SECRET`       | **yes**  | none                    | Secret for signing session cookies, min. 32 characters                                       |
+| `VITE_API_URL`        | no       | `http://localhost:3000` | API base URL used by the web app                                                             |
