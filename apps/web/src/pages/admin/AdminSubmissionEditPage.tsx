@@ -19,6 +19,7 @@ import Label from '../../components/ui/Label';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
+import useConfirm from '../../lib/useConfirm';
 
 interface ArtworkFields {
   title: string;
@@ -27,6 +28,7 @@ interface ArtworkFields {
 
 const AdminSubmissionEditPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const { id, submissionId } = useParams<{ id: string; submissionId: string }>();
   const contestId = id as string;
   const submissionIdValue = submissionId as string;
@@ -91,8 +93,13 @@ const AdminSubmissionEditPage = () => {
       .catch(() => setError(true));
   };
 
-  const handleDeleteArtwork = (artworkId: string) => {
-    if (!window.confirm(t('pages.adminSubmissionEdit.confirmDeleteArtwork'))) {
+  const handleDeleteArtwork = async (artworkId: string) => {
+    const confirmed = await confirm({
+      message: t('pages.adminSubmissionEdit.confirmDeleteArtwork'),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
     deleteAdminArtwork(contestId, submissionIdValue, artworkId)
@@ -253,7 +260,7 @@ const AdminSubmissionEditPage = () => {
                     variant="ghost"
                     size="sm"
                     disabled={artworks.length === 1}
-                    onClick={() => handleDeleteArtwork(artwork.id)}
+                    onClick={() => void handleDeleteArtwork(artwork.id)}
                   >
                     <i className="bi bi-trash" aria-hidden="true" />
                     {t('common.remove')}
@@ -292,6 +299,8 @@ const AdminSubmissionEditPage = () => {
           </div>
         </div>
       </div>
+
+      {confirmDialog}
     </div>
   );
 };

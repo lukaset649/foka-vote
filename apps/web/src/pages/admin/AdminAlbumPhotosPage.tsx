@@ -21,14 +21,17 @@ import Label from '../../components/ui/Label';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 import ThumbnailTile from '../../components/ui/ThumbnailTile';
+import useConfirm from '../../lib/useConfirm';
 
 const AdminAlbumPhotosPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const { id } = useParams<{ id: string }>();
 
   const [album, setAlbum] = useState<AdminAlbumDto | null>(null);
   const [photos, setPhotos] = useState<AdminAlbumPhotoDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const [drafts, setDrafts] = useState<Record<string, { title: string; description: string }>>({});
   const [busyPhotoId, setBusyPhotoId] = useState<string | null>(null);
@@ -81,21 +84,31 @@ const AdminAlbumPhotosPage = () => {
     }
 
     setBusyPhotoId(photoId);
+    setActionError(null);
     updateAdminAlbumPhoto(id, photoId, { title: draft.title, description: draft.description })
       .then(replacePhoto)
-      .catch((err: unknown) => window.alert(errorMessage(err, t)))
+      .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyPhotoId(null));
   };
 
-  const removePhoto = (photoId: string) => {
-    if (!id || !window.confirm(t('pages.adminAlbumPhotos.confirmDeletePhoto'))) {
+  const removePhoto = async (photoId: string) => {
+    if (!id) {
+      return;
+    }
+    const confirmed = await confirm({
+      message: t('pages.adminAlbumPhotos.confirmDeletePhoto'),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
     setBusyPhotoId(photoId);
+    setActionError(null);
     deleteAdminAlbumPhoto(id, photoId)
       .then(() => setPhotos((prev) => prev?.filter((photo) => photo.id !== photoId) ?? prev))
-      .catch((err: unknown) => window.alert(errorMessage(err, t)))
+      .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyPhotoId(null));
   };
 
@@ -114,6 +127,8 @@ const AdminAlbumPhotosPage = () => {
         backTo={`/admin/gallery/albums/${album.id}`}
         backLabel={t('pages.adminAlbumPhotos.backToAlbum')}
       />
+
+      {actionError && <Alert variant="error">{actionError}</Alert>}
 
       <section>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
@@ -201,7 +216,7 @@ const AdminAlbumPhotosPage = () => {
                         variant="danger"
                         size="sm"
                         disabled={busyPhotoId === photo.id}
-                        onClick={() => removePhoto(photo.id)}
+                        onClick={() => void removePhoto(photo.id)}
                       >
                         <i className="bi bi-trash" aria-hidden="true" />
                         {t('common.remove')}
@@ -230,6 +245,8 @@ const AdminAlbumPhotosPage = () => {
           onClose={() => setLightboxIndex(null)}
         />
       )}
+
+      {confirmDialog}
     </div>
   );
 };

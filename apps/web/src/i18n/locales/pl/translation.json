@@ -20,6 +20,8 @@
       "results": "Wyniki"
     },
     "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "confirmTitle": "Potwierdzenie",
     "descriptionOptional": "Opis (opcjonalnie)",
     "titleOptional": "Tytuł (opcjonalnie)",
     "remove": "Usuń",
@@ -248,7 +250,8 @@
       "valid": "ważna",
       "restore": "Przywróć",
       "void": "Unieważnij",
-      "voidReasonPrompt": "Powód (opcjonalnie)"
+      "voidReasonPrompt": "Powód (opcjonalnie)",
+      "confirmVoid": "Unieważnić tę kartę do głosowania? Przestanie się liczyć do wyników."
     },
     "adminSubmissionEdit": {
       "heading": "Edytuj zgłoszenie: {{alias}}",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { AdminContestDto, UpdateContestDto } from '@foka-vote/shared';
 import { updateContest } from '../services/contests';
+import useConfirm from '../lib/useConfirm';
 import Button from './ui/Button';
 
 const RESUME_GRACE_MS = 24 * 60 * 60 * 1000;
@@ -89,16 +90,24 @@ function getPhaseActions(contest: AdminContestDto, t: TFunction): PhaseAction[] 
 interface ContestPhaseActionsProps {
   contest: AdminContestDto;
   onUpdated: (contest: AdminContestDto) => void;
+  onError: (message: string) => void;
   className?: string;
 }
 
-const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActionsProps) => {
+const ContestPhaseActions = ({
+  contest,
+  onUpdated,
+  onError,
+  className,
+}: ContestPhaseActionsProps) => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const [pendingAction, setPendingAction] = useState<PhaseAction | null>(null);
   const actions = getPhaseActions(contest, t);
 
-  const handleClick = (action: PhaseAction) => {
-    if (!window.confirm(action.confirmMessage)) {
+  const handleClick = async (action: PhaseAction) => {
+    const confirmed = await confirm({ message: action.confirmMessage });
+    if (!confirmed) {
       return;
     }
 
@@ -106,7 +115,7 @@ const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActi
     updateContest(contest.id, action.buildPayload())
       .then(onUpdated)
       .catch(() => {
-        window.alert(t('components.contestPhaseActions.updateFailed'));
+        onError(t('components.contestPhaseActions.updateFailed'));
       })
       .finally(() => {
         setPendingAction(null);
@@ -121,7 +130,7 @@ const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActi
           type="button"
           variant="secondary"
           size="sm"
-          onClick={() => handleClick(action)}
+          onClick={() => void handleClick(action)}
           disabled={pendingAction !== null}
           className={className}
         >
@@ -129,6 +138,8 @@ const ContestPhaseActions = ({ contest, onUpdated, className }: ContestPhaseActi
           {action.label}
         </Button>
       ))}
+
+      {confirmDialog}
     </>
   );
 };

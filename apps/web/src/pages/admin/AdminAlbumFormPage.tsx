@@ -18,6 +18,7 @@ import Label from '../../components/ui/Label';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 import Textarea from '../../components/ui/Textarea';
+import useConfirm from '../../lib/useConfirm';
 
 interface FormState {
   title: string;
@@ -29,6 +30,7 @@ const EMPTY_FORM: FormState = { title: '', description: '', accessCode: '' };
 
 const AdminAlbumFormPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = id !== undefined;
@@ -94,8 +96,16 @@ const AdminAlbumFormPage = () => {
       .finally(() => setSubmitting(false));
   };
 
-  const handleDelete = () => {
-    if (!id || !window.confirm(t('pages.adminGallery.confirmDelete', { title: form.title }))) {
+  const handleDelete = async () => {
+    if (!id) {
+      return;
+    }
+    const confirmed = await confirm({
+      message: t('pages.adminGallery.confirmDelete', { title: form.title }),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
@@ -182,7 +192,7 @@ const AdminAlbumFormPage = () => {
             <Button
               type="button"
               variant="danger"
-              onClick={handleDelete}
+              onClick={() => void handleDelete()}
               disabled={deleting}
               aria-label={t('pages.adminAlbumForm.deleteAlbum')}
             >
@@ -197,6 +207,8 @@ const AdminAlbumFormPage = () => {
           </Button>
         </div>
       </ActionBar>
+
+      {confirmDialog}
     </form>
   );
 };

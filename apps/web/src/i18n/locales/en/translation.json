@@ -20,6 +20,8 @@
       "results": "Results"
     },
     "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirmTitle": "Confirmation",
     "descriptionOptional": "Description (optional)",
     "titleOptional": "Title (optional)",
     "remove": "Remove",
@@ -240,7 +242,8 @@
       "valid": "valid",
       "restore": "Restore",
       "void": "Void",
-      "voidReasonPrompt": "Reason (optional)"
+      "voidReasonPrompt": "Reason (optional)",
+      "confirmVoid": "Void this vote card? It will stop counting towards the results."
     },
     "adminSubmissionEdit": {
       "heading": "Edit submission: {{alias}}",

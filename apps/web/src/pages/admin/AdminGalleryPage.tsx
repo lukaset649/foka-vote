@@ -15,11 +15,14 @@ import Card from '../../components/ui/Card';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
+import useConfirm from '../../lib/useConfirm';
 
 const AdminGalleryPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const [albums, setAlbums] = useState<AdminAlbumDto[] | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,6 +51,7 @@ const AdminGalleryPage = () => {
 
   const toggleVisibility = (album: AdminAlbumDto) => {
     setBusyId(album.id);
+    setActionError(null);
     const action =
       album.kind === 'CONTEST'
         ? setContestAlbumVisibility(album.id, !album.hidden)
@@ -55,19 +59,25 @@ const AdminGalleryPage = () => {
 
     action
       .then(replaceAlbum)
-      .catch((err: unknown) => window.alert(errorMessage(err, t)))
+      .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyId(null));
   };
 
-  const handleDelete = (album: AdminAlbumDto) => {
-    if (!window.confirm(t('pages.adminGallery.confirmDelete', { title: album.title }))) {
+  const handleDelete = async (album: AdminAlbumDto) => {
+    const confirmed = await confirm({
+      message: t('pages.adminGallery.confirmDelete', { title: album.title }),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
     setBusyId(album.id);
+    setActionError(null);
     deleteAdminAlbum(album.id)
       .then(() => setAlbums((prev) => prev?.filter((entry) => entry.id !== album.id) ?? prev))
-      .catch((err: unknown) => window.alert(errorMessage(err, t)))
+      .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyId(null));
   };
 
@@ -76,6 +86,7 @@ const AdminGalleryPage = () => {
       <PageHeader title={t('pages.adminGallery.title')} />
 
       {loadError && <Alert variant="error">{t('pages.galleryAlbums.failedToLoad')}</Alert>}
+      {actionError && <Alert variant="error">{actionError}</Alert>}
       {!loadError && albums === null && <Spinner />}
 
       {albums !== null && (
@@ -152,7 +163,7 @@ const AdminGalleryPage = () => {
                           size="sm"
                           className="sm:w-28"
                           disabled={busyId === album.id}
-                          onClick={() => handleDelete(album)}
+                          onClick={() => void handleDelete(album)}
                         >
                           <i className="bi bi-trash" aria-hidden="true" />
                           {t('common.remove')}
@@ -166,6 +177,8 @@ const AdminGalleryPage = () => {
           </ul>
         </section>
       )}
+
+      {confirmDialog}
     </div>
   );
 };

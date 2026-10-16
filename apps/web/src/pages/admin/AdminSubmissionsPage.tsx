@@ -18,11 +18,13 @@ import Table, {
   TableHeaderCell,
   TableRow,
 } from '../../components/ui/Table';
+import useConfirm from '../../lib/useConfirm';
 
 type Tab = 'submissions' | 'voteCards';
 
 const AdminSubmissionsPage = () => {
   const { t } = useTranslation();
+  const { confirm, promptFor, confirmDialog } = useConfirm();
   const { id } = useParams<{ id: string }>();
   const contestId = id as string;
 
@@ -49,8 +51,13 @@ const AdminSubmissionsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- contestId is stable for the life of this page
   }, [contestId]);
 
-  const handleDelete = (submissionId: string) => {
-    if (!window.confirm(t('pages.adminSubmissions.confirmDeleteSubmission'))) {
+  const handleDelete = async (submissionId: string) => {
+    const confirmed = await confirm({
+      message: t('pages.adminSubmissions.confirmDeleteSubmission'),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
     deleteAdminSubmission(contestId, submissionId)
@@ -58,9 +65,17 @@ const AdminSubmissionsPage = () => {
       .catch(() => setError(true));
   };
 
-  const handleVoid = (cardId: string) => {
-    const reason = window.prompt(t('pages.adminSubmissions.voidReasonPrompt')) ?? undefined;
-    voidVoteCard(contestId, cardId, reason)
+  const handleVoid = async (cardId: string) => {
+    const reason = await promptFor({
+      message: t('pages.adminSubmissions.confirmVoid'),
+      promptLabel: t('pages.adminSubmissions.voidReasonPrompt'),
+      confirmLabel: t('pages.adminSubmissions.void'),
+      confirmVariant: 'danger',
+    });
+    if (reason === null) {
+      return;
+    }
+    voidVoteCard(contestId, cardId, reason.length > 0 ? reason : undefined)
       .then(loadVoteCards)
       .catch(() => setError(true));
   };
@@ -163,7 +178,11 @@ const AdminSubmissionsPage = () => {
                         <i className="bi bi-pencil-square" aria-hidden="true" />
                         {t('pages.submissionPreview.edit')}
                       </LinkButton>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(submission.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => void handleDelete(submission.id)}
+                      >
                         <i className="bi bi-trash" aria-hidden="true" />
                         {t('common.remove')}
                       </Button>
@@ -226,7 +245,7 @@ const AdminSubmissionsPage = () => {
                         {t('pages.adminSubmissions.restore')}
                       </Button>
                     ) : (
-                      <Button variant="ghost" size="sm" onClick={() => handleVoid(card.id)}>
+                      <Button variant="ghost" size="sm" onClick={() => void handleVoid(card.id)}>
                         <i className="bi bi-ban" aria-hidden="true" />
                         {t('pages.adminSubmissions.void')}
                       </Button>
@@ -237,6 +256,8 @@ const AdminSubmissionsPage = () => {
             </TableBody>
           </Table>
         ))}
+
+      {confirmDialog}
     </div>
   );
 };
