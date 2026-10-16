@@ -1,14 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { isUnauthorizedError } from '../../services/apiClient';
-import {
-  contestGatePath,
-  fetchContest,
-  isGalleryVisible,
-  verifyContestAccessCode,
-} from '../../services/contests';
+import { fetchContest, isGalleryVisible, verifyContestAccessCode } from '../../services/contests';
 import ContestGalleryCard from '../../components/ContestGalleryCard';
 import ContestPhaseCard from '../../components/ContestPhaseCard';
 import ContestResultsCard from '../../components/ContestResultsCard';
@@ -21,7 +15,6 @@ import PageHeader from '../../components/ui/PageHeader';
 const ContestPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [error, setError] = useState(false);
@@ -44,11 +37,10 @@ const ContestPage = () => {
         if (!cancelled) {
           setContest(data);
         }
-      } catch (err) {
-        if (cancelled) {
-          return;
+      } catch {
+        if (!cancelled) {
+          setError(true);
         }
-        setError(true);
       }
     };
 

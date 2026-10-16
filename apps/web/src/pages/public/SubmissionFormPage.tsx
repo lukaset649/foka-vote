@@ -84,18 +84,10 @@ const SubmissionFormPage = () => {
           setContest(data);
         }
       })
-      .catch((err: unknown) => {
-        if (cancelled) {
-          return;
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(true);
         }
-        if (isUnauthorizedError(err)) {
-          void navigate(contestGatePath(slug, `/contest/${slug}/submit`), {
-            replace: true,
-            state: draft,
-          });
-          return;
-        }
-        setLoadError(true);
       });
 
     return () => {

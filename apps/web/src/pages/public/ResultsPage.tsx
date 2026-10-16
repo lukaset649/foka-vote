@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
-import { isUnauthorizedError } from '../../services/apiClient';
-import { contestGatePath, fetchContest } from '../../services/contests';
+import { fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
 import PageHeader from '../../components/ui/PageHeader';
@@ -62,11 +61,10 @@ const ResultsPage = () => {
           }
         });
       })
-      .catch((err: unknown) => {
-        if (cancelled) {
-          return;
+      .catch(() => {
+        if (!cancelled) {
+          setError(true);
         }
-        setError(true);
       });
 
     return () => {
