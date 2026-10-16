@@ -78,6 +78,7 @@
       "photosHeading": "Photos (up to {{max}})",
       "photoLegend": "Photo {{index}}",
       "addAnotherPhoto": "Add another photo",
+      "rulesLabel": "I accept the <rulesLink>gallery rules</rulesLink>.",
       "submit": "Add photos",
       "errors": {
         "nameRequired": "First and last name are required",
@@ -378,6 +379,56 @@
           "heading": "§6 Final provisions",
           "items": [
             "The Organizer reserves the right to exclude entries that violate these rules or applicable law.",
+            "Matters not covered by these rules are decided by the Organizer."
+          ]
+        }
+      ]
+    },
+    "albumRulesModal": {
+      "title": "Gallery rules of the FO-KA Photography and Graphics Student Society",
+      "sections": [
+        {
+          "heading": "§1 General provisions",
+          "items": [
+            "The gallery is run by the FO-KA Photography and Graphics Student Society, operating at the University of the National Education Commission in Krakow (UKEN), hereinafter referred to as the \"Organizer\".",
+            "An album is a set of photographs presented in the Society's application. Albums are created by the Organizer, and photos are sent to them by participants.",
+            "Sending photos is voluntary and free of charge. An album is not a contest: photos are neither judged nor voted on."
+          ]
+        },
+        {
+          "heading": "§2 Conditions for sending photos",
+          "items": [
+            "Sending photos requires providing a first and last name and accepting these rules.",
+            "The participant declares that the submitted photographs are their own original work and do not infringe the rights of third parties, including copyright and image rights.",
+            "If an album is protected by an access code, photos may only be sent by a person who received the code from the Organizer. The code must not be passed on."
+          ]
+        },
+        {
+          "heading": "§3 Publication of photos",
+          "items": [
+            "Submitted photos are published in the album immediately, without prior approval.",
+            "An album is visible to anyone who opens the gallery in the application.",
+            "Once a photo has been sent, only an administrator can change its caption or remove it. Such a request should be reported to the Organizer."
+          ]
+        },
+        {
+          "heading": "§4 Copyright and license",
+          "items": [
+            "The participant retains full copyright to the submitted photographs.",
+            "By sending photos, the participant grants the Organizer a free, non-exclusive license to use them in the gallery of the application, on the Society's website and social media, for purposes related to the activity and documentation of the Society."
+          ]
+        },
+        {
+          "heading": "§5 Personal data and publication of authorship",
+          "items": [
+            "The participant agrees to the publication of their first and last name next to every photo they send. An album has no nicknames and no period of anonymity: authorship is visible from the moment a photo is added.",
+            "The Organizer is the administrator of participants' personal data. Data is processed solely for the purpose of running the gallery in accordance with these rules."
+          ]
+        },
+        {
+          "heading": "§6 Final provisions",
+          "items": [
+            "The Organizer reserves the right to remove photos that violate these rules or applicable law, and to hide an album.",
             "Matters not covered by these rules are decided by the Organizer."
           ]
         }

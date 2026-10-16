@@ -78,6 +78,7 @@
       "photosHeading": "Zdjęcia (maksymalnie {{max}})",
       "photoLegend": "Zdjęcie {{index}}",
       "addAnotherPhoto": "Dodaj kolejne zdjęcie",
+      "rulesLabel": "Akceptuję <rulesLink>regulamin galerii</rulesLink>.",
       "submit": "Dodaj zdjęcia",
       "errors": {
         "nameRequired": "Imię i nazwisko są wymagane",
@@ -390,6 +391,56 @@
           "heading": "§6 Postanowienia końcowe",
           "items": [
             "Organizator zastrzega sobie prawo do wykluczenia zgłoszeń naruszających niniejszy regulamin lub obowiązujące przepisy prawa.",
+            "W sprawach nieuregulowanych decyzje podejmuje Organizator."
+          ]
+        }
+      ]
+    },
+    "albumRulesModal": {
+      "title": "Regulamin galerii Koła Naukowego Fotografii i Grafiki FO-KA",
+      "sections": [
+        {
+          "heading": "§1 Postanowienia ogólne",
+          "items": [
+            "Galerię prowadzi Koło Naukowe Fotografii i Grafiki FO-KA, działające przy Uniwersytecie Komisji Edukacji Narodowej w Krakowie (UKEN), zwane dalej „Organizatorem”.",
+            "Album jest zbiorem fotografii prezentowanym w aplikacji Koła. Albumy zakłada Organizator, a zdjęcia przesyłają do nich uczestnicy.",
+            "Przesyłanie zdjęć jest dobrowolne i bezpłatne. Album nie jest konkursem: zdjęcia nie są oceniane ani poddawane głosowaniu."
+          ]
+        },
+        {
+          "heading": "§2 Warunki przesłania zdjęć",
+          "items": [
+            "Warunkiem przesłania zdjęć jest podanie imienia i nazwiska oraz akceptacja niniejszego regulaminu.",
+            "Uczestnik oświadcza, że przesłane fotografie są jego autorskimi pracami i nie naruszają praw osób trzecich, w tym praw autorskich i praw do wizerunku.",
+            "Jeżeli album jest zabezpieczony kodem dostępu, zdjęcia może przesłać wyłącznie osoba, która otrzymała kod od Organizatora. Kodu nie należy przekazywać dalej."
+          ]
+        },
+        {
+          "heading": "§3 Publikacja zdjęć",
+          "items": [
+            "Przesłane zdjęcia są publikowane w albumie od razu, bez wcześniejszego zatwierdzenia.",
+            "Album jest widoczny dla każdego, kto otworzy galerię w aplikacji.",
+            "Po przesłaniu zdjęcia zmianę podpisu lub jego usunięcie może wykonać wyłącznie administrator. Prośbę w tej sprawie należy zgłosić Organizatorowi."
+          ]
+        },
+        {
+          "heading": "§4 Prawa autorskie i licencja",
+          "items": [
+            "Uczestnik zachowuje pełnię praw autorskich do przesłanych fotografii.",
+            "Przesyłając zdjęcia, uczestnik udziela Organizatorowi nieodpłatnej, niewyłącznej licencji na wykorzystanie ich w galerii aplikacji, na stronie internetowej oraz w mediach społecznościowych Koła, w celach związanych z działalnością i dokumentacją Koła."
+          ]
+        },
+        {
+          "heading": "§5 Dane osobowe i publikacja autorstwa",
+          "items": [
+            "Uczestnik wyraża zgodę na publikację swojego imienia i nazwiska przy każdym przesłanym zdjęciu. W albumie nie ma pseudonimów ani okresu anonimowości: autorstwo jest widoczne od chwili dodania zdjęcia.",
+            "Administratorem danych osobowych uczestników jest Organizator. Dane przetwarzane są wyłącznie w celu prowadzenia galerii zgodnie z niniejszym regulaminem."
+          ]
+        },
+        {
+          "heading": "§6 Postanowienia końcowe",
+          "items": [
+            "Organizator zastrzega sobie prawo do usunięcia zdjęć naruszających niniejszy regulamin lub obowiązujące przepisy prawa, a także do ukrycia albumu.",
             "W sprawach nieuregulowanych decyzje podejmuje Organizator."
           ]
         }

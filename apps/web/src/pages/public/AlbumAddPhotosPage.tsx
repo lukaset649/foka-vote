@@ -6,7 +6,7 @@ import type { AlbumDetailDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { addAlbumPhotos, albumGatePath, fetchAlbum } from '../../services/gallery';
-import ContestRulesModal from '../../components/ContestRulesModal';
+import RulesModal from '../../components/RulesModal';
 import Alert from '../../components/ui/Alert';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -275,7 +275,7 @@ const AlbumAddPhotosPage = () => {
         />
         <span>
           <Trans
-            i18nKey="pages.submissionForm.rulesLabel"
+            i18nKey="pages.albumAddPhotos.rulesLabel"
             components={{
               rulesLink: (
                 <button
@@ -289,7 +289,7 @@ const AlbumAddPhotosPage = () => {
         </span>
       </label>
 
-      <ContestRulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} />
+      <RulesModal variant="album" open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} />
 
       <div className="flex flex-wrap justify-between gap-3">
         <LinkButton to={albumPath} variant="secondaryDanger">
