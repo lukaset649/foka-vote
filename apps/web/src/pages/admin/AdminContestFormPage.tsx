@@ -19,6 +19,7 @@ import Label from '../../components/ui/Label';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
+import useConfirm from '../../lib/useConfirm';
 
 function toDateTimeLocalValue(iso: string): string {
   const date = new Date(iso);
@@ -68,6 +69,7 @@ function toFormState(contest: AdminContestDto): FormState {
 
 const AdminContestFormPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const { id } = useParams();
   const isEditing = id !== undefined;
   const navigate = useNavigate();
@@ -139,19 +141,25 @@ const AdminContestFormPage = () => {
     void submit();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!id || !contest) {
       return;
     }
-    if (!window.confirm(t('pages.adminContestsList.confirmDelete', { title: contest.title }))) {
+    const confirmed = await confirm({
+      message: t('pages.adminContestsList.confirmDelete', { title: contest.title }),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
     setDeleting(true);
+    setError(null);
     deleteContest(id)
       .then(() => navigate('/admin/contests'))
       .catch(() => {
-        window.alert(t('pages.adminContestsList.deleteFailed'));
+        setError(t('pages.adminContestsList.deleteFailed'));
         setDeleting(false);
       });
   };
@@ -218,9 +226,11 @@ const AdminContestFormPage = () => {
                 <ContestPhaseActions
                   contest={contest}
                   onUpdated={(updated) => {
+                    setError(null);
                     setContest(updated);
                     setForm(toFormState(updated));
                   }}
+                  onError={setError}
                 />
               </div>
             )}
@@ -314,7 +324,7 @@ const AdminContestFormPage = () => {
             <Button
               type="button"
               variant="danger"
-              onClick={handleDelete}
+              onClick={() => void handleDelete()}
               disabled={deleting}
               aria-label={t('pages.adminContestForm.deleteContest')}
             >
@@ -329,6 +339,8 @@ const AdminContestFormPage = () => {
           </Button>
         </div>
       </ActionBar>
+
+      {confirmDialog}
     </form>
   );
 };

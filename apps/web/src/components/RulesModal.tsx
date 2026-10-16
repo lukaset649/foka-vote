@@ -7,15 +7,30 @@ interface RulesSection {
   items: string[];
 }
 
-interface ContestRulesModalProps {
+type RulesVariant = 'contest' | 'album';
+
+const I18N_KEYS = {
+  contest: {
+    title: 'components.contestRulesModal.title',
+    sections: 'components.contestRulesModal.sections',
+  },
+  album: {
+    title: 'components.albumRulesModal.title',
+    sections: 'components.albumRulesModal.sections',
+  },
+} as const;
+
+interface RulesModalProps {
+  variant: RulesVariant;
   open: boolean;
   onClose: () => void;
 }
 
-const ContestRulesModal = ({ open, onClose }: ContestRulesModalProps) => {
+const RulesModal = ({ variant, open, onClose }: RulesModalProps) => {
   const { t } = useTranslation();
+  const keys = I18N_KEYS[variant];
 
-  const sections = t('components.contestRulesModal.sections', {
+  const sections = t(keys.sections, {
     returnObjects: true,
   }) as RulesSection[];
 
@@ -23,12 +38,12 @@ const ContestRulesModal = ({ open, onClose }: ContestRulesModalProps) => {
     <Modal
       open={open}
       onClose={onClose}
-      ariaLabelledBy="contest-rules-title"
+      ariaLabelledBy="rules-modal-title"
       className="flex max-h-[85vh] max-w-lg flex-col overflow-hidden"
     >
       <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-4">
-        <h2 id="contest-rules-title" className="text-lg font-semibold text-zinc-900">
-          {t('components.contestRulesModal.title')}
+        <h2 id="rules-modal-title" className="text-lg font-semibold text-zinc-900">
+          {t(keys.title)}
         </h2>
         <button
           type="button"
@@ -62,4 +77,4 @@ const ContestRulesModal = ({ open, onClose }: ContestRulesModalProps) => {
   );
 };
 
-export default ContestRulesModal;
+export default RulesModal;

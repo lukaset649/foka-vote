@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 
 import Layout from './components/Layout';
 import RequireAdmin from './components/RequireAdmin';
+import AdminNav from './components/AdminNav';
 import ContestsListPage from './pages/public/ContestsListPage';
 import ContestPage from './pages/public/ContestPage';
 import AccessGatePage from './pages/public/AccessGatePage';
@@ -9,6 +10,10 @@ import SubmissionFormPage from './pages/public/SubmissionFormPage';
 import SubmissionPreviewPage from './pages/public/SubmissionPreviewPage';
 import SubmissionConfirmationPage from './pages/public/SubmissionConfirmationPage';
 import GalleryPage from './pages/public/GalleryPage';
+import GalleryAlbumsPage from './pages/public/GalleryAlbumsPage';
+import AlbumPage from './pages/public/AlbumPage';
+import AlbumGatePage from './pages/public/AlbumGatePage';
+import AlbumAddPhotosPage from './pages/public/AlbumAddPhotosPage';
 import VoteCardPage from './pages/public/VoteCardPage';
 import VoteConfirmationPage from './pages/public/VoteConfirmationPage';
 import ResultsPage from './pages/public/ResultsPage';
@@ -17,6 +22,9 @@ import AdminContestsListPage from './pages/admin/AdminContestsListPage';
 import AdminContestFormPage from './pages/admin/AdminContestFormPage';
 import AdminSubmissionsPage from './pages/admin/AdminSubmissionsPage';
 import AdminSubmissionEditPage from './pages/admin/AdminSubmissionEditPage';
+import AdminGalleryPage from './pages/admin/AdminGalleryPage';
+import AdminAlbumFormPage from './pages/admin/AdminAlbumFormPage';
+import AdminAlbumPhotosPage from './pages/admin/AdminAlbumPhotosPage';
 
 export interface RouteHandle {
   wide?: boolean;
@@ -27,6 +35,10 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '/', element: <ContestsListPage /> },
+      { path: '/gallery', element: <GalleryAlbumsPage /> },
+      { path: '/gallery/:slug', element: <AlbumPage /> },
+      { path: '/gallery/:slug/gate', element: <AlbumGatePage /> },
+      { path: '/gallery/:slug/add-photos', element: <AlbumAddPhotosPage /> },
       { path: '/contest/:slug', element: <ContestPage /> },
       { path: '/contest/:slug/gate', element: <AccessGatePage /> },
       { path: '/contest/:slug/submit', element: <SubmissionFormPage /> },
@@ -41,7 +53,13 @@ export const router = createBrowserRouter([
       {
         element: <RequireAdmin />,
         children: [
-          { path: '/admin/contests', element: <AdminContestsListPage /> },
+          {
+            element: <AdminNav />,
+            children: [
+              { path: '/admin/contests', element: <AdminContestsListPage /> },
+              { path: '/admin/gallery', element: <AdminGalleryPage /> },
+            ],
+          },
           { path: '/admin/contests/new', element: <AdminContestFormPage /> },
           { path: '/admin/contests/:id', element: <AdminContestFormPage /> },
           {
@@ -53,6 +71,9 @@ export const router = createBrowserRouter([
             path: '/admin/contests/:id/submissions/:submissionId',
             element: <AdminSubmissionEditPage />,
           },
+          { path: '/admin/gallery/albums/new', element: <AdminAlbumFormPage /> },
+          { path: '/admin/gallery/albums/:id', element: <AdminAlbumFormPage /> },
+          { path: '/admin/gallery/albums/:id/photos', element: <AdminAlbumPhotosPage /> },
         ],
       },
     ],

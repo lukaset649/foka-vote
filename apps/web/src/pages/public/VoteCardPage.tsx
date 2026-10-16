@@ -168,7 +168,7 @@ const VoteCardPage = () => {
                     <span className="font-semibold">
                       {weight} {t('common.points')}
                     </span>
-                    <span>{submission ? submission.alias : '—'}</span>
+                    <span>{submission ? submission.alias : '-'}</span>
                   </li>
                 );
               })}

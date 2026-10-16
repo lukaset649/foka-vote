@@ -6,7 +6,7 @@ import { errorMessage } from '../../lib/errorMessage';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
-import ContestRulesModal from '../../components/ContestRulesModal';
+import RulesModal from '../../components/RulesModal';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -84,18 +84,10 @@ const SubmissionFormPage = () => {
           setContest(data);
         }
       })
-      .catch((err: unknown) => {
-        if (cancelled) {
-          return;
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(true);
         }
-        if (isUnauthorizedError(err)) {
-          void navigate(contestGatePath(slug, `/contest/${slug}/submit`), {
-            replace: true,
-            state: draft,
-          });
-          return;
-        }
-        setLoadError(true);
       });
 
     return () => {
@@ -375,7 +367,11 @@ const SubmissionFormPage = () => {
         </span>
       </label>
 
-      <ContestRulesModal open={rulesModalOpen} onClose={() => setRulesModalOpen(false)} />
+      <RulesModal
+        variant="contest"
+        open={rulesModalOpen}
+        onClose={() => setRulesModalOpen(false)}
+      />
 
       <div className="flex flex-wrap justify-between gap-3">
         <LinkButton to={`/contest/${slug}`} variant="secondaryDanger">

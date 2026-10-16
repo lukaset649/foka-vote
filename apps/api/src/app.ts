@@ -31,7 +31,7 @@ export function createApp(): Express {
   app.use(requestLogger);
 
   // In production nginx serves /media/ directly from disk (see nginx location block),
-  // so this Express route only ever runs cross-origin, in dev — CORP must allow that.
+  // so this Express route only ever runs cross-origin in dev, which CORP must allow.
   app.use(
     MEDIA_URL_PREFIX,
     (_request: Request, response: Response, next: NextFunction) => {

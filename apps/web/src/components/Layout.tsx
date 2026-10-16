@@ -11,7 +11,8 @@ import LanguageSwitcher from './ui/LanguageSwitcher';
 import LinkButton from './ui/LinkButton';
 
 export const NAV_ITEMS = [
-  { to: '/', labelKey: 'nav.voting' },
+  { to: '/', labelKey: 'nav.contests' },
+  { to: '/gallery', labelKey: 'nav.gallery' },
   { to: '/admin', labelKey: 'nav.admin' },
 ] as const;
 

@@ -25,6 +25,19 @@ const Modal = ({ open, onClose, children, className, ariaLabelledBy }: ModalProp
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open || !onClose) {
+      return;
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }

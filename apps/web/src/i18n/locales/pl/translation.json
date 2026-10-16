@@ -1,10 +1,11 @@
 {
   "nav": {
-    "voting": "Głosowanie",
+    "contests": "Konkursy",
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
+    "gallery": "Galeria",
     "install": "Zainstaluj",
     "installApp": "Zainstaluj aplikację"
   },
@@ -19,6 +20,8 @@
       "results": "Wyniki"
     },
     "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "confirmTitle": "Potwierdzenie",
     "descriptionOptional": "Opis (opcjonalnie)",
     "titleOptional": "Tytuł (opcjonalnie)",
     "remove": "Usuń",
@@ -53,6 +56,38 @@
       "noContestsYet": "Brak konkursów",
       "failedToLoad": "Nie udało się wczytać konkursów"
     },
+    "galleryAlbums": {
+      "title": "Galeria",
+      "noAlbumsYet": "Brak albumów",
+      "failedToLoad": "Nie udało się wczytać galerii"
+    },
+    "album": {
+      "title": "Album",
+      "backToGallery": "Powrót do galerii",
+      "addPhotos": "Dodaj zdjęcia",
+      "noPhotosYet": "W tym albumie nie ma jeszcze zdjęć",
+      "photoBy": "autor: {{author}}",
+      "notFound": "Taki album nie istnieje",
+      "failedToLoad": "Nie udało się wczytać albumu"
+    },
+    "albumAddPhotos": {
+      "title": "Dodaj zdjęcia",
+      "heading": "Dodaj zdjęcia: {{title}}",
+      "backToAlbum": "Powrót do albumu",
+      "infoNamePublished": "Twoje imię i nazwisko zostaną opublikowane przy każdym dodanym zdjęciu.",
+      "firstNameLabel": "Imię",
+      "lastNameLabel": "Nazwisko",
+      "photosHeading": "Zdjęcia (maksymalnie {{max}})",
+      "photoLegend": "Zdjęcie {{index}}",
+      "addAnotherPhoto": "Dodaj kolejne zdjęcie",
+      "rulesLabel": "Akceptuję <rulesLink>regulamin galerii</rulesLink>.",
+      "submit": "Dodaj zdjęcia",
+      "errors": {
+        "nameRequired": "Imię i nazwisko są wymagane",
+        "photoRequired": "Dodaj przynajmniej jedno zdjęcie",
+        "rulesRequired": "Musisz zaakceptować regulamin, aby wysłać zdjęcia"
+      }
+    },
     "contest": {
       "failedToLoad": "Nie udało się wczytać konkursu"
     },
@@ -63,7 +98,7 @@
       "invalidCode": "Nieprawidłowy kod dostępu"
     },
     "submissionForm": {
-      "heading": "Zgłoś swoją pracę — {{title}}",
+      "heading": "Zgłoś swoją pracę: {{title}}",
       "infoNamePublished": "Twoje imię i nazwisko zostanie opublikowane przy zgłoszeniu po zakończeniu głosowania.",
       "infoAliasAfter": "Do tego czasu wyświetlany będzie losowy pseudonim.",
       "infoAdminOnly": "Po wysłaniu zgłoszenia zmiany może wprowadzić już tylko administrator.",
@@ -103,10 +138,11 @@
       "submittedUnder": "Twoja praca została zgłoszona pod pseudonimem <strong>{{alias}}</strong>."
     },
     "gallery": {
+      "heading": "Galeria: {{title}}",
       "failedToLoad": "Nie udało się wczytać galerii"
     },
     "voteCard": {
-      "heading": "Głosuj — {{title}}",
+      "heading": "Głosuj: {{title}}",
       "failedToLoad": "Nie udało się wczytać karty do głosowania",
       "notEnoughSubmissions": "Za mało zgłoszeń, aby móc głosować.",
       "slots": "Miejsca",
@@ -121,7 +157,7 @@
       "recorded": "Twoja karta do głosowania została zapisana. Nie można jej już zmienić."
     },
     "results": {
-      "heading": "Wyniki — {{title}}",
+      "heading": "Wyniki: {{title}}",
       "failedToLoad": "Nie udało się wczytać wyników",
       "votingInProgress": "Głosowanie trwa. Wyniki zostaną ujawnione po jego zakończeniu.",
       "availableFrom": "Wyniki będą dostępne po rozpoczęciu głosowania, {{date}}.",
@@ -129,7 +165,7 @@
       "voteCardsCast_few": "{{count}} oddane karty do głosowania",
       "voteCardsCast_many": "{{count}} oddanych kart do głosowania",
       "voteCardsCast_other": "{{count}} oddanej karty do głosowania",
-      "stillInProgress": "Głosowanie wciąż trwa — wyniki mogą się zmienić przed zakończeniem konkursu.",
+      "stillInProgress": "Głosowanie wciąż trwa, wyniki mogą się zmienić przed zakończeniem konkursu.",
       "tablePlace": "Miejsce",
       "tableAuthor": "Autor",
       "tablePoints": "Punkty",
@@ -148,6 +184,22 @@
       "confirmDelete": "Usunąć „{{title}}”? To trwale usunie wszystkie jego zgłoszenia, prace i głosy.",
       "deleteFailed": "Nie udało się usunąć konkursu",
       "submissionsAndVoteCards": "Zgłoszenia i karty do głosowania"
+    },
+    "adminGallery": {
+      "title": "Galeria",
+      "accessCodeLabel": "Kod dostępu do wysyłania zdjęć (opcjonalnie)",
+      "accessCodePlaceholder": "Brak kodu: każdy może wysłać zdjęcia",
+      "accessCodeHint": "Wymagany przy wysyłaniu zdjęć do tego albumu. Puste pole oznacza, że każdy może dodać zdjęcia.",
+      "hide": "Ukryj",
+      "show": "Pokaż",
+      "hiddenBadge": "Ukryty",
+      "editContest": "Edytuj konkurs",
+      "confirmDelete": "Usunąć album \"{{title}}\"? Trwale usuwa album wraz ze wszystkimi zdjęciami.",
+      "newAlbumHeading": "Nowy album",
+      "titleLabel": "Nazwa albumu",
+      "createAlbum": "Utwórz album",
+      "codeBadge": "Kod: {{code}}",
+      "photos": "Zdjęcia"
     },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",
@@ -198,10 +250,11 @@
       "valid": "ważna",
       "restore": "Przywróć",
       "void": "Unieważnij",
-      "voidReasonPrompt": "Powód (opcjonalnie)"
+      "voidReasonPrompt": "Powód (opcjonalnie)",
+      "confirmVoid": "Unieważnić tę kartę do głosowania? Przestanie się liczyć do wyników."
     },
     "adminSubmissionEdit": {
-      "heading": "Edytuj zgłoszenie — {{alias}}",
+      "heading": "Edytuj zgłoszenie: {{alias}}",
       "backToSubmissions": "Powrót do zgłoszeń",
       "author": "Autor",
       "saveData": "Zapisz dane",
@@ -212,6 +265,24 @@
       "confirmDeleteArtwork": "Usunąć tę pracę?",
       "replacementFileSr": "Plik zastępczy",
       "replace": "Zastąp"
+    },
+    "albumGate": {
+      "title": "Wymagany kod dostępu",
+      "codeLabel": "Kod dostępu do albumu",
+      "submit": "Wejdź",
+      "invalidCode": "Nieprawidłowy kod dostępu"
+    },
+    "adminAlbumForm": {
+      "editAlbum": "Edytuj album",
+      "backToGallery": "Powrót do panelu galerii",
+      "deleteAlbum": "Usuń album",
+      "slugLocked": "Adres: /gallery/{{slug}} (bez możliwości zmiany)"
+    },
+    "adminAlbumPhotos": {
+      "heading": "Zdjęcia: {{title}}",
+      "backToAlbum": "Powrót do albumu",
+      "photosHeading": "Zdjęcia",
+      "confirmDeletePhoto": "Usunąć to zdjęcie? Plik zostanie też skasowany z dysku."
     }
   },
   "components": {
@@ -252,10 +323,29 @@
       "viewGallery": "Zobacz galerię",
       "noSubmissionsYet": "Brak zgłoszeń"
     },
+    "albumCard": {
+      "kind": {
+        "CONTEST": "Konkurs",
+        "STANDALONE": "Album"
+      },
+      "viewAlbum": "Zobacz album",
+      "createdOn": "Utworzono {{date}}",
+      "submissionsCount_one": "{{count}} zgłoszenie",
+      "submissionsCount_few": "{{count}} zgłoszenia",
+      "submissionsCount_many": "{{count}} zgłoszeń",
+      "submissionsCount_other": "{{count}} zgłoszenia",
+      "photosCount_one": "{{count}} zdjęcie",
+      "photosCount_few": "{{count}} zdjęcia",
+      "photosCount_many": "{{count}} zdjęć",
+      "photosCount_other": "{{count}} zdjęcia",
+      "noPhotosYet": "Brak zdjęć",
+      "accessCodeRequired": "Ten konkurs jest chroniony kodem dostępu",
+      "enterAccessCode": "Wpisz kod"
+    },
     "contestResultsCard": {
       "viewResults": "Zobacz wyniki",
       "noVotesYet": "Brak oddanych głosów",
-      "showingTopOf": "Pokazano najlepsze {{shown}} z {{total}} wyników — pełna klasyfikacja jest dostępna na stronie wyników."
+      "showingTopOf": "Pokazano najlepsze {{shown}} z {{total}} wyników, pełna klasyfikacja jest dostępna na stronie wyników."
     },
     "artworkLightbox": {
       "defaultAlt": "Praca"
@@ -296,7 +386,7 @@
           "heading": "§5 Dane osobowe i publikacja autorstwa",
           "items": [
             "Uczestnik wyraża zgodę na publikację swojego imienia i nazwiska jako autora zgłoszonej pracy po zakończeniu konkursu (zakończeniu głosowania).",
-            "Do czasu zakończenia głosowania dane osobowe uczestnika nie są publicznie ujawniane — prezentowany jest wyłącznie pseudonim.",
+            "Do czasu zakończenia głosowania dane osobowe uczestnika nie są publicznie ujawniane: prezentowany jest wyłącznie pseudonim.",
             "Administratorem danych osobowych uczestników jest Organizator. Dane przetwarzane są wyłącznie w celu przeprowadzenia konkursu i publikacji wyników zgodnie z niniejszym regulaminem."
           ]
         },
@@ -304,6 +394,56 @@
           "heading": "§6 Postanowienia końcowe",
           "items": [
             "Organizator zastrzega sobie prawo do wykluczenia zgłoszeń naruszających niniejszy regulamin lub obowiązujące przepisy prawa.",
+            "W sprawach nieuregulowanych decyzje podejmuje Organizator."
+          ]
+        }
+      ]
+    },
+    "albumRulesModal": {
+      "title": "Regulamin galerii Koła Naukowego Fotografii i Grafiki FO-KA",
+      "sections": [
+        {
+          "heading": "§1 Postanowienia ogólne",
+          "items": [
+            "Galerię prowadzi Koło Naukowe Fotografii i Grafiki FO-KA, działające przy Uniwersytecie Komisji Edukacji Narodowej w Krakowie (UKEN), zwane dalej „Organizatorem”.",
+            "Album jest zbiorem fotografii prezentowanym w aplikacji Koła. Albumy zakłada Organizator, a zdjęcia przesyłają do nich uczestnicy.",
+            "Przesyłanie zdjęć jest dobrowolne i bezpłatne. Album nie jest konkursem: zdjęcia nie są oceniane ani poddawane głosowaniu."
+          ]
+        },
+        {
+          "heading": "§2 Warunki przesłania zdjęć",
+          "items": [
+            "Warunkiem przesłania zdjęć jest podanie imienia i nazwiska oraz akceptacja niniejszego regulaminu.",
+            "Uczestnik oświadcza, że przesłane fotografie są jego autorskimi pracami i nie naruszają praw osób trzecich, w tym praw autorskich i praw do wizerunku.",
+            "Jeżeli album jest zabezpieczony kodem dostępu, zdjęcia może przesłać wyłącznie osoba, która otrzymała kod od Organizatora. Kodu nie należy przekazywać dalej."
+          ]
+        },
+        {
+          "heading": "§3 Publikacja zdjęć",
+          "items": [
+            "Przesłane zdjęcia są publikowane w albumie od razu, bez wcześniejszego zatwierdzenia.",
+            "Album jest widoczny dla każdego, kto otworzy galerię w aplikacji.",
+            "Po przesłaniu zdjęcia zmianę podpisu lub jego usunięcie może wykonać wyłącznie administrator. Prośbę w tej sprawie należy zgłosić Organizatorowi."
+          ]
+        },
+        {
+          "heading": "§4 Prawa autorskie i licencja",
+          "items": [
+            "Uczestnik zachowuje pełnię praw autorskich do przesłanych fotografii.",
+            "Przesyłając zdjęcia, uczestnik udziela Organizatorowi nieodpłatnej, niewyłącznej licencji na wykorzystanie ich w galerii aplikacji, na stronie internetowej oraz w mediach społecznościowych Koła, w celach związanych z działalnością i dokumentacją Koła."
+          ]
+        },
+        {
+          "heading": "§5 Dane osobowe i publikacja autorstwa",
+          "items": [
+            "Uczestnik wyraża zgodę na publikację swojego imienia i nazwiska przy każdym przesłanym zdjęciu. W albumie nie ma pseudonimów ani okresu anonimowości: autorstwo jest widoczne od chwili dodania zdjęcia.",
+            "Administratorem danych osobowych uczestników jest Organizator. Dane przetwarzane są wyłącznie w celu prowadzenia galerii zgodnie z niniejszym regulaminem."
+          ]
+        },
+        {
+          "heading": "§6 Postanowienia końcowe",
+          "items": [
+            "Organizator zastrzega sobie prawo do usunięcia zdjęć naruszających niniejszy regulamin lub obowiązujące przepisy prawa, a także do ukrycia albumu.",
             "W sprawach nieuregulowanych decyzje podejmuje Organizator."
           ]
         }

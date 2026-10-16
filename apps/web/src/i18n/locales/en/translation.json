@@ -1,10 +1,11 @@
 {
   "nav": {
-    "voting": "Voting",
+    "contests": "Contests",
     "admin": "Admin",
     "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "gallery": "Gallery",
     "install": "Install",
     "installApp": "Install app"
   },
@@ -19,6 +20,8 @@
       "results": "Results"
     },
     "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirmTitle": "Confirmation",
     "descriptionOptional": "Description (optional)",
     "titleOptional": "Title (optional)",
     "remove": "Remove",
@@ -53,6 +56,38 @@
       "noContestsYet": "No contests yet",
       "failedToLoad": "Failed to load contests"
     },
+    "galleryAlbums": {
+      "title": "Gallery",
+      "noAlbumsYet": "No albums yet",
+      "failedToLoad": "Failed to load the gallery"
+    },
+    "album": {
+      "title": "Album",
+      "backToGallery": "Back to the gallery",
+      "addPhotos": "Add photos",
+      "noPhotosYet": "No photos in this album yet",
+      "photoBy": "by {{author}}",
+      "notFound": "This album does not exist",
+      "failedToLoad": "Failed to load the album"
+    },
+    "albumAddPhotos": {
+      "title": "Add photos",
+      "heading": "Add photos: {{title}}",
+      "backToAlbum": "Back to the album",
+      "infoNamePublished": "Your first and last name will be published next to every photo you add.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "photosHeading": "Photos (up to {{max}})",
+      "photoLegend": "Photo {{index}}",
+      "addAnotherPhoto": "Add another photo",
+      "rulesLabel": "I accept the <rulesLink>gallery rules</rulesLink>.",
+      "submit": "Add photos",
+      "errors": {
+        "nameRequired": "First and last name are required",
+        "photoRequired": "Attach at least one photo",
+        "rulesRequired": "You must accept the rules to send photos"
+      }
+    },
     "contest": {
       "failedToLoad": "Failed to load contest"
     },
@@ -63,7 +98,7 @@
       "invalidCode": "Invalid access code"
     },
     "submissionForm": {
-      "heading": "Submit your work — {{title}}",
+      "heading": "Submit your work: {{title}}",
       "infoNamePublished": "Your first and last name will be published next to your work once voting closes.",
       "infoAliasAfter": "Since then, the random alias will be displayed instead.",
       "infoAdminOnly": "After submitting, only the admin can make changes.",
@@ -103,10 +138,11 @@
       "submittedUnder": "Your work was submitted under the nickname <strong>{{alias}}</strong>."
     },
     "gallery": {
+      "heading": "Gallery: {{title}}",
       "failedToLoad": "Failed to load gallery"
     },
     "voteCard": {
-      "heading": "Vote — {{title}}",
+      "heading": "Vote: {{title}}",
       "failedToLoad": "Failed to load voting card",
       "notEnoughSubmissions": "Not enough submissions to vote on yet.",
       "slots": "Slots",
@@ -121,13 +157,13 @@
       "recorded": "Your vote card has been recorded. It cannot be changed."
     },
     "results": {
-      "heading": "Results — {{title}}",
+      "heading": "Results: {{title}}",
       "failedToLoad": "Failed to load results",
       "votingInProgress": "Voting is currently in progress. Results will be revealed once voting closes.",
       "availableFrom": "Results will be available once voting starts, on {{date}}.",
       "voteCardsCast_one": "{{count}} vote card cast",
       "voteCardsCast_other": "{{count}} vote cards cast",
-      "stillInProgress": "Voting is still in progress — standings may change before the contest closes.",
+      "stillInProgress": "Voting is still in progress, standings may change before the contest closes.",
       "tablePlace": "Place",
       "tableAuthor": "Author",
       "tablePoints": "Points",
@@ -146,6 +182,22 @@
       "confirmDelete": "Delete \"{{title}}\"? This permanently removes all its submissions, artworks and votes.",
       "deleteFailed": "Failed to delete the contest",
       "submissionsAndVoteCards": "Submissions & vote cards"
+    },
+    "adminGallery": {
+      "title": "Gallery",
+      "accessCodeLabel": "Access code for sending photos (optional)",
+      "accessCodePlaceholder": "No code: anyone can send photos",
+      "accessCodeHint": "Required to send photos to this album. Leave empty to let anyone add photos.",
+      "hide": "Hide",
+      "show": "Show",
+      "hiddenBadge": "Hidden",
+      "editContest": "Edit contest",
+      "confirmDelete": "Delete \"{{title}}\"? This permanently removes the album and all its photos.",
+      "newAlbumHeading": "New album",
+      "titleLabel": "Album name",
+      "createAlbum": "Create album",
+      "codeBadge": "Code: {{code}}",
+      "photos": "Photos"
     },
     "adminContestForm": {
       "editContest": "Edit contest",
@@ -190,10 +242,11 @@
       "valid": "valid",
       "restore": "Restore",
       "void": "Void",
-      "voidReasonPrompt": "Reason (optional)"
+      "voidReasonPrompt": "Reason (optional)",
+      "confirmVoid": "Void this vote card? It will stop counting towards the results."
     },
     "adminSubmissionEdit": {
-      "heading": "Edit submission — {{alias}}",
+      "heading": "Edit submission: {{alias}}",
       "backToSubmissions": "Back to submissions",
       "author": "Author",
       "saveData": "Save data",
@@ -204,6 +257,24 @@
       "confirmDeleteArtwork": "Delete this artwork?",
       "replacementFileSr": "Replacement file",
       "replace": "Replace"
+    },
+    "albumGate": {
+      "title": "Access code required",
+      "codeLabel": "Album access code",
+      "submit": "Enter",
+      "invalidCode": "Invalid access code"
+    },
+    "adminAlbumForm": {
+      "editAlbum": "Edit album",
+      "backToGallery": "Back to the gallery panel",
+      "deleteAlbum": "Delete album",
+      "slugLocked": "Address: /gallery/{{slug}} (cannot be changed)"
+    },
+    "adminAlbumPhotos": {
+      "heading": "Photos: {{title}}",
+      "backToAlbum": "Back to the album",
+      "photosHeading": "Photos",
+      "confirmDeletePhoto": "Delete this photo? The file is removed from disk as well."
     }
   },
   "components": {
@@ -244,10 +315,25 @@
       "viewGallery": "View gallery",
       "noSubmissionsYet": "No submissions yet"
     },
+    "albumCard": {
+      "kind": {
+        "CONTEST": "Contest",
+        "STANDALONE": "Album"
+      },
+      "viewAlbum": "View album",
+      "createdOn": "Created {{date}}",
+      "submissionsCount_one": "{{count}} submission",
+      "submissionsCount_other": "{{count}} submissions",
+      "photosCount_one": "{{count}} photo",
+      "photosCount_other": "{{count}} photos",
+      "noPhotosYet": "No photos yet",
+      "accessCodeRequired": "This contest is protected with an access code",
+      "enterAccessCode": "Enter the code"
+    },
     "contestResultsCard": {
       "viewResults": "View results",
       "noVotesYet": "No votes cast yet",
-      "showingTopOf": "Showing the top {{shown}} of {{total}} results - see the full standings on the results page."
+      "showingTopOf": "Showing the top {{shown}} of {{total}} results, see the full standings on the results page."
     },
     "artworkLightbox": {
       "defaultAlt": "Artwork"
@@ -288,7 +374,7 @@
           "heading": "§5 Personal data and publication of authorship",
           "items": [
             "The participant agrees to the publication of their first and last name as the author of the submitted work after the contest ends (once voting closes).",
-            "Until voting closes, the participant's personal data is not publicly disclosed — only the nickname is displayed.",
+            "Until voting closes, the participant's personal data is not publicly disclosed: only the nickname is displayed.",
             "The Organizer is the administrator of participants' personal data. Data is processed solely for the purpose of running the contest and publishing results in accordance with these rules."
           ]
         },
@@ -296,6 +382,56 @@
           "heading": "§6 Final provisions",
           "items": [
             "The Organizer reserves the right to exclude entries that violate these rules or applicable law.",
+            "Matters not covered by these rules are decided by the Organizer."
+          ]
+        }
+      ]
+    },
+    "albumRulesModal": {
+      "title": "Gallery rules of the FO-KA Photography and Graphics Student Society",
+      "sections": [
+        {
+          "heading": "§1 General provisions",
+          "items": [
+            "The gallery is run by the FO-KA Photography and Graphics Student Society, operating at the University of the National Education Commission in Krakow (UKEN), hereinafter referred to as the \"Organizer\".",
+            "An album is a set of photographs presented in the Society's application. Albums are created by the Organizer, and photos are sent to them by participants.",
+            "Sending photos is voluntary and free of charge. An album is not a contest: photos are neither judged nor voted on."
+          ]
+        },
+        {
+          "heading": "§2 Conditions for sending photos",
+          "items": [
+            "Sending photos requires providing a first and last name and accepting these rules.",
+            "The participant declares that the submitted photographs are their own original work and do not infringe the rights of third parties, including copyright and image rights.",
+            "If an album is protected by an access code, photos may only be sent by a person who received the code from the Organizer. The code must not be passed on."
+          ]
+        },
+        {
+          "heading": "§3 Publication of photos",
+          "items": [
+            "Submitted photos are published in the album immediately, without prior approval.",
+            "An album is visible to anyone who opens the gallery in the application.",
+            "Once a photo has been sent, only an administrator can change its caption or remove it. Such a request should be reported to the Organizer."
+          ]
+        },
+        {
+          "heading": "§4 Copyright and license",
+          "items": [
+            "The participant retains full copyright to the submitted photographs.",
+            "By sending photos, the participant grants the Organizer a free, non-exclusive license to use them in the gallery of the application, on the Society's website and social media, for purposes related to the activity and documentation of the Society."
+          ]
+        },
+        {
+          "heading": "§5 Personal data and publication of authorship",
+          "items": [
+            "The participant agrees to the publication of their first and last name next to every photo they send. An album has no nicknames and no period of anonymity: authorship is visible from the moment a photo is added.",
+            "The Organizer is the administrator of participants' personal data. Data is processed solely for the purpose of running the gallery in accordance with these rules."
+          ]
+        },
+        {
+          "heading": "§6 Final provisions",
+          "items": [
+            "The Organizer reserves the right to remove photos that violate these rules or applicable law, and to hide an album.",
             "Matters not covered by these rules are decided by the Organizer."
           ]
         }

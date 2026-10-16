@@ -11,11 +11,14 @@ import LinkButton from '../../components/ui/LinkButton';
 import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
+import useConfirm from '../../lib/useConfirm';
 
 const AdminContestsListPage = () => {
   const { t } = useTranslation();
+  const { confirm, confirmDialog } = useConfirm();
   const [contests, setContests] = useState<AdminContestDto[] | null>(null);
-  const [error, setError] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,7 +32,7 @@ const AdminContestsListPage = () => {
       })
       .catch(() => {
         if (!cancelled) {
-          setError(true);
+          setLoadError(true);
         }
       });
 
@@ -38,18 +41,24 @@ const AdminContestsListPage = () => {
     };
   }, []);
 
-  const handleDelete = (contest: AdminContestDto) => {
-    if (!window.confirm(t('pages.adminContestsList.confirmDelete', { title: contest.title }))) {
+  const handleDelete = async (contest: AdminContestDto) => {
+    const confirmed = await confirm({
+      message: t('pages.adminContestsList.confirmDelete', { title: contest.title }),
+      confirmLabel: t('common.remove'),
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
 
     setDeletingId(contest.id);
+    setActionError(null);
     deleteContest(contest.id)
       .then(() => {
         setContests((prev) => prev?.filter((c) => c.id !== contest.id) ?? prev);
       })
       .catch(() => {
-        window.alert(t('pages.adminContestsList.deleteFailed'));
+        setActionError(t('pages.adminContestsList.deleteFailed'));
       })
       .finally(() => {
         setDeletingId(null);
@@ -58,15 +67,15 @@ const AdminContestsListPage = () => {
 
   return (
     <div>
-      <PageHeader title={t('pages.adminContestsList.title')}>
-        <LinkButton to="/admin/contests/new" variant="success" size="sm">
-          <i className="bi bi-plus-circle" aria-hidden="true" />
-          {t('pages.adminContestsList.newContest')}
-        </LinkButton>
-      </PageHeader>
+      <PageHeader title={t('pages.adminContestsList.title')} />
 
-      {error && <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>}
-      {!error && contests === null && <Spinner />}
+      {loadError && <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>}
+      {actionError && (
+        <Alert variant="error" className="mb-3">
+          {actionError}
+        </Alert>
+      )}
+      {!loadError && contests === null && <Spinner />}
       {contests !== null && contests.length === 0 && (
         <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />
       )}
@@ -85,11 +94,13 @@ const AdminContestsListPage = () => {
                 <div className="flex flex-col items-stretch gap-2 sm:items-end">
                   <ContestPhaseActions
                     contest={contest}
-                    onUpdated={(updated) =>
+                    onUpdated={(updated) => {
+                      setActionError(null);
                       setContests(
                         (prev) => prev?.map((c) => (c.id === updated.id ? updated : c)) ?? prev,
-                      )
-                    }
+                      );
+                    }}
+                    onError={setActionError}
                   />
                   <LinkButton
                     to={`/admin/contests/${contest.id}/submissions`}
@@ -112,7 +123,7 @@ const AdminContestsListPage = () => {
                     type="button"
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(contest)}
+                    onClick={() => void handleDelete(contest)}
                     disabled={deletingId === contest.id}
                     className="sm:w-28"
                   >
@@ -125,6 +136,8 @@ const AdminContestsListPage = () => {
           ))}
         </ul>
       )}
+
+      {confirmDialog}
     </div>
   );
 };
