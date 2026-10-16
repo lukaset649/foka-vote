@@ -65,7 +65,7 @@
       "addPhotos": "Dodaj zdjęcia",
       "noPhotosYet": "W tym albumie nie ma jeszcze zdjęć",
       "photoBy": "autor: {{author}}",
-      "notFound": "Taki album nie istnieje lub czeka na zatwierdzenie",
+      "notFound": "Taki album nie istnieje",
       "failedToLoad": "Nie udało się wczytać albumu"
     },
     "albumAddPhotos": {
@@ -78,7 +78,7 @@
       "photosHeading": "Zdjęcia (maksymalnie {{max}})",
       "photoLegend": "Zdjęcie {{index}}",
       "addAnotherPhoto": "Dodaj kolejne zdjęcie",
-      "submit": "Wyślij do zatwierdzenia",
+      "submit": "Dodaj zdjęcia",
       "errors": {
         "nameRequired": "Imię i nazwisko są wymagane",
         "photoRequired": "Dodaj przynajmniej jedno zdjęcie",
@@ -186,7 +186,7 @@
       "title": "Galeria",
       "accessCodeLabel": "Kod dostępu do wysyłania zdjęć (opcjonalnie)",
       "accessCodePlaceholder": "Brak kodu: każdy może wysłać zdjęcia",
-      "accessCodeHint": "Wymagany przy wysyłaniu zdjęć do tego albumu. Zdjęcia zawsze czekają na zatwierdzenie.",
+      "accessCodeHint": "Wymagany przy wysyłaniu zdjęć do tego albumu. Puste pole oznacza, że każdy może dodać zdjęcia.",
       "hide": "Ukryj",
       "show": "Pokaż",
       "hiddenBadge": "Ukryty",

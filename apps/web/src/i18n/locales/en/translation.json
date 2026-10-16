@@ -65,7 +65,7 @@
       "addPhotos": "Add photos",
       "noPhotosYet": "No photos in this album yet",
       "photoBy": "by {{author}}",
-      "notFound": "This album does not exist or is still waiting for approval",
+      "notFound": "This album does not exist",
       "failedToLoad": "Failed to load the album"
     },
     "albumAddPhotos": {
@@ -78,7 +78,7 @@
       "photosHeading": "Photos (up to {{max}})",
       "photoLegend": "Photo {{index}}",
       "addAnotherPhoto": "Add another photo",
-      "submit": "Send for approval",
+      "submit": "Add photos",
       "errors": {
         "nameRequired": "First and last name are required",
         "photoRequired": "Attach at least one photo",
@@ -184,7 +184,7 @@
       "title": "Gallery",
       "accessCodeLabel": "Access code for sending photos (optional)",
       "accessCodePlaceholder": "No code: anyone can send photos",
-      "accessCodeHint": "Required to send photos to this album. Photos always wait for approval.",
+      "accessCodeHint": "Required to send photos to this album. Leave empty to let anyone add photos.",
       "hide": "Hide",
       "show": "Show",
       "hiddenBadge": "Hidden",
