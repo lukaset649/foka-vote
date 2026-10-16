@@ -1,7 +1,7 @@
 import { mkdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
-export const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 export const ORIGINALS_DIR = path.join(UPLOADS_DIR, 'originals');
 export const VARIANTS_DIR = path.join(UPLOADS_DIR, 'variants');
 

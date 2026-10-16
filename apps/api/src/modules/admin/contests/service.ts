@@ -1,5 +1,3 @@
-import { unlink } from 'node:fs/promises';
-import path from 'node:path';
 import {
   DEFAULT_MAX_ARTWORKS_PER_SUBMISSION,
   MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
@@ -10,7 +8,7 @@ import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
-import { UPLOADS_DIR } from '../../../lib/storage.js';
+import { removeStoredFiles } from '../../../lib/storage.js';
 
 function toAdminContestDto(contest: Contest): AdminContestDto {
   const status = computeContestStatus(new Date(), contest);
@@ -179,9 +177,7 @@ export async function deleteContest(id: string): Promise<void> {
   // files on disk need explicit cleanup.
   await prisma.contest.delete({ where: { id } });
 
-  await Promise.all(
-    artworks
-      .flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath])
-      .map((relativePath) => unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined)),
+  await removeStoredFiles(
+    artworks.flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath]),
   );
 }

@@ -1,5 +1,3 @@
-import { unlink } from 'node:fs/promises';
-import path from 'node:path';
 import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/shared';
 import type { AliasReservation, Artwork, Submission } from '@prisma/client';
 import { Prisma } from '@prisma/client';
@@ -11,7 +9,7 @@ import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
 import { prisma } from '../../lib/prisma.js';
-import { mediaUrl, UPLOADS_DIR } from '../../lib/storage.js';
+import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
 const ALIAS_RESERVATION_TTL_MS = 20 * 60 * 1000;
@@ -124,13 +122,9 @@ export async function reserveAlias(
   throw conflict('Could not allocate a unique nickname, please try again');
 }
 
-async function cleanupProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
-  await Promise.all(
-    processed.flatMap((file) =>
-      [file.filePath, file.previewPath, file.thumbPath].map((relativePath) =>
-        unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined),
-      ),
-    ),
+async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
+  await removeStoredFiles(
+    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
   );
 }
 
@@ -285,7 +279,7 @@ export async function createSubmission(
   }
 
   if (firstError !== undefined) {
-    await cleanupProcessedFiles(processed);
+    await removeProcessedFiles(processed);
     throw firstError;
   }
 
@@ -299,7 +293,7 @@ export async function createSubmission(
     );
     return toSubmissionDto(submission, artworks, false);
   } catch (error) {
-    await cleanupProcessedFiles(processed);
+    await removeProcessedFiles(processed);
     throw error;
   }
 }

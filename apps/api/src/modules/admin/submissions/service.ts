@@ -1,5 +1,3 @@
-import { unlink } from 'node:fs/promises';
-import path from 'node:path';
 import type {
   AdminSubmissionDto,
   ArtworkDto,
@@ -10,7 +8,7 @@ import type { Artwork, Submission } from '@prisma/client';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { processArtworkImage } from '../../../lib/artwork-image.js';
 import { prisma } from '../../../lib/prisma.js';
-import { mediaUrl, UPLOADS_DIR } from '../../../lib/storage.js';
+import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
 
 function toAdminArtworkDto(artwork: Artwork): ArtworkDto {
   return {
@@ -67,16 +65,8 @@ function findArtwork(submission: Submission & { artworks: Artwork[] }, artworkId
   return artwork;
 }
 
-async function unlinkRelativePaths(paths: string[]): Promise<void> {
-  await Promise.all(
-    paths.map((relativePath) =>
-      unlink(path.join(UPLOADS_DIR, relativePath)).catch(() => undefined),
-    ),
-  );
-}
-
-async function unlinkArtworkFiles(artworks: Artwork[]): Promise<void> {
-  await unlinkRelativePaths(
+async function removeArtworkFiles(artworks: Artwork[]): Promise<void> {
+  await removeStoredFiles(
     artworks.flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath]),
   );
 }
@@ -104,7 +94,7 @@ export async function getAdminSubmission(
 export async function deleteSubmission(contestId: string, submissionId: string): Promise<void> {
   const submission = await loadSubmission(contestId, submissionId);
   await prisma.submission.delete({ where: { id: submission.id } });
-  await unlinkArtworkFiles(submission.artworks);
+  await removeArtworkFiles(submission.artworks);
 }
 
 export async function updateSubmission(
@@ -161,7 +151,7 @@ export async function deleteArtwork(
   }
 
   await prisma.artwork.delete({ where: { id: artwork.id } });
-  await unlinkArtworkFiles([artwork]);
+  await removeArtworkFiles([artwork]);
 
   return getAdminSubmission(contestId, submissionId);
 }
@@ -216,11 +206,11 @@ export async function replaceArtwork(
       },
     });
   } catch (error) {
-    await unlinkRelativePaths([processed.filePath, processed.previewPath, processed.thumbPath]);
+    await removeStoredFiles([processed.filePath, processed.previewPath, processed.thumbPath]);
     throw error;
   }
 
-  await unlinkRelativePaths([artwork.filePath, artwork.previewPath, artwork.thumbPath]);
+  await removeStoredFiles([artwork.filePath, artwork.previewPath, artwork.thumbPath]);
 
   return getAdminSubmission(contestId, submissionId);
 }
