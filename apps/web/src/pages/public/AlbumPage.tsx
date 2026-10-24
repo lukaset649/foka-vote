@@ -98,12 +98,18 @@ const AlbumPage = () => {
                   onClick={() => setLightboxIndex(index)}
                 />
                 {photo.title && (
-                  <p className="mt-1 text-sm font-medium text-zinc-900">{photo.title}</p>
+                  <p
+                    title={photo.title}
+                    className="mt-1 line-clamp-2 text-sm font-medium break-words text-zinc-900"
+                  >
+                    {photo.title}
+                  </p>
                 )}
                 {photo.description && (
                   <ClampedText
                     text={photo.description}
                     title={photo.title ?? photo.authorName}
+                    thumbUrl={mediaUrl(photo.thumbUrl)}
                     className="text-sm text-zinc-600"
                   />
                 )}

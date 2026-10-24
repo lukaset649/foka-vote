@@ -106,12 +106,18 @@ const GalleryPage = () => {
                         onClick={() => setLightbox({ submissionId: submission.id, index })}
                       />
                       {artwork.title && (
-                        <p className="mt-1 text-sm font-medium text-zinc-900">{artwork.title}</p>
+                        <p
+                          title={artwork.title}
+                          className="mt-1 line-clamp-2 text-sm font-medium break-words text-zinc-900"
+                        >
+                          {artwork.title}
+                        </p>
                       )}
                       {artwork.description && (
                         <ClampedText
                           text={artwork.description}
                           title={artwork.title ?? submissionDisplayName(submission)}
+                          thumbUrl={mediaUrl(artwork.thumbUrl)}
                           className="text-sm text-zinc-600"
                         />
                       )}

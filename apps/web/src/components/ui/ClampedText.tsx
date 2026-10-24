@@ -6,10 +6,11 @@ import Modal from './Modal';
 interface ClampedTextProps {
   text: string;
   title: string;
+  thumbUrl?: string | null;
   className?: string;
 }
 
-const ClampedText = ({ text, title, className }: ClampedTextProps) => {
+const ClampedText = ({ text, title, thumbUrl, className }: ClampedTextProps) => {
   const { t } = useTranslation();
   const textRef = useRef<HTMLParagraphElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -49,9 +50,18 @@ const ClampedText = ({ text, title, className }: ClampedTextProps) => {
         ariaLabelledBy={titleId}
         className="flex max-h-[85vh] max-w-lg flex-col p-6"
       >
-        <h2 id={titleId} className="text-lg font-semibold break-words text-zinc-900">
-          {title}
-        </h2>
+        <div className="flex items-center gap-4">
+          {thumbUrl && (
+            <img
+              src={thumbUrl}
+              alt=""
+              className="size-16 shrink-0 rounded-md border border-zinc-200 object-cover sm:size-20"
+            />
+          )}
+          <h2 id={titleId} className="min-w-0 text-lg font-semibold break-words text-zinc-900">
+            {title}
+          </h2>
+        </div>
         <p className="mt-3 overflow-y-auto text-sm break-words whitespace-pre-line text-zinc-700">
           {text}
         </p>
