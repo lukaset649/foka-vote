@@ -23,12 +23,13 @@ export function createApp(): Express {
     app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
   }
 
+  // Before the body parsers, so their errors still get a request id and a log line.
+  app.use(requestId);
+  app.use(requestLogger);
+
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: false }));
   app.use(cookieParser(env.COOKIE_SECRET));
-
-  app.use(requestId);
-  app.use(requestLogger);
 
   // In production nginx serves /media/ directly from disk (see nginx location block),
   // so this Express route only ever runs cross-origin in dev, which CORP must allow.

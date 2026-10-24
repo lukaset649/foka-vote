@@ -1,7 +1,22 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ErrorCode, type ErrorResponseBody } from '@foka-vote/shared';
-import { AppError } from '../errors/app-error.js';
+import { AppError, badRequest } from '../errors/app-error.js';
 import { logger } from '../lib/logger.js';
+
+// body-parser rejects malformed or oversized bodies with an http-errors object (4xx `status`, `expose: true`).
+function toClientAppError(error: unknown): AppError | null {
+  if (typeof error !== 'object' || error === null) {
+    return null;
+  }
+  const { status, expose, type } = error as { status?: unknown; expose?: unknown; type?: unknown };
+  if (typeof status !== 'number' || status < 400 || status >= 500 || expose !== true) {
+    return null;
+  }
+  if (type === 'entity.parse.failed') {
+    return badRequest('Malformed request body');
+  }
+  return new AppError(ErrorCode.VALIDATION_FAILED, status, (error as Error).message);
+}
 
 export function errorHandler(
   error: unknown,
@@ -14,7 +29,7 @@ export function errorHandler(
     return;
   }
 
-  const appError = error instanceof AppError ? error : null;
+  const appError = error instanceof AppError ? error : toClientAppError(error);
   const statusCode = appError?.statusCode ?? 500;
   const code = appError?.code ?? ErrorCode.INTERNAL_ERROR;
   const clientMessage = appError ? appError.message : 'Internal server error';
