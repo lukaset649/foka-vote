@@ -8,6 +8,7 @@ import { fetchAlbum } from '../../services/gallery';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Alert from '../../components/ui/Alert';
 import Card from '../../components/ui/Card';
+import ClampedText from '../../components/ui/ClampedText';
 import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
@@ -99,7 +100,13 @@ const AlbumPage = () => {
                 {photo.title && (
                   <p className="mt-1 text-sm font-medium text-zinc-900">{photo.title}</p>
                 )}
-                {photo.description && <p className="text-sm text-zinc-600">{photo.description}</p>}
+                {photo.description && (
+                  <ClampedText
+                    text={photo.description}
+                    title={photo.title ?? photo.authorName}
+                    className="text-sm text-zinc-600"
+                  />
+                )}
                 <p className="text-xs text-zinc-500">
                   {t('pages.album.photoBy', { author: photo.authorName })}
                 </p>

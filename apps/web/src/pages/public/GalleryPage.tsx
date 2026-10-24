@@ -11,6 +11,7 @@ import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
+import ClampedText from '../../components/ui/ClampedText';
 import ThumbnailTile from '../../components/ui/ThumbnailTile';
 
 interface OpenLightbox {
@@ -108,7 +109,11 @@ const GalleryPage = () => {
                         <p className="mt-1 text-sm font-medium text-zinc-900">{artwork.title}</p>
                       )}
                       {artwork.description && (
-                        <p className="text-sm text-zinc-600">{artwork.description}</p>
+                        <ClampedText
+                          text={artwork.description}
+                          title={artwork.title ?? submissionDisplayName(submission)}
+                          className="text-sm text-zinc-600"
+                        />
                       )}
                     </li>
                   ))}
