@@ -269,12 +269,12 @@ export async function createSubmission(
   const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
 
   const processed: ArtworkImageResult[] = [];
-  let firstError: unknown;
+  let firstError: Error | undefined;
   for (const result of settled) {
     if (result.status === 'fulfilled') {
       processed.push(result.value);
     } else if (firstError === undefined) {
-      firstError = result.reason;
+      firstError = result.reason as Error;
     }
   }
 
