@@ -1,5 +1,5 @@
 import type { VoteCardDto, VoteCardPayload } from '@foka-vote/shared';
-import type { VoteCard, VoteItem } from '@prisma/client';
+import type { VoteCard, VoteItem } from '../../generated/prisma/client.js';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, notFound } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';

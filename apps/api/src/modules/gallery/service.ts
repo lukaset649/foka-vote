@@ -10,7 +10,7 @@ import {
   MAX_ALBUM_TITLE_LENGTH,
   MAX_PHOTOS_PER_ALBUM_UPLOAD,
 } from '@foka-vote/shared';
-import type { AlbumPhoto } from '@prisma/client';
+import type { AlbumPhoto } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';

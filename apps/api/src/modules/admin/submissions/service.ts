@@ -4,7 +4,7 @@ import type {
   UpdateArtworkDto,
   UpdateSubmissionDto,
 } from '@foka-vote/shared';
-import type { Artwork, Submission } from '@prisma/client';
+import type { Artwork, Submission } from '../../../generated/prisma/client.js';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { processArtworkImage } from '../../../lib/artwork-image.js';
 import { prisma } from '../../../lib/prisma.js';

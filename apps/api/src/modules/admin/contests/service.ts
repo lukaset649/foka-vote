@@ -3,7 +3,7 @@ import {
   MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
 } from '@foka-vote/shared';
 import type { AdminContestDto, CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
-import type { Contest } from '@prisma/client';
+import type { Contest } from '../../../generated/prisma/client.js';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
 import { prisma } from '../../../lib/prisma.js';

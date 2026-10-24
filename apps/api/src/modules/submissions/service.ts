@@ -1,6 +1,6 @@
 import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/shared';
-import type { AliasReservation, Artwork, Submission } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { AliasReservation, Artwork, Submission } from '../../generated/prisma/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, forbidden, notFound } from '../../errors/app-error.js';
 import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';

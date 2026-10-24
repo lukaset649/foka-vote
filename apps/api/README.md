@@ -3,16 +3,18 @@
 ## Structure
 
 ```
+prisma.config.ts         Prisma CLI config: schema, migrations, DATABASE_URL (loads .env if present)
 prisma/
 ├─ schema.prisma         data model (Contest, Submission, Artwork, VoteCard, VoteItem, Alias)
 └─ migrations/           applied SQL migrations
 src/
+├─ generated/prisma/     generated Prisma Client (gitignored, `npm run prisma:generate`)
 ├─ modules/<domain>/     routes.ts, controller.ts, service.ts: one domain, one folder
 ├─ routes.ts             aggregator, mounts each module under /api/<domain>
 ├─ middleware/           request-id, request-logger, not-found, error-handler
 ├─ errors/               app-error.ts: AppError + factory helpers, ErrorCode/ErrorResponseBody come from @foka-vote/shared
 ├─ config/               env.ts: only place that reads process.env
-├─ lib/                  logger.ts, prisma.ts: shared PrismaClient singleton
+├─ lib/                  logger.ts, prisma.ts: shared PrismaClient singleton (pg driver adapter)
 ├─ types/                express.d.ts: extends Request with requestId
 ├─ app.ts                createApp(): Express factory, no listen()
 └─ index.ts              server bootstrap, graceful shutdown
@@ -83,7 +85,7 @@ Deleting a contest, an album, a submission or a photo also removes the stored im
 - `npm run start`: `node dist/index.js`
 - `npm run typecheck`: `tsc --noEmit`
 - `npm run lint`: ESLint over `src/`
-- `npm run prisma:generate`: regenerate the Prisma Client after a schema change
+- `npm run prisma:generate`: regenerate the Prisma Client after a schema change (required before typecheck/build; `prisma migrate dev` no longer runs it)
 - `npm run prisma:migrate`: create and apply a migration (`prisma migrate dev`)
 
 ## Database

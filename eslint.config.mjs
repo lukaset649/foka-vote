@@ -29,6 +29,7 @@ export default [
       '**/.turbo',
       '**/coverage',
       'apps/api/src/generated',
+      'apps/api/prisma.config.ts',
     ],
   },
   ...sharedConfigs,
