@@ -26,7 +26,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
 
   return (
     <Card>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-zinc-900">{album.title}</h2>
