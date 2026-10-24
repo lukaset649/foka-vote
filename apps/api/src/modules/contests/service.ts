@@ -1,5 +1,5 @@
 import type { ContestDto } from '@foka-vote/shared';
-import type { Contest } from '@prisma/client';
+import type { Contest } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { prisma } from '../../lib/prisma.js';

@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
     working_dir: /app
-    command: sh -c "npx prisma generate --schema=apps/api/prisma/schema.prisma && npm run dev:api"
+    command: sh -c "npm run prisma:generate -w apps/api && npm run dev:api"
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -26,7 +26,6 @@ services:
     volumes:
       - .:/app
       - api_node_modules:/app/node_modules
-      - api_prisma_client:/app/apps/api/node_modules/.prisma
     ports:
       - '3000:3000'
     depends_on:
@@ -53,5 +52,4 @@ services:
 volumes:
   db_data:
   api_node_modules:
-  api_prisma_client:
   web_node_modules:

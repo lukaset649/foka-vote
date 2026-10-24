@@ -5,3 +5,4 @@ dist
 coverage
 **/dist
 package-lock.json
+apps/api/src/generated

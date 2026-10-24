@@ -1,5 +1,5 @@
 import type { VoteCardDto } from '@foka-vote/shared';
-import type { VoteCard, VoteItem } from '@prisma/client';
+import type { VoteCard, VoteItem } from '../../../generated/prisma/client.js';
 import { notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 

@@ -6,7 +6,7 @@ import type {
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
 import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
-import type { AlbumPhoto } from '@prisma/client';
+import type { AlbumPhoto } from '../../../generated/prisma/client.js';
 import { conflict, notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
