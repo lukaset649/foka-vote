@@ -286,6 +286,9 @@
     }
   },
   "components": {
+    "clampedText": {
+      "readMore": "Czytaj dalej"
+    },
     "installInstructions": {
       "title": "Zainstaluj FOKA Vote",
       "share": "Stuknij przycisk Udostępnij na pasku przeglądarki.",
