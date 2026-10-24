@@ -1,8 +1,0 @@
-node_modules
-dist
-.cache
-.turbo
-coverage
-**/dist
-apps/api/src/generated
-apps/api/prisma.config.ts
