@@ -28,7 +28,7 @@ jobs:
         env:
           VITE_API_URL: ''
 
-      - uses: webfactory/ssh-agent@v0.9.0
+      - uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MIKRUS_SSH_KEY }}
 
