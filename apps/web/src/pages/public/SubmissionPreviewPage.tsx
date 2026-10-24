@@ -30,6 +30,9 @@ const SubmissionPreviewPage = () => {
       return;
     }
     const urls = draft.artworks.map((artwork) => URL.createObjectURL(artwork.file));
+    // Object URLs are an external resource: created and revoked per effect run, which keeps
+    // them valid under StrictMode's mount-unmount-mount cycle.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPreviewUrls(urls);
 
     return () => {

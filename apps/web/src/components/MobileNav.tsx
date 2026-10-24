@@ -16,15 +16,21 @@ const MobileNav = ({ isOpen, onClose, items }: MobileNavProps) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      setShouldRender(true);
-      const raf = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setIsVisible(true));
-      });
-      return () => cancelAnimationFrame(raf);
-    }
+  if (isOpen && !shouldRender) {
+    setShouldRender(true);
+  }
+  if (!isOpen && isVisible) {
     setIsVisible(false);
+  }
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsVisible(true));
+    });
+    return () => cancelAnimationFrame(raf);
   }, [isOpen]);
 
   if (!shouldRender) {

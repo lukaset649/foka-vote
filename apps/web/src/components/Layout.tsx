@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation, useMatches } from 'react-router';
 import logo from '../assets/logo.svg';
@@ -23,11 +23,13 @@ const Layout = () => {
   const matches = useMatches();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuPathname, setMenuPathname] = useState(location.pathname);
   const isWide = matches.some((match) => (match.handle as RouteHandle | undefined)?.wide);
 
-  useEffect(() => {
+  if (menuPathname !== location.pathname) {
+    setMenuPathname(location.pathname);
     setIsMenuOpen(false);
-  }, [location.pathname]);
+  }
 
   return (
     <div className="min-h-dvh bg-zinc-50 text-zinc-900">
