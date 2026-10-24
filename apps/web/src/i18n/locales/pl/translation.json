@@ -286,6 +286,10 @@
     }
   },
   "components": {
+    "descriptionModal": {
+      "previous": "Poprzedni opis",
+      "next": "Następny opis"
+    },
     "clampedText": {
       "readMore": "Czytaj dalej"
     },

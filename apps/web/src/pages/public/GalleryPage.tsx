@@ -12,12 +12,32 @@ import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import ClampedText from '../../components/ui/ClampedText';
+import DescriptionModal from '../../components/ui/DescriptionModal';
+import type { DescriptionItem } from '../../components/ui/DescriptionModal';
 import ThumbnailTile from '../../components/ui/ThumbnailTile';
 
 interface OpenLightbox {
   submissionId: string;
   index: number;
 }
+
+interface OpenDescription {
+  submissionId: string;
+  index: number;
+}
+
+const descriptionItems = (submission: SubmissionDto): DescriptionItem[] =>
+  submission.artworks.flatMap((artwork) =>
+    artwork.description
+      ? [
+          {
+            title: artwork.title ?? submissionDisplayName(submission),
+            text: artwork.description,
+            thumbUrl: mediaUrl(artwork.thumbUrl),
+          },
+        ]
+      : [],
+  );
 
 const GalleryPage = () => {
   const { t } = useTranslation();
@@ -28,6 +48,7 @@ const GalleryPage = () => {
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [error, setError] = useState(false);
   const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
+  const [description, setDescription] = useState<OpenDescription | null>(null);
 
   const cameFromGallery = searchParams.get('from') === 'gallery';
   const currentPath = `/contest/${slug}/gallery${cameFromGallery ? '?from=gallery' : ''}`;
@@ -73,6 +94,9 @@ const GalleryPage = () => {
   }
 
   const openSubmission = submissions.find((submission) => submission.id === lightbox?.submissionId);
+  const descriptionSubmission = submissions.find(
+    (submission) => submission.id === description?.submissionId,
+  );
 
   return (
     <div>
@@ -116,8 +140,14 @@ const GalleryPage = () => {
                       {artwork.description && (
                         <ClampedText
                           text={artwork.description}
-                          title={artwork.title ?? submissionDisplayName(submission)}
-                          thumbUrl={mediaUrl(artwork.thumbUrl)}
+                          onReadMore={() =>
+                            setDescription({
+                              submissionId: submission.id,
+                              index: submission.artworks
+                                .slice(0, index)
+                                .filter((previous) => previous.description).length,
+                            })
+                          }
                           className="text-sm text-zinc-600"
                         />
                       )}
@@ -137,6 +167,15 @@ const GalleryPage = () => {
           open
           onClose={() => setLightbox(null)}
           authorAlias={submissionDisplayName(openSubmission)}
+        />
+      )}
+
+      {descriptionSubmission && description && (
+        <DescriptionModal
+          items={descriptionItems(descriptionSubmission)}
+          index={description.index}
+          onIndexChange={(index) => setDescription({ ...description, index })}
+          onClose={() => setDescription(null)}
         />
       )}
     </div>

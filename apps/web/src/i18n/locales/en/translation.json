@@ -278,6 +278,10 @@
     }
   },
   "components": {
+    "descriptionModal": {
+      "previous": "Previous description",
+      "next": "Next description"
+    },
     "clampedText": {
       "readMore": "Read more"
     },
