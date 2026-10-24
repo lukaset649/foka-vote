@@ -44,9 +44,9 @@ const DescriptionModal = ({ items, index, onIndexChange, onClose }: DescriptionM
       open
       onClose={onClose}
       ariaLabelledBy={titleId}
-      className="flex max-h-[85vh] max-w-lg flex-col p-6"
+      className="flex h-[min(85vh,32rem)] max-w-lg flex-col p-6"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 border-b border-zinc-200 pb-4">
         <img
           src={item.thumbUrl}
           alt=""
@@ -59,7 +59,7 @@ const DescriptionModal = ({ items, index, onIndexChange, onClose }: DescriptionM
           {item.title}
         </h2>
       </div>
-      <p className="mt-3 overflow-y-auto text-sm break-words whitespace-pre-line text-zinc-700">
+      <p className="mt-4 min-h-0 flex-1 overflow-y-auto text-sm break-words whitespace-pre-line text-zinc-700">
         {item.text}
       </p>
       <div className="mt-6 flex items-center justify-between gap-2">
