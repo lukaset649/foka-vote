@@ -63,7 +63,7 @@ const ContestPage = () => {
   return (
     <div>
       <PageHeader title={contest.title} backTo="/" backLabel={t('common.backToContests')}>
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex grow flex-wrap items-center justify-between gap-5">
           <ContestStatusBadge status={contest.status} />
           {contest.status === 'SUBMISSIONS' && (
             <LinkButton to={`/contest/${contest.slug}/submit`} variant="primary">
