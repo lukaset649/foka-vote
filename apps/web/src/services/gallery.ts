@@ -65,12 +65,14 @@ export async function createAlbumSubmission(
   }
 }
 
-export async function fetchAdminAlbums(): Promise<AdminAlbumDto[]> {
-  const response = await apiRequest('/api/admin/gallery/albums');
+export async function fetchAdminAlbums(
+  query: ListQuery = {},
+): Promise<PaginatedDto<AdminAlbumDto>> {
+  const response = await apiRequest(`/api/admin/gallery/albums${listQueryString(query)}`);
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch albums');
   }
-  return response.json() as Promise<AdminAlbumDto[]>;
+  return response.json() as Promise<PaginatedDto<AdminAlbumDto>>;
 }
 
 export async function createAdminAlbum(input: CreateAlbumDto): Promise<AdminAlbumDto> {

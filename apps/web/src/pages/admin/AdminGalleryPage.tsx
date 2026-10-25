@@ -1,26 +1,33 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AdminAlbumDto } from '@foka-vote/shared';
+import type { AdminAlbumDto, PaginatedDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
+import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
 import {
   deleteAdminAlbum,
   fetchAdminAlbums,
   setAdminAlbumVisibility,
   setContestAlbumVisibility,
 } from '../../services/gallery';
+import ListToolbar from '../../components/ListToolbar';
 import Alert from '../../components/ui/Alert';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
+import Pagination from '../../components/ui/Pagination';
 import Spinner from '../../components/ui/Spinner';
 import useConfirm from '../../lib/useConfirm';
 
 const AdminGalleryPage = () => {
   const { t } = useTranslation();
   const { confirm, confirmDialog } = useConfirm();
-  const [albums, setAlbums] = useState<AdminAlbumDto[] | null>(null);
+  const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
+    useListSearchParams();
+  const [albums, setAlbums] = useState<PaginatedDto<AdminAlbumDto> | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -28,10 +35,11 @@ const AdminGalleryPage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    fetchAdminAlbums()
+    fetchAdminAlbums(query)
       .then((data) => {
         if (!cancelled) {
           setAlbums(data);
+          setLoadError(false);
         }
       })
       .catch(() => {
@@ -43,10 +51,23 @@ const AdminGalleryPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [query, reloadCount]);
+
+  const totalPages = albums ? Math.ceil(albums.total / albums.pageSize) : 0;
+  useClampedPage(query.page, totalPages, setPage);
+  const isSearching = query.q !== undefined;
 
   const replaceAlbum = (updated: AdminAlbumDto) => {
-    setAlbums((prev) => prev?.map((album) => (album.id === updated.id ? updated : album)) ?? prev);
+    setAlbums((prev) =>
+      prev
+        ? {
+            ...prev,
+            items: prev.items.map((album) =>
+              album.kind === updated.kind && album.id === updated.id ? updated : album,
+            ),
+          }
+        : prev,
+    );
   };
 
   const toggleVisibility = (album: AdminAlbumDto) => {
@@ -76,7 +97,8 @@ const AdminGalleryPage = () => {
     setBusyId(album.id);
     setActionError(null);
     deleteAdminAlbum(album.id)
-      .then(() => setAlbums((prev) => prev?.filter((entry) => entry.id !== album.id) ?? prev))
+      // Reloading pulls the next album onto this page; an emptied last page gets clamped.
+      .then(() => setReloadCount((count) => count + 1))
       .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyId(null));
   };
@@ -89,10 +111,26 @@ const AdminGalleryPage = () => {
       {actionError && <Alert variant="error">{actionError}</Alert>}
       {!loadError && albums === null && <Spinner />}
 
-      {albums !== null && (
+      {albums !== null && albums.total === 0 && !isSearching && (
+        <EmptyState icon="bi-images" text={t('pages.galleryAlbums.noAlbumsYet')} />
+      )}
+
+      {albums !== null && (albums.total > 0 || isSearching) && (
         <section>
+          <ListToolbar
+            searchInput={searchInput}
+            onSearchInputChange={setSearchInput}
+            sortOption={sortOption}
+            onSortOptionChange={setSortOption}
+          />
+          {isSearching && albums.items.length === 0 && (
+            <EmptyState
+              icon="bi-search"
+              text={t('pages.galleryAlbums.noResults', { query: query.q ?? '' })}
+            />
+          )}
           <ul className="flex flex-col gap-3">
-            {albums.map((album) => (
+            {albums.items.map((album) => (
               <li key={`${album.kind}-${album.id}`}>
                 <Card className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
@@ -173,6 +211,7 @@ const AdminGalleryPage = () => {
               </li>
             ))}
           </ul>
+          <Pagination page={albums.page} totalPages={totalPages} onPageChange={setPage} />
         </section>
       )}
 

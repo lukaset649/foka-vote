@@ -2,11 +2,14 @@ import type {
   AdminAlbumDto,
   AdminAlbumPhotoDto,
   CreateAlbumDto,
+  PaginatedDto,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
 import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
 import { conflict, notFound } from '../../../errors/app-error.js';
+import type { ListKey, ParsedListQuery } from '../../../lib/list-query.js';
+import { paginateKeys, titleSearchFilter } from '../../../lib/list-query.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
 import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
@@ -68,9 +71,9 @@ function toAdminAlbumDto(album: StandaloneAlbumRow, itemCount: number): AdminAlb
  * never locked out by an access code, and needs moderation counters instead of a preview
  * grid. Keeping the queries apart also keeps admin-only fields out of the public DTOs.
  */
-async function listContestAlbums(): Promise<AdminAlbumDto[]> {
+async function listContestAlbums(ids: string[]): Promise<AdminAlbumDto[]> {
   const contests = await prisma.contest.findMany({
-    orderBy: { createdAt: 'desc' },
+    where: { id: { in: ids } },
     select: {
       id: true,
       slug: true,
@@ -91,6 +94,7 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
 
   const submissionCounts = await prisma.submission.groupBy({
     by: ['contestId'],
+    where: { contestId: { in: ids } },
     _count: { _all: true },
   });
   const countByContestId = new Map(
@@ -115,14 +119,15 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
   });
 }
 
-async function listStandaloneAlbums(): Promise<AdminAlbumDto[]> {
+async function listStandaloneAlbums(ids: string[]): Promise<AdminAlbumDto[]> {
   const albums = await prisma.album.findMany({
-    orderBy: { createdAt: 'desc' },
+    where: { id: { in: ids } },
     select: standaloneAlbumSelect,
   });
 
   const submissionCounts = await prisma.albumSubmission.groupBy({
     by: ['albumId'],
+    where: { albumId: { in: ids } },
     _count: { _all: true },
   });
   const countByAlbumId = new Map(
@@ -144,23 +149,54 @@ async function getStandaloneAlbum(id: string): Promise<AdminAlbumDto> {
 }
 
 async function getContestAlbum(contestId: string): Promise<AdminAlbumDto> {
-  const albums = await listContestAlbums();
-  const album = albums.find((entry) => entry.id === contestId);
+  const [album] = await listContestAlbums([contestId]);
   if (!album) {
     throw notFound('Contest not found');
   }
   return album;
 }
 
-export async function listAdminAlbums(): Promise<AdminAlbumDto[]> {
-  const [contestAlbums, standaloneAlbums] = await Promise.all([
-    listContestAlbums(),
-    listStandaloneAlbums(),
+type AdminAlbumKey = ListKey & { kind: AdminAlbumDto['kind'] };
+
+/** Same two-phase paging as the public gallery listing, without its visibility filters. */
+export async function listAdminAlbums(
+  listQuery: ParsedListQuery,
+): Promise<PaginatedDto<AdminAlbumDto>> {
+  const keyQuery = {
+    where: titleSearchFilter(listQuery.q),
+    select: { id: true, title: true, createdAt: true },
+  } as const;
+
+  const [contestKeys, albumKeys] = await Promise.all([
+    prisma.contest.findMany(keyQuery),
+    prisma.album.findMany(keyQuery),
   ]);
 
-  return [...contestAlbums, ...standaloneAlbums].sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
+  const page = paginateKeys<AdminAlbumKey>(
+    [
+      ...contestKeys.map((key) => ({ ...key, kind: 'CONTEST' as const })),
+      ...albumKeys.map((key) => ({ ...key, kind: 'STANDALONE' as const })),
+    ],
+    listQuery,
   );
+
+  const idsOf = (kind: AdminAlbumKey['kind']) =>
+    page.items.filter((key) => key.kind === kind).map((key) => key.id);
+  const [contestAlbums, standaloneAlbums] = await Promise.all([
+    listContestAlbums(idsOf('CONTEST')),
+    listStandaloneAlbums(idsOf('STANDALONE')),
+  ]);
+  const albumByKey = new Map(
+    [...contestAlbums, ...standaloneAlbums].map((album) => [`${album.kind}-${album.id}`, album]),
+  );
+
+  return {
+    ...page,
+    items: page.items.flatMap((key) => {
+      const album = albumByKey.get(`${key.kind}-${key.id}`);
+      return album ? [album] : [];
+    }),
+  };
 }
 
 export async function getAdminAlbum(id: string): Promise<AdminAlbumDto> {

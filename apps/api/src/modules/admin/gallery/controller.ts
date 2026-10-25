@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { CreateAlbumDto, UpdateAlbumDto, UpdateAlbumPhotoDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
+import { parseListQuery } from '../../../lib/list-query.js';
 import {
   createAdminAlbum,
   deleteAdminAlbum,
@@ -30,8 +31,8 @@ function parseHidden(body: unknown): boolean {
   return hidden;
 }
 
-export async function list(_request: Request, response: Response): Promise<void> {
-  const albums = await listAdminAlbums();
+export async function list(request: Request, response: Response): Promise<void> {
+  const albums = await listAdminAlbums(parseListQuery(request.query));
   response.json(albums);
 }
 
