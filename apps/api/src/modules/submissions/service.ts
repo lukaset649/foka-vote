@@ -8,14 +8,12 @@ import type {
   AliasReservation,
   Artwork,
   Contest,
+  PendingUpload,
   Submission,
 } from '../../generated/prisma/client.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, forbidden, notFound } from '../../errors/app-error.js';
-import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
-import type { ArtworkImageResult } from '../../lib/artwork-image.js';
-import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
 import {
@@ -25,7 +23,7 @@ import {
   toPendingUploadDto,
 } from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
-import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
+import { mediaUrl } from '../../lib/storage.js';
 import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
@@ -139,15 +137,10 @@ export async function reserveAlias(
   throw conflict('Could not allocate a unique nickname, please try again');
 }
 
-async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
-  await removeStoredFiles(
-    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
-  );
-}
-
-type ArtworkSource = Omit<ArtworkImageResult, 'width' | 'height'> & {
-  width: number | null;
-  height: number | null;
+type ArtworkSource = Pick<
+  PendingUpload,
+  'filePath' | 'previewPath' | 'thumbPath' | 'width' | 'height'
+> & {
   title: string | null;
   description: string | null;
 };
@@ -263,69 +256,6 @@ export async function listSubmissions(slug: string): Promise<SubmissionDto[]> {
 }
 
 export async function createSubmission(
-  slug: string,
-  input: CreateSubmissionInput,
-  files: Express.Multer.File[],
-  meta: ArtworkMetaInput[],
-  signedCookies: Record<string, string | undefined>,
-): Promise<SubmissionDto> {
-  const contest = await prisma.contest.findUnique({ where: { slug } });
-  if (!contest) {
-    throw notFound('Contest not found');
-  }
-
-  const status = computeContestStatus(new Date(), contest);
-  if (status !== 'SUBMISSIONS') {
-    throw conflict('This contest is not currently accepting submissions');
-  }
-
-  assertContestAccess(contest, signedCookies);
-
-  if (files.length < 1 || files.length > contest.maxArtworksPerSubmission) {
-    throw badRequest(
-      `Submission must include between 1 and ${contest.maxArtworksPerSubmission} artworks`,
-    );
-  }
-
-  if (meta.length !== files.length) {
-    throw badRequest('artworks metadata length must match the number of uploaded files');
-  }
-
-  const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
-
-  const processed: ArtworkImageResult[] = [];
-  let firstError: Error | undefined;
-  for (const result of settled) {
-    if (result.status === 'fulfilled') {
-      processed.push(result.value);
-    } else if (firstError === undefined) {
-      firstError = result.reason as Error;
-    }
-  }
-
-  if (firstError !== undefined) {
-    await removeProcessedFiles(processed);
-    throw firstError;
-  }
-
-  try {
-    const { submission, artworks } = await createSubmissionWithRetry(contest.id, input, () =>
-      Promise.resolve(
-        processed.map((file, index) => ({
-          ...file,
-          title: meta[index]?.title ?? null,
-          description: meta[index]?.description ?? null,
-        })),
-      ),
-    );
-    return toSubmissionDto(submission, artworks, false);
-  } catch (error) {
-    await removeProcessedFiles(processed);
-    throw error;
-  }
-}
-
-export async function createSubmissionFromUploads(
   slug: string,
   input: CreateSubmissionInput,
   artworks: SubmissionPhotoInput[],

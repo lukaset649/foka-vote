@@ -1,12 +1,10 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
-import { parseArtworkMeta } from '../../lib/artwork-meta.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
 import {
   addPendingContestUpload,
   createSubmission,
-  createSubmissionFromUploads,
   listSubmissions,
   removePendingContestUpload,
   reserveAlias,
@@ -39,48 +37,6 @@ export async function reserveAliasHandler(request: Request, response: Response):
   response.status(201).json(reservation);
 }
 
-export async function create(request: Request, response: Response): Promise<void> {
-  // Multipart uploads stay supported until the web form switches to pending uploads.
-  if (request.is('application/json')) {
-    await createFromUploads(request, response);
-    return;
-  }
-
-  const slug = requireSlugParam(request);
-  const body = (request.body ?? {}) as Record<string, unknown>;
-  const { firstName, lastName, description, meta, reservationId, rulesAccepted } = body;
-
-  if (typeof firstName !== 'string' || firstName.length === 0) {
-    throw badRequest('firstName is required');
-  }
-  if (typeof lastName !== 'string' || lastName.length === 0) {
-    throw badRequest('lastName is required');
-  }
-  if (rulesAccepted !== 'true') {
-    throw badRequest('rulesAccepted must be accepted');
-  }
-
-  const files = (request.files as Express.Multer.File[] | undefined) ?? [];
-  const artworksMeta = parseArtworkMeta(meta);
-  const descriptionValue = optionalString(description);
-  const reservationIdValue = optionalString(reservationId);
-
-  const submission = await createSubmission(
-    slug,
-    {
-      firstName,
-      lastName,
-      ...(descriptionValue !== undefined ? { description: descriptionValue } : {}),
-      ...(reservationIdValue !== undefined ? { reservationId: reservationIdValue } : {}),
-    },
-    files,
-    artworksMeta,
-    request.signedCookies as Record<string, string | undefined>,
-  );
-
-  response.status(201).json(submission);
-}
-
 export async function uploadArtwork(request: Request, response: Response): Promise<void> {
   const upload = await addPendingContestUpload(
     requireSlugParam(request),
@@ -99,7 +55,7 @@ export async function removeUpload(request: Request, response: Response): Promis
   response.status(204).end();
 }
 
-async function createFromUploads(request: Request, response: Response): Promise<void> {
+export async function create(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
   const body = (request.body ?? {}) as Record<string, unknown>;
   const { firstName, lastName, description, reservationId, rulesAccepted, artworks } = body;
@@ -117,7 +73,7 @@ async function createFromUploads(request: Request, response: Response): Promise<
   const descriptionValue = optionalString(description);
   const reservationIdValue = optionalString(reservationId);
 
-  const submission = await createSubmissionFromUploads(
+  const submission = await createSubmission(
     slug,
     {
       firstName: firstName.trim(),

@@ -13,10 +13,7 @@ import {
 } from '@foka-vote/shared';
 import type { AlbumPhoto, AlbumSubmission } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
-import type { ArtworkImageResult } from '../../lib/artwork-image.js';
-import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
-import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import {
   claimPendingUploads,
   createPendingUpload,
@@ -25,7 +22,7 @@ import {
 } from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
 import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
-import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
+import { mediaUrl } from '../../lib/storage.js';
 
 type SignedCookies = Record<string, string | undefined>;
 
@@ -314,91 +311,6 @@ export async function getPublicAlbum(
       photos: photos.map((photo) => toAlbumPhotoDto({ ...photo, submission })),
     })),
   };
-}
-
-export interface AddAlbumPhotosInput {
-  firstName: string;
-  lastName: string;
-}
-
-async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
-  await removeStoredFiles(
-    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
-  );
-}
-
-export async function addAlbumPhotos(
-  slug: string,
-  input: AddAlbumPhotosInput,
-  files: Express.Multer.File[],
-  meta: ArtworkMetaInput[],
-  signedCookies: SignedCookies,
-): Promise<void> {
-  const album = await prisma.album.findFirst({
-    where: { slug, hidden: false },
-    select: { id: true, accessCode: true },
-  });
-  if (!album) {
-    throw notFound('Album not found');
-  }
-
-  if (!hasAlbumUploadAccess(album, signedCookies)) {
-    throw unauthorized('Access code required');
-  }
-
-  if (files.length < 1 || files.length > MAX_PHOTOS_PER_ALBUM_UPLOAD) {
-    throw badRequest(`Upload must include between 1 and ${MAX_PHOTOS_PER_ALBUM_UPLOAD} photos`);
-  }
-  if (meta.length !== files.length) {
-    throw badRequest('photos metadata length must match the number of uploaded files');
-  }
-  // Checked before any image is processed, so a rejected caption leaves no orphan files.
-  for (const entry of meta) {
-    assertValidPhotoCaption(entry.title ?? null, entry.description ?? null);
-  }
-
-  const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
-
-  const processed: ArtworkImageResult[] = [];
-  let firstError: Error | undefined;
-  for (const result of settled) {
-    if (result.status === 'fulfilled') {
-      processed.push(result.value);
-    } else if (firstError === undefined) {
-      firstError = result.reason as Error;
-    }
-  }
-
-  if (firstError !== undefined) {
-    await removeProcessedFiles(processed);
-    throw firstError;
-  }
-
-  try {
-    await prisma.albumSubmission.create({
-      data: {
-        albumId: album.id,
-        firstName: input.firstName,
-        lastName: input.lastName,
-        rulesAcceptedAt: new Date(),
-        photos: {
-          create: processed.map((file, index) => ({
-            title: meta[index]?.title ?? null,
-            description: meta[index]?.description ?? null,
-            filePath: file.filePath,
-            previewPath: file.previewPath,
-            thumbPath: file.thumbPath,
-            width: file.width,
-            height: file.height,
-            sortOrder: index,
-          })),
-        },
-      },
-    });
-  } catch (error) {
-    await removeProcessedFiles(processed);
-    throw error;
-  }
 }
 
 async function findAlbumForUpload(slug: string, signedCookies: SignedCookies) {

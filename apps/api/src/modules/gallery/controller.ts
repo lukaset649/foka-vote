@@ -1,11 +1,9 @@
 import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
-import { parseArtworkMeta } from '../../lib/artwork-meta.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
 import {
-  addAlbumPhotos,
   addPendingAlbumUpload,
   ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
   albumAccessCookieName,
@@ -55,34 +53,6 @@ export async function verifyAccess(request: Request, response: Response): Promis
     maxAge: ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
   });
   response.status(204).end();
-}
-
-export async function addPhotos(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
-  const { firstName, lastName, meta, rulesAccepted } = request.body as Record<string, unknown>;
-
-  if (typeof firstName !== 'string' || firstName.trim().length === 0) {
-    throw badRequest('firstName is required');
-  }
-  if (typeof lastName !== 'string' || lastName.trim().length === 0) {
-    throw badRequest('lastName is required');
-  }
-  if (rulesAccepted !== 'true') {
-    throw badRequest('rulesAccepted must be accepted');
-  }
-
-  const files = (request.files as Express.Multer.File[] | undefined) ?? [];
-  const photosMeta = parseArtworkMeta(meta);
-
-  await addAlbumPhotos(
-    slug,
-    { firstName: firstName.trim(), lastName: lastName.trim() },
-    files,
-    photosMeta,
-    request.signedCookies as Record<string, string | undefined>,
-  );
-
-  response.status(201).end();
 }
 
 export async function uploadPhoto(request: Request, response: Response): Promise<void> {

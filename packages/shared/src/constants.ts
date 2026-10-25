@@ -8,12 +8,9 @@ export const ALLOWED_ARTWORK_MIME_TYPES = ['image/jpeg', 'image/png'] as const;
 export type AllowedArtworkMimeType = (typeof ALLOWED_ARTWORK_MIME_TYPES)[number];
 
 export const DEFAULT_MAX_ARTWORKS_PER_SUBMISSION = 3;
-// Bounded so a contest's worst-case upload size (this * MAX_ARTWORK_FILE_SIZE_BYTES)
-// stays within the reverse proxy's client_max_body_size (see deploy/nginx.conf).
+// Photos are uploaded one per request, so these limits do not depend on the reverse
+// proxy's client_max_body_size (see deploy/nginx.conf).
 export const MAX_ARTWORKS_PER_SUBMISSION_LIMIT = 15;
-
-// Kept at or below MAX_ARTWORKS_PER_SUBMISSION_LIMIT so album uploads stay within the
-// same reverse proxy body limit the submission form already fits into.
 export const MAX_PHOTOS_PER_ALBUM_UPLOAD = 15;
 
 export const GALLERY_ALBUM_PREVIEW_COUNT = 8;
