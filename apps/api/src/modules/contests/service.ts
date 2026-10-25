@@ -1,7 +1,9 @@
-import type { ContestDto } from '@foka-vote/shared';
+import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
 import type { Contest } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
+import type { ParsedListQuery } from '../../lib/list-query.js';
+import { paginateKeys, titleSearchFilter } from '../../lib/list-query.js';
 import { prisma } from '../../lib/prisma.js';
 
 export const CONTEST_ACCESS_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
@@ -42,9 +44,45 @@ function toPublicContestDto(contest: Contest): ContestDto {
   };
 }
 
-export async function listPublicContests(): Promise<ContestDto[]> {
-  const contests = await prisma.contest.findMany({ orderBy: { createdAt: 'desc' } });
-  return contests.map(toPublicContestDto);
+/**
+ * Current contests (open for submissions or voting) are returned in full and never searched or
+ * paginated; only the remaining contests are. The date filters mirror `computeContestStatus`.
+ */
+export async function listPublicContests(
+  listQuery: ParsedListQuery,
+): Promise<PublicContestListDto> {
+  const now = new Date();
+
+  const [current, otherKeys] = await Promise.all([
+    prisma.contest.findMany({
+      where: { submissionStart: { lte: now }, votingEnd: { gt: now } },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.contest.findMany({
+      where: {
+        OR: [{ submissionStart: { gt: now } }, { votingEnd: { lte: now } }],
+        ...titleSearchFilter(listQuery.q),
+      },
+      select: { id: true, title: true, createdAt: true },
+    }),
+  ]);
+
+  const page = paginateKeys(otherKeys, listQuery);
+  const pageContests = await prisma.contest.findMany({
+    where: { id: { in: page.items.map((key) => key.id) } },
+  });
+  const contestById = new Map(pageContests.map((contest) => [contest.id, contest]));
+
+  return {
+    current: current.map(toPublicContestDto),
+    others: {
+      ...page,
+      items: page.items.flatMap((key) => {
+        const contest = contestById.get(key.id);
+        return contest ? [toPublicContestDto(contest)] : [];
+      }),
+    },
+  };
 }
 
 export async function getPublicContestBySlug(slug: string): Promise<ContestDto> {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import type { ContestDto } from '@foka-vote/shared';
+import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
 import { fetchContests, isGalleryVisible } from '../../services/contests';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
@@ -9,10 +9,6 @@ import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import Spinner from '../../components/ui/Spinner';
-
-function isCurrent(contest: ContestDto): boolean {
-  return contest.status === 'SUBMISSIONS' || contest.status === 'VOTING';
-}
 
 const ContestListItem = ({ contest }: { contest: ContestDto }) => {
   const { t } = useTranslation();
@@ -91,7 +87,7 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
 
 const ContestsListPage = () => {
   const { t } = useTranslation();
-  const [contests, setContests] = useState<ContestDto[] | null>(null);
+  const [contests, setContests] = useState<PublicContestListDto | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -122,12 +118,12 @@ const ContestsListPage = () => {
     return <Spinner />;
   }
 
-  if (contests.length === 0) {
+  const { current } = contests;
+  const rest = contests.others.items;
+
+  if (current.length === 0 && rest.length === 0) {
     return <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />;
   }
-
-  const current = contests.filter(isCurrent);
-  const rest = contests.filter((contest) => !isCurrent(contest));
 
   return (
     <div>
@@ -149,15 +145,11 @@ const ContestsListPage = () => {
             {t('pages.contestsList.allContests')}
           </h2>
         )}
-        {rest.length === 0 && current.length === 0 ? (
-          <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />
-        ) : (
-          <ul className="flex flex-col gap-3">
-            {rest.map((contest) => (
-              <ContestListItem key={contest.id} contest={contest} />
-            ))}
-          </ul>
-        )}
+        <ul className="flex flex-col gap-3">
+          {rest.map((contest) => (
+            <ContestListItem key={contest.id} contest={contest} />
+          ))}
+        </ul>
       </section>
     </div>
   );

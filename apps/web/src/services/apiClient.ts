@@ -1,5 +1,5 @@
 import { ErrorCode } from '@foka-vote/shared';
-import type { ErrorResponseBody } from '@foka-vote/shared';
+import type { ErrorResponseBody, ListQuery } from '@foka-vote/shared';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,6 +17,17 @@ export function apiRequest(path: string, init?: RequestInit): Promise<Response> 
   }).catch(() => {
     throw new NetworkError();
   });
+}
+
+export function listQueryString(query: ListQuery): string {
+  const params = new URLSearchParams();
+  for (const [name, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') {
+      params.set(name, String(value));
+    }
+  }
+  const search = params.toString();
+  return search.length > 0 ? `?${search}` : '';
 }
 
 export function isAbortError(err: unknown): boolean {
