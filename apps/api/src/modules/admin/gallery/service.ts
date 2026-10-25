@@ -9,6 +9,7 @@ import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
 import { conflict, notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
+import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
 import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
 import type { AlbumPhotoWithSubmission } from '../../gallery/service.js';
 import {
@@ -252,15 +253,17 @@ export async function deleteAdminAlbum(id: string): Promise<void> {
   if (!album) {
     throw notFound('Album not found');
   }
+  const pendingPaths = await pendingUploadPaths({ albumId: id });
 
-  // The DB cascades the photo rows; only the files on disk need explicit cleanup.
+  // The DB cascades the photo and pending upload rows; only the files on disk need explicit cleanup.
   await prisma.album.delete({ where: { id } });
 
-  await removeStoredFiles(
-    album.submissions.flatMap((submission) =>
+  await removeStoredFiles([
+    ...album.submissions.flatMap((submission) =>
       submission.photos.flatMap((photo) => [photo.filePath, photo.previewPath, photo.thumbPath]),
     ),
-  );
+    ...pendingPaths,
+  ]);
 }
 
 export async function setContestAlbumVisibility(

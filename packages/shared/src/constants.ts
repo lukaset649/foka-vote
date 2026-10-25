@@ -18,6 +18,9 @@ export const MAX_PHOTOS_PER_ALBUM_UPLOAD = 15;
 
 export const GALLERY_ALBUM_PREVIEW_COUNT = 8;
 
+// Photos uploaded but never attached to a sent submission are deleted after this long.
+export const PENDING_UPLOAD_TTL_HOURS = 24;
+
 // Album titles and descriptions come from anonymous visitors, so both are bounded.
 export const MAX_ALBUM_TITLE_LENGTH = 120;
 export const MAX_ALBUM_DESCRIPTION_LENGTH = 2000;
