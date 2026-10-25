@@ -109,3 +109,27 @@ export function paginateKeys<K extends ListKey>(
     pageSize: listQuery.pageSize,
   };
 }
+
+/**
+ * For lists whose full rows are too heavy to load for every key: cuts the page out of the keys,
+ * loads rows only for it and returns them in page order. `identify` must give a key and its row
+ * the same value; a row deleted between the two queries is left out of the page.
+ */
+export async function paginateRows<K extends ListKey, T>(
+  keys: K[],
+  listQuery: ParsedListQuery,
+  load: (pageKeys: K[]) => Promise<T[]>,
+  identify: (entry: K | T) => string,
+): Promise<PaginatedDto<T>> {
+  const page = paginateKeys(keys, listQuery);
+  const rows = await load(page.items);
+  const rowById = new Map(rows.map((row) => [identify(row), row]));
+
+  return {
+    ...page,
+    items: page.items.flatMap((key) => {
+      const row = rowById.get(identify(key));
+      return row ? [row] : [];
+    }),
+  };
+}

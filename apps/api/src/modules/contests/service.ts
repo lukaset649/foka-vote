@@ -53,7 +53,7 @@ export async function listPublicContests(
 ): Promise<PublicContestListDto> {
   const now = new Date();
 
-  const [current, otherKeys] = await Promise.all([
+  const [current, others] = await Promise.all([
     prisma.contest.findMany({
       where: { submissionStart: { lte: now }, votingEnd: { gt: now } },
       orderBy: { createdAt: 'desc' },
@@ -63,25 +63,15 @@ export async function listPublicContests(
         OR: [{ submissionStart: { gt: now } }, { votingEnd: { lte: now } }],
         ...titleSearchFilter(listQuery.q),
       },
-      select: { id: true, title: true, createdAt: true },
     }),
   ]);
 
-  const page = paginateKeys(otherKeys, listQuery);
-  const pageContests = await prisma.contest.findMany({
-    where: { id: { in: page.items.map((key) => key.id) } },
-  });
-  const contestById = new Map(pageContests.map((contest) => [contest.id, contest]));
+  // Contest rows are small, so all of them are sorted and paged without a second query.
+  const page = paginateKeys(others, listQuery);
 
   return {
     current: current.map((contest) => toPublicContestDto(contest, now)),
-    others: {
-      ...page,
-      items: page.items.flatMap((key) => {
-        const contest = contestById.get(key.id);
-        return contest ? [toPublicContestDto(contest, now)] : [];
-      }),
-    },
+    others: { ...page, items: page.items.map((contest) => toPublicContestDto(contest, now)) },
   };
 }
 

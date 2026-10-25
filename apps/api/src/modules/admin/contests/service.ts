@@ -116,24 +116,11 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
 export async function listContests(
   listQuery: ParsedListQuery,
 ): Promise<PaginatedDto<AdminContestDto>> {
-  const keys = await prisma.contest.findMany({
-    where: titleSearchFilter(listQuery.q),
-    select: { id: true, title: true, createdAt: true },
-  });
+  // Contest rows are small, so all of them are sorted and paged without a second query.
+  const contests = await prisma.contest.findMany({ where: titleSearchFilter(listQuery.q) });
+  const page = paginateKeys(contests, listQuery);
 
-  const page = paginateKeys(keys, listQuery);
-  const contests = await prisma.contest.findMany({
-    where: { id: { in: page.items.map((key) => key.id) } },
-  });
-  const contestById = new Map(contests.map((contest) => [contest.id, contest]));
-
-  return {
-    ...page,
-    items: page.items.flatMap((key) => {
-      const contest = contestById.get(key.id);
-      return contest ? [toAdminContestDto(contest)] : [];
-    }),
-  };
+  return { ...page, items: page.items.map(toAdminContestDto) };
 }
 
 export async function getContestById(id: string): Promise<AdminContestDto> {

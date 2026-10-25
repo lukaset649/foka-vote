@@ -1,5 +1,6 @@
 import type {
   AlbumDetailDto,
+  AlbumKind,
   AlbumPhotoDto,
   GalleryAlbumDto,
   GalleryAlbumPreviewDto,
@@ -16,7 +17,7 @@ import type { AlbumPhoto, AlbumSubmission } from '../../generated/prisma/client.
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import type { ListKey, ParsedListQuery } from '../../lib/list-query.js';
-import { paginateKeys, titleSearchFilter } from '../../lib/list-query.js';
+import { paginateRows, titleSearchFilter } from '../../lib/list-query.js';
 import {
   claimPendingUploads,
   createPendingUpload,
@@ -192,13 +193,39 @@ async function listStandaloneAlbums(ids: string[]): Promise<GalleryAlbumDto[]> {
   }));
 }
 
-type GalleryAlbumKey = ListKey & { kind: GalleryAlbumDto['kind'] };
+type AlbumListKey = ListKey & { kind: AlbumKind };
 
 /**
  * Contest albums and standalone albums come from two tables, so the page is cut from their
- * merged keys first and only the albums on it are loaded in full. A contest shows up once its
- * voting has started (VOTING or CLOSED in `computeContestStatus`).
+ * merged keys and only the albums on it are loaded, each kind by its own loader. Shared with
+ * the admin listing, which loads different DTOs.
  */
+export function paginateAlbums<T extends { kind: AlbumKind; id: string }>(
+  contestKeys: ListKey[],
+  standaloneKeys: ListKey[],
+  listQuery: ParsedListQuery,
+  load: Record<AlbumKind, (ids: string[]) => Promise<T[]>>,
+): Promise<PaginatedDto<T>> {
+  const keys: AlbumListKey[] = [
+    ...contestKeys.map((key) => ({ ...key, kind: 'CONTEST' as const })),
+    ...standaloneKeys.map((key) => ({ ...key, kind: 'STANDALONE' as const })),
+  ];
+
+  const loadKind = (pageKeys: AlbumListKey[], kind: AlbumKind) => {
+    const ids = pageKeys.filter((key) => key.kind === kind).map((key) => key.id);
+    return ids.length > 0 ? load[kind](ids) : Promise.resolve([]);
+  };
+
+  return paginateRows(
+    keys,
+    listQuery,
+    async (pageKeys) =>
+      (await Promise.all([loadKind(pageKeys, 'CONTEST'), loadKind(pageKeys, 'STANDALONE')])).flat(),
+    (entry) => `${entry.kind}-${entry.id}`,
+  );
+}
+
+/** A contest shows up once its voting has started (VOTING or CLOSED in `computeContestStatus`). */
 export async function listGalleryAlbums(
   listQuery: ParsedListQuery,
 ): Promise<PaginatedDto<GalleryAlbumDto>> {
@@ -213,31 +240,10 @@ export async function listGalleryAlbums(
     prisma.album.findMany({ where: { hidden: false, ...titleFilter }, select: keySelect }),
   ]);
 
-  const page = paginateKeys<GalleryAlbumKey>(
-    [
-      ...contestKeys.map((key) => ({ ...key, kind: 'CONTEST' as const })),
-      ...albumKeys.map((key) => ({ ...key, kind: 'STANDALONE' as const })),
-    ],
-    listQuery,
-  );
-
-  const idsOf = (kind: GalleryAlbumKey['kind']) =>
-    page.items.filter((key) => key.kind === kind).map((key) => key.id);
-  const [contestAlbums, standaloneAlbums] = await Promise.all([
-    listContestAlbums(idsOf('CONTEST')),
-    listStandaloneAlbums(idsOf('STANDALONE')),
-  ]);
-  const albumByKey = new Map(
-    [...contestAlbums, ...standaloneAlbums].map((album) => [`${album.kind}-${album.id}`, album]),
-  );
-
-  return {
-    ...page,
-    items: page.items.flatMap((key) => {
-      const album = albumByKey.get(`${key.kind}-${key.id}`);
-      return album ? [album] : [];
-    }),
-  };
+  return paginateAlbums(contestKeys, albumKeys, listQuery, {
+    CONTEST: listContestAlbums,
+    STANDALONE: listStandaloneAlbums,
+  });
 }
 
 export function assertValidAlbumInput(title: string, description: string): void {
