@@ -29,6 +29,12 @@ export function createApp(): Express {
 
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: false }));
+  // Express leaves the body undefined when no parser matched (no body or another content
+  // type); an empty object lets handlers answer 400 for missing fields instead of crashing.
+  app.use((request: Request, _response: Response, next: NextFunction) => {
+    request.body ??= {};
+    next();
+  });
   app.use(cookieParser(env.COOKIE_SECRET));
 
   // In production nginx serves /media/ directly from disk (see nginx location block),
