@@ -109,6 +109,7 @@ const AlbumAddPhotosPage = () => {
           ...(photo.description ? { description: photo.description } : {}),
         })),
       });
+      queue.keep();
       void navigate(albumPath, { replace: true });
     } catch (err) {
       setSubmitting(false);

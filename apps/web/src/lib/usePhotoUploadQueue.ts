@@ -9,6 +9,7 @@ import {
 import { ApiError, isAbortError, isUnauthorizedError, mediaUrl } from '../services/apiClient';
 import { deletePendingPhoto, uploadPendingPhoto, type UploadTarget } from '../services/uploads';
 import { errorMessage } from './errorMessage';
+import useDiscardOnLeave from './useDiscardOnLeave';
 
 export type PhotoUploadStatus = 'queued' | 'uploading' | 'processing' | 'done' | 'error';
 
@@ -95,7 +96,8 @@ function rejectionReason(file: File): RejectedFileReason | null {
 
 /**
  * Uploads picked photos one at a time in the background, while the form lets the user reorder,
- * caption and remove them. Removed photos are deleted on the server right away.
+ * caption and remove them. Removed photos are deleted on the server right away, and so are all
+ * of them when the user leaves the form, unless `keep` was called for an intended navigation.
  */
 const usePhotoUploadQueue = (
   target: UploadTarget,
@@ -114,6 +116,7 @@ const usePhotoUploadQueue = (
   const controllersRef = useRef(new Map<string, AbortController>());
   const objectUrlsRef = useRef(new Set<string>());
   const disposedRef = useRef(false);
+  const discardedRef = useRef(false);
 
   useEffect(() => {
     targetRef.current = target;
@@ -156,8 +159,8 @@ const usePhotoUploadQueue = (
             ),
           controller.signal,
         );
-        if (!itemsRef.current.some((candidate) => candidate.key === key)) {
-          // Removed while the server was still processing it.
+        if (discardedRef.current || !itemsRef.current.some((candidate) => candidate.key === key)) {
+          // Removed, or the form was left, while the server was still processing it.
           void deletePendingPhoto(uploadTarget, upload.id).catch(() => undefined);
           return;
         }
@@ -314,6 +317,18 @@ const usePhotoUploadQueue = (
     };
   }, []);
 
+  const discardAll = useCallback(() => {
+    discardedRef.current = true;
+    controllersRef.current.forEach((controller) => controller.abort());
+    itemsRef.current.forEach((item) => {
+      if (item.uploadId) {
+        void deletePendingPhoto(targetRef.current, item.uploadId).catch(() => undefined);
+      }
+    });
+  }, []);
+
+  const keep = useDiscardOnLeave(discardAll);
+
   const summary = useMemo<PhotoUploadSummary>(() => {
     let loaded = 0;
     let size = 0;
@@ -344,7 +359,7 @@ const usePhotoUploadQueue = (
     }));
   }, [items]);
 
-  return { items, summary, uploadedPhotos, max, add, remove, retry, move, update, clear };
+  return { items, summary, uploadedPhotos, max, add, remove, retry, move, update, clear, keep };
 };
 
 export type PhotoUploadQueue = ReturnType<typeof usePhotoUploadQueue>;

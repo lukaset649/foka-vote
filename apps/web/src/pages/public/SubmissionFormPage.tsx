@@ -138,11 +138,14 @@ const SubmissionFormPage = () => {
 
   const queue = usePhotoUploadQueue({ kind: 'contest', slug }, maxArtworks, {
     initialPhotos: draft?.artworks ?? [],
-    onUnauthorized: () =>
+    onUnauthorized: () => {
+      // The draft carries the uploaded photos through the gate and back to the form.
+      queue.keep();
       void navigate(contestGatePath(slug, formPath), {
         replace: true,
         state: buildDraft(queue.items.flatMap(uploadedDraft)),
-      }),
+      });
+    },
   });
   const { summary, uploadedPhotos } = queue;
 
@@ -187,6 +190,7 @@ const SubmissionFormPage = () => {
       return;
     }
 
+    queue.keep();
     void navigate(`${formPath}/preview`, { state: buildDraft(uploadedPhotos) });
   };
 

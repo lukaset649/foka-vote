@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
+import useDiscardOnLeave from '../../lib/useDiscardOnLeave';
 import useOnlineStatus from '../../lib/useOnlineStatus';
 import { ApiError, mediaUrl } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
+import { deletePendingPhoto } from '../../services/uploads';
 import type { SubmissionDraftState } from './SubmissionFormPage';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -13,7 +15,7 @@ import Alert from '../../components/ui/Alert';
 
 const SubmissionPreviewPage = () => {
   const { t } = useTranslation();
-  const { slug } = useParams<{ slug: string }>();
+  const { slug = '' } = useParams<{ slug: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const draft = (location.state as SubmissionDraftState | null) ?? null;
@@ -21,6 +23,13 @@ const SubmissionPreviewPage = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // The preview is the last page of the submission form, so leaving it discards the photos too.
+  const keep = useDiscardOnLeave(() => {
+    draft?.artworks.forEach((artwork) => {
+      void deletePendingPhoto({ kind: 'contest', slug }, artwork.uploadId).catch(() => undefined);
+    });
+  });
 
   if (!draft) {
     return (
@@ -35,6 +44,7 @@ const SubmissionPreviewPage = () => {
   }
 
   const handleBack = () => {
+    keep();
     void navigate(`/contest/${slug}/submit`, { state: draft, replace: true });
   };
 
@@ -59,10 +69,12 @@ const SubmissionPreviewPage = () => {
           ...(artwork.description ? { description: artwork.description } : {}),
         })),
       });
+      keep();
       void navigate(`/contest/${slug}/submit/confirmation`, { state: { submission } });
     } catch (err) {
       if (err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED) {
         const redirect = `/contest/${slug}/submit/preview`;
+        keep();
         void navigate(`/contest/${slug}/gate?redirect=${encodeURIComponent(redirect)}`, {
           state: draft,
         });
