@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import type { ListQuery } from '@foka-vote/shared';
+import { MAX_LIST_SEARCH_LENGTH } from '@foka-vote/shared';
 
 export type ListSortOption = 'newest' | 'oldest' | 'titleAsc' | 'titleDesc';
 
@@ -31,7 +32,8 @@ function parsePage(value: string | null): number {
 export function useListSearchParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const urlQ = searchParams.get('q')?.trim() ?? '';
+  // A longer phrase from an edited or shared link would make the API reject the whole request.
+  const urlQ = (searchParams.get('q') ?? '').slice(0, MAX_LIST_SEARCH_LENGTH).trim();
   const sortOption = sortOptionFrom(searchParams.get('sort'), searchParams.get('order'));
   const page = parsePage(searchParams.get('page'));
 
@@ -94,7 +96,10 @@ export function useListSearchParams() {
   const setPage = useCallback(
     (nextPage: number, replace = false) => {
       update({ page: nextPage > 1 ? String(nextPage) : null }, replace);
-      window.scrollTo({ top: 0 });
+      // Replacing is a correction (see useClampedPage), not a navigation, so the view stays put.
+      if (!replace) {
+        window.scrollTo({ top: 0 });
+      }
     },
     [update],
   );

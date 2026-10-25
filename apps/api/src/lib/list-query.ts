@@ -78,7 +78,11 @@ export function parseListQuery(query: Record<string, unknown>): ParsedListQuery 
 export function titleSearchFilter(q: string | null): {
   title?: { contains: string; mode: 'insensitive' };
 } {
-  return q === null ? {} : { title: { contains: q, mode: 'insensitive' } };
+  if (q === null) {
+    return {};
+  }
+  // Prisma passes `contains` to ILIKE unescaped, so "%" and "_" would act as wildcards.
+  return { title: { contains: q.replace(/[\\%_]/g, '\\$&'), mode: 'insensitive' } };
 }
 
 function compareKeys(a: ListKey, b: ListKey, sort: ListSort): number {

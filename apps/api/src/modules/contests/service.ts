@@ -25,8 +25,8 @@ export function assertContestAccess(
   }
 }
 
-function toPublicContestDto(contest: Contest): ContestDto {
-  const status = computeContestStatus(new Date(), contest);
+function toPublicContestDto(contest: Contest, now = new Date()): ContestDto {
+  const status = computeContestStatus(now, contest);
 
   return {
     id: contest.id,
@@ -74,12 +74,12 @@ export async function listPublicContests(
   const contestById = new Map(pageContests.map((contest) => [contest.id, contest]));
 
   return {
-    current: current.map(toPublicContestDto),
+    current: current.map((contest) => toPublicContestDto(contest, now)),
     others: {
       ...page,
       items: page.items.flatMap((key) => {
         const contest = contestById.get(key.id);
-        return contest ? [toPublicContestDto(contest)] : [];
+        return contest ? [toPublicContestDto(contest, now)] : [];
       }),
     },
   };

@@ -123,7 +123,7 @@ const AdminGalleryPage = () => {
             sortOption={sortOption}
             onSortOptionChange={setSortOption}
           />
-          {isSearching && albums.items.length === 0 && (
+          {isSearching && albums.total === 0 && (
             <EmptyState
               icon="bi-search"
               text={t('pages.galleryAlbums.noResults', { query: query.q ?? '' })}

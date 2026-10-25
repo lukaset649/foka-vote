@@ -15,7 +15,7 @@ const EmptyState = ({ icon, text, className }: EmptyStateProps) => {
       )}
     >
       <i className={`bi text-2xl ${icon}`} aria-hidden="true" />
-      <p className="text-sm">{text}</p>
+      <p className="max-w-full px-4 text-sm break-words">{text}</p>
     </div>
   );
 };

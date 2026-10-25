@@ -166,7 +166,7 @@ const ContestsListPage = () => {
             sortOption={sortOption}
             onSortOptionChange={setSortOption}
           />
-          {others.items.length === 0 ? (
+          {others.total === 0 ? (
             <EmptyState
               icon="bi-search"
               text={t('pages.contestsList.noResults', { query: query.q ?? '' })}

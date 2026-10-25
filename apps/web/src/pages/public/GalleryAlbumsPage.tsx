@@ -70,7 +70,7 @@ const GalleryAlbumsPage = () => {
             sortOption={sortOption}
             onSortOptionChange={setSortOption}
           />
-          {albums.items.length === 0 ? (
+          {albums.total === 0 ? (
             <EmptyState
               icon="bi-search"
               text={t('pages.galleryAlbums.noResults', { query: query.q ?? '' })}

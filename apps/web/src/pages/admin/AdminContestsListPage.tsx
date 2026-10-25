@@ -99,7 +99,7 @@ const AdminContestsListPage = () => {
           onSortOptionChange={setSortOption}
         />
       )}
-      {contests !== null && isSearching && contests.items.length === 0 && (
+      {contests !== null && isSearching && contests.total === 0 && (
         <EmptyState
           icon="bi-search"
           text={t('pages.contestsList.noResults', { query: query.q ?? '' })}
