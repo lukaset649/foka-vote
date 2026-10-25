@@ -440,6 +440,34 @@
           ]
         }
       ]
+    },
+    "photoUpload": {
+      "pickPhotos": "Choose photos",
+      "addMore": "Add more photos",
+      "counter": "Photos: {{count}} of {{max}}",
+      "hint": "You can select several photos at once (JPEG or PNG, up to {{size}} MB each). Uploading starts right away, and meanwhile you can set the order and captions.",
+      "photoLabel": "Photo {{index}}",
+      "status": {
+        "queued": "Queued",
+        "uploading": "Uploading {{percent}}%",
+        "processing": "Processing…",
+        "done": "Uploaded",
+        "error": "Upload failed"
+      },
+      "retry": "Retry",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "invalidPhoto": "The photo could not be processed. Use a JPEG or PNG file at least {{minSize}} px on the longer side.",
+      "rejected": {
+        "type": "{{name}}: only JPEG and PNG files are allowed",
+        "size": "{{name}}: the file is larger than {{size}} MB",
+        "limit": "{{name}}: the limit of {{max}} photos has been reached"
+      },
+      "summary": {
+        "uploading": "Uploading photos: {{done}} of {{total}}",
+        "done": "All photos uploaded",
+        "failed": "Some photos could not be uploaded. Retry or remove them."
+      }
     }
   }
 }
