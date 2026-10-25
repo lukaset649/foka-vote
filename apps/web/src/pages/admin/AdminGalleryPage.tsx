@@ -112,9 +112,7 @@ const AdminGalleryPage = () => {
                     </div>
                     <p className="text-sm text-zinc-500">
                       {new Date(album.createdAt).toLocaleDateString()} ·{' '}
-                      {album.kind === 'CONTEST'
-                        ? t('components.albumCard.submissionsCount', { count: album.photoCount })
-                        : t('components.albumCard.photosCount', { count: album.photoCount })}
+                      {t('components.albumCard.submissionsCount', { count: album.itemCount })}
                     </p>
                   </div>
 

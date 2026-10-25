@@ -6,11 +6,11 @@ import type {
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
 import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
-import type { AlbumPhoto } from '../../../generated/prisma/client.js';
 import { conflict, notFound } from '../../../errors/app-error.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
 import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
+import type { AlbumPhotoWithSubmission } from '../../gallery/service.js';
 import {
   assertValidAlbumInput,
   assertValidPhotoCaption,
@@ -27,8 +27,11 @@ const standaloneAlbumSelect = {
   createdAt: true,
   accessCode: true,
   hidden: true,
-  // Any status: a brand new album only has photos that are still waiting for approval.
-  photos: { orderBy: { createdAt: 'asc' }, take: 1, select: { thumbPath: true } },
+  submissions: {
+    orderBy: { createdAt: 'asc' },
+    take: 1,
+    select: { photos: { orderBy: { sortOrder: 'asc' }, take: 1, select: { thumbPath: true } } },
+  },
 } as const;
 
 interface StandaloneAlbumRow {
@@ -39,11 +42,11 @@ interface StandaloneAlbumRow {
   createdAt: Date;
   accessCode: string | null;
   hidden: boolean;
-  photos: { thumbPath: string }[];
+  submissions: { photos: { thumbPath: string }[] }[];
 }
 
-function toAdminAlbumDto(album: StandaloneAlbumRow, photoCount: number): AdminAlbumDto {
-  const coverThumbPath = album.photos[0]?.thumbPath;
+function toAdminAlbumDto(album: StandaloneAlbumRow, itemCount: number): AdminAlbumDto {
+  const coverThumbPath = album.submissions[0]?.photos[0]?.thumbPath;
 
   return {
     kind: 'STANDALONE',
@@ -54,7 +57,7 @@ function toAdminAlbumDto(album: StandaloneAlbumRow, photoCount: number): AdminAl
     createdAt: album.createdAt.toISOString(),
     accessCode: album.accessCode,
     hidden: album.hidden,
-    photoCount,
+    itemCount,
     coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
   };
 }
@@ -105,7 +108,7 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
       createdAt: contest.createdAt.toISOString(),
       accessCode: contest.accessCode,
       hidden: contest.hiddenInGallery,
-      photoCount: countByContestId.get(contest.id) ?? 0,
+      itemCount: countByContestId.get(contest.id) ?? 0,
       coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
     };
   });
@@ -117,11 +120,13 @@ async function listStandaloneAlbums(): Promise<AdminAlbumDto[]> {
     select: standaloneAlbumSelect,
   });
 
-  const photoCounts = await prisma.albumPhoto.groupBy({
+  const submissionCounts = await prisma.albumSubmission.groupBy({
     by: ['albumId'],
     _count: { _all: true },
   });
-  const countByAlbumId = new Map(photoCounts.map((entry) => [entry.albumId, entry._count._all]));
+  const countByAlbumId = new Map(
+    submissionCounts.map((entry) => [entry.albumId, entry._count._all]),
+  );
 
   return albums.map((album) => toAdminAlbumDto(album, countByAlbumId.get(album.id) ?? 0));
 }
@@ -132,9 +137,9 @@ async function getStandaloneAlbum(id: string): Promise<AdminAlbumDto> {
     throw notFound('Album not found');
   }
 
-  const photoCount = await prisma.albumPhoto.count({ where: { albumId: id } });
+  const submissionCount = await prisma.albumSubmission.count({ where: { albumId: id } });
 
-  return toAdminAlbumDto(album, photoCount);
+  return toAdminAlbumDto(album, submissionCount);
 }
 
 async function getContestAlbum(contestId: string): Promise<AdminAlbumDto> {
@@ -238,7 +243,11 @@ export async function setAdminAlbumVisibility(id: string, hidden: boolean): Prom
 export async function deleteAdminAlbum(id: string): Promise<void> {
   const album = await prisma.album.findUnique({
     where: { id },
-    select: { photos: { select: { filePath: true, previewPath: true, thumbPath: true } } },
+    select: {
+      submissions: {
+        select: { photos: { select: { filePath: true, previewPath: true, thumbPath: true } } },
+      },
+    },
   });
   if (!album) {
     throw notFound('Album not found');
@@ -248,7 +257,9 @@ export async function deleteAdminAlbum(id: string): Promise<void> {
   await prisma.album.delete({ where: { id } });
 
   await removeStoredFiles(
-    album.photos.flatMap((photo) => [photo.filePath, photo.previewPath, photo.thumbPath]),
+    album.submissions.flatMap((submission) =>
+      submission.photos.flatMap((photo) => [photo.filePath, photo.previewPath, photo.thumbPath]),
+    ),
   );
 }
 
@@ -268,17 +279,20 @@ export async function setContestAlbumVisibility(
   return getContestAlbum(contestId);
 }
 
-function toAdminAlbumPhotoDto(photo: AlbumPhoto): AdminAlbumPhotoDto {
+function toAdminAlbumPhotoDto(photo: AlbumPhotoWithSubmission): AdminAlbumPhotoDto {
   return {
     ...toAlbumPhotoDto(photo),
-    firstName: photo.firstName,
-    lastName: photo.lastName,
-    rulesAcceptedAt: photo.rulesAcceptedAt.toISOString(),
+    firstName: photo.submission.firstName,
+    lastName: photo.submission.lastName,
+    rulesAcceptedAt: photo.submission.rulesAcceptedAt.toISOString(),
   };
 }
 
-async function findAlbumPhoto(albumId: string, photoId: string): Promise<AlbumPhoto> {
-  const photo = await prisma.albumPhoto.findFirst({ where: { id: photoId, albumId } });
+async function findAlbumPhoto(albumId: string, photoId: string): Promise<AlbumPhotoWithSubmission> {
+  const photo = await prisma.albumPhoto.findFirst({
+    where: { id: photoId, submission: { albumId } },
+    include: { submission: true },
+  });
   if (!photo) {
     throw notFound('Photo not found');
   }
@@ -292,8 +306,9 @@ export async function listAdminAlbumPhotos(albumId: string): Promise<AdminAlbumP
   }
 
   const photos = await prisma.albumPhoto.findMany({
-    where: { albumId },
-    orderBy: { createdAt: 'asc' },
+    where: { submission: { albumId } },
+    orderBy: [{ submission: { createdAt: 'asc' } }, { sortOrder: 'asc' }],
+    include: { submission: true },
   });
 
   return photos.map(toAdminAlbumPhotoDto);
@@ -314,6 +329,7 @@ export async function updateAdminAlbumPhoto(
   const photo = await prisma.albumPhoto.update({
     where: { id: photoId },
     data: { title, description },
+    include: { submission: true },
   });
   return toAdminAlbumPhotoDto(photo);
 }
@@ -321,7 +337,13 @@ export async function updateAdminAlbumPhoto(
 export async function deleteAdminAlbumPhoto(albumId: string, photoId: string): Promise<void> {
   const photo = await findAlbumPhoto(albumId, photoId);
 
-  await prisma.albumPhoto.delete({ where: { id: photoId } });
+  await prisma.$transaction(async (tx) => {
+    await tx.albumPhoto.delete({ where: { id: photoId } });
+    // A submission without photos would show up as an empty entry in the album.
+    await tx.albumSubmission.deleteMany({
+      where: { id: photo.submissionId, photos: { none: {} } },
+    });
+  });
 
   await removeStoredFiles([photo.filePath, photo.previewPath, photo.thumbPath]);
 }

@@ -19,11 +19,6 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
   const [openPreview, setOpenPreview] = useState<GalleryAlbumPreviewDto | null>(null);
   const targetPath = albumPath(album);
 
-  const itemCountLabel =
-    album.kind === 'CONTEST'
-      ? t('components.albumCard.submissionsCount', { count: album.itemCount })
-      : t('components.albumCard.photosCount', { count: album.itemCount });
-
   return (
     <Card>
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
@@ -38,7 +33,7 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             {t('components.albumCard.createdOn', {
               date: new Date(album.createdAt).toLocaleDateString(),
             })}
-            {` · ${itemCountLabel}`}
+            {` · ${t('components.albumCard.submissionsCount', { count: album.itemCount })}`}
           </p>
         </div>
 

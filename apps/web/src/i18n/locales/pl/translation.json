@@ -66,7 +66,6 @@
       "backToGallery": "Powrót do galerii",
       "addPhotos": "Dodaj zdjęcia",
       "noPhotosYet": "W tym albumie nie ma jeszcze zdjęć",
-      "photoBy": "autor: {{author}}",
       "notFound": "Taki album nie istnieje",
       "failedToLoad": "Nie udało się wczytać albumu"
     },
@@ -341,10 +340,6 @@
       "submissionsCount_few": "{{count}} zgłoszenia",
       "submissionsCount_many": "{{count}} zgłoszeń",
       "submissionsCount_other": "{{count}} zgłoszenia",
-      "photosCount_one": "{{count}} zdjęcie",
-      "photosCount_few": "{{count}} zdjęcia",
-      "photosCount_many": "{{count}} zdjęć",
-      "photosCount_other": "{{count}} zdjęcia",
       "noPhotosYet": "Brak zdjęć",
       "accessCodeRequired": "Ten konkurs jest chroniony kodem dostępu",
       "enterAccessCode": "Wpisz kod"
