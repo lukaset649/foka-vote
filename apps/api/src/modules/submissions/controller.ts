@@ -1,7 +1,14 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
 import { parseArtworkMeta } from '../../lib/artwork-meta.js';
-import { createSubmission, listSubmissions, reserveAlias } from './service.js';
+import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
+import {
+  addPendingContestUpload,
+  createSubmission,
+  listSubmissions,
+  removePendingContestUpload,
+  reserveAlias,
+} from './service.js';
 
 function requireSlugParam(request: Request): string {
   const { slug } = request.params;
@@ -64,4 +71,22 @@ export async function create(request: Request, response: Response): Promise<void
   );
 
   response.status(201).json(submission);
+}
+
+export async function uploadArtwork(request: Request, response: Response): Promise<void> {
+  const upload = await addPendingContestUpload(
+    requireSlugParam(request),
+    requireSingleUpload(request),
+    request.signedCookies as Record<string, string | undefined>,
+  );
+  response.status(201).json(upload);
+}
+
+export async function removeUpload(request: Request, response: Response): Promise<void> {
+  await removePendingContestUpload(
+    requireSlugParam(request),
+    requireUploadIdParam(request),
+    request.signedCookies as Record<string, string | undefined>,
+  );
+  response.status(204).end();
 }

@@ -1,10 +1,10 @@
-import { PENDING_UPLOAD_TTL_HOURS } from '@foka-vote/shared';
+import { PENDING_UPLOAD_TTL_HOURS, type PendingUploadDto } from '@foka-vote/shared';
 import type { PendingUpload, Prisma } from '../generated/prisma/client.js';
 import { badRequest } from '../errors/app-error.js';
 import { processArtworkImage } from './artwork-image.js';
 import { logger } from './logger.js';
 import { prisma } from './prisma.js';
-import { removeStoredFiles } from './storage.js';
+import { mediaUrl, removeStoredFiles } from './storage.js';
 
 const PENDING_UPLOAD_TTL_MS = PENDING_UPLOAD_TTL_HOURS * 60 * 60 * 1000;
 
@@ -16,6 +16,10 @@ function storedPaths(upload: Pick<PendingUpload, 'filePath' | 'previewPath' | 't
 
 function expiryCutoff(): Date {
   return new Date(Date.now() - PENDING_UPLOAD_TTL_MS);
+}
+
+export function toPendingUploadDto(upload: PendingUpload): PendingUploadDto {
+  return { id: upload.id, thumbUrl: mediaUrl(upload.thumbPath) };
 }
 
 export async function createPendingUpload(

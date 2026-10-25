@@ -3,6 +3,7 @@ import type {
   AlbumPhotoDto,
   GalleryAlbumDto,
   GalleryAlbumPreviewDto,
+  PendingUploadDto,
 } from '@foka-vote/shared';
 import {
   GALLERY_ALBUM_PREVIEW_COUNT,
@@ -16,6 +17,11 @@ import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
+import {
+  createPendingUpload,
+  deletePendingUpload,
+  toPendingUploadDto,
+} from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
 import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
 
@@ -391,4 +397,37 @@ export async function addAlbumPhotos(
     await removeProcessedFiles(processed);
     throw error;
   }
+}
+
+async function findAlbumForUpload(slug: string, signedCookies: SignedCookies) {
+  const album = await prisma.album.findFirst({
+    where: { slug, hidden: false },
+    select: { id: true, accessCode: true },
+  });
+  if (!album) {
+    throw notFound('Album not found');
+  }
+  if (!hasAlbumUploadAccess(album, signedCookies)) {
+    throw unauthorized('Access code required');
+  }
+  return album;
+}
+
+export async function addPendingAlbumUpload(
+  slug: string,
+  file: Express.Multer.File,
+  signedCookies: SignedCookies,
+): Promise<PendingUploadDto> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+  const upload = await createPendingUpload({ albumId: album.id }, file.buffer);
+  return toPendingUploadDto(upload);
+}
+
+export async function removePendingAlbumUpload(
+  slug: string,
+  uploadId: string,
+  signedCookies: SignedCookies,
+): Promise<void> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+  await deletePendingUpload({ albumId: album.id }, uploadId);
 }

@@ -1,5 +1,15 @@
-import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/shared';
-import type { AliasReservation, Artwork, Submission } from '../../generated/prisma/client.js';
+import type {
+  AliasReservationDto,
+  ArtworkDto,
+  PendingUploadDto,
+  SubmissionDto,
+} from '@foka-vote/shared';
+import type {
+  AliasReservation,
+  Artwork,
+  Contest,
+  Submission,
+} from '../../generated/prisma/client.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, forbidden, notFound } from '../../errors/app-error.js';
@@ -8,6 +18,11 @@ import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
+import {
+  createPendingUpload,
+  deletePendingUpload,
+  toPendingUploadDto,
+} from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
 import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
 
@@ -296,4 +311,39 @@ export async function createSubmission(
     await removeProcessedFiles(processed);
     throw error;
   }
+}
+
+async function findContestForUpload(
+  slug: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<Contest> {
+  const contest = await prisma.contest.findUnique({ where: { slug } });
+  if (!contest) {
+    throw notFound('Contest not found');
+  }
+  assertContestAccess(contest, signedCookies);
+  return contest;
+}
+
+export async function addPendingContestUpload(
+  slug: string,
+  file: Express.Multer.File,
+  signedCookies: Record<string, string | undefined>,
+): Promise<PendingUploadDto> {
+  const contest = await findContestForUpload(slug, signedCookies);
+  if (computeContestStatus(new Date(), contest) !== 'SUBMISSIONS') {
+    throw conflict('This contest is not currently accepting submissions');
+  }
+  const upload = await createPendingUpload({ contestId: contest.id }, file.buffer);
+  return toPendingUploadDto(upload);
+}
+
+// Allowed after the submission phase ends too, so a form left open can still clean up after itself.
+export async function removePendingContestUpload(
+  slug: string,
+  uploadId: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<void> {
+  const contest = await findContestForUpload(slug, signedCookies);
+  await deletePendingUpload({ contestId: contest.id }, uploadId);
 }
