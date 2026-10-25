@@ -64,9 +64,16 @@ jobs:
         run: |
           ssh -p ${{ env.MIKRUS_PORT }} root@${{ env.MIKRUS_HOST }} '
             set -e
-            cd /var/www/foka-vote &&
-            npm ci --omit=dev -w apps/api &&
-            cd apps/api &&
-            npx prisma migrate deploy &&
+            cd /var/www/foka-vote
+            free -m
+            df -h /
+            if ! npm ci --omit=dev --no-audit --no-fund -w apps/api; then
+              free -m
+              tail -n 60 "$(ls -t /root/.npm/_logs/*-debug-0.log | head -n 1)"
+              dmesg 2>/dev/null | tail -n 20 || true
+              exit 1
+            fi
+            cd apps/api
+            npx prisma migrate deploy
             pm2 reload foka-api
           '
