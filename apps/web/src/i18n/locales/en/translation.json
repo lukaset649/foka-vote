@@ -278,6 +278,13 @@
     }
   },
   "components": {
+    "descriptionModal": {
+      "previous": "Previous description",
+      "next": "Next description"
+    },
+    "clampedText": {
+      "readMore": "Read more"
+    },
     "installInstructions": {
       "title": "Install FOKA Vote",
       "share": "Tap the Share button in the browser toolbar.",

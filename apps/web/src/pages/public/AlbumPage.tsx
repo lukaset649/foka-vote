@@ -8,6 +8,8 @@ import { fetchAlbum } from '../../services/gallery';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Alert from '../../components/ui/Alert';
 import Card from '../../components/ui/Card';
+import ClampedText from '../../components/ui/ClampedText';
+import DescriptionModal from '../../components/ui/DescriptionModal';
 import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
@@ -20,6 +22,7 @@ const AlbumPage = () => {
   const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
   const [error, setError] = useState<'notFound' | 'failed' | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [descriptionIndex, setDescriptionIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -97,9 +100,25 @@ const AlbumPage = () => {
                   onClick={() => setLightboxIndex(index)}
                 />
                 {photo.title && (
-                  <p className="mt-1 text-sm font-medium text-zinc-900">{photo.title}</p>
+                  <p
+                    title={photo.title}
+                    className="mt-1 line-clamp-2 text-sm font-medium break-words text-zinc-900"
+                  >
+                    {photo.title}
+                  </p>
                 )}
-                {photo.description && <p className="text-sm text-zinc-600">{photo.description}</p>}
+                {photo.description && (
+                  <ClampedText
+                    text={photo.description}
+                    onReadMore={() =>
+                      setDescriptionIndex(
+                        album.photos.slice(0, index).filter((previous) => previous.description)
+                          .length,
+                      )
+                    }
+                    className="text-sm text-zinc-600"
+                  />
+                )}
                 <p className="text-xs text-zinc-500">
                   {t('pages.album.photoBy', { author: photo.authorName })}
                 </p>
@@ -122,6 +141,25 @@ const AlbumPage = () => {
           startIndex={lightboxIndex}
           open
           onClose={() => setLightboxIndex(null)}
+        />
+      )}
+
+      {descriptionIndex !== null && (
+        <DescriptionModal
+          items={album.photos.flatMap((photo) =>
+            photo.description
+              ? [
+                  {
+                    title: photo.title ?? photo.authorName,
+                    text: photo.description,
+                    thumbUrl: mediaUrl(photo.thumbUrl),
+                  },
+                ]
+              : [],
+          )}
+          index={descriptionIndex}
+          onIndexChange={setDescriptionIndex}
+          onClose={() => setDescriptionIndex(null)}
         />
       )}
     </div>
