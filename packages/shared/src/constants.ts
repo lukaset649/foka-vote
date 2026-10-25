@@ -11,7 +11,7 @@ export const DEFAULT_MAX_ARTWORKS_PER_SUBMISSION = 3;
 // Photos are uploaded one per request, so these limits do not depend on the reverse
 // proxy's client_max_body_size (see deploy/nginx.conf).
 export const MAX_ARTWORKS_PER_SUBMISSION_LIMIT = 15;
-export const MAX_PHOTOS_PER_ALBUM_UPLOAD = 15;
+export const MAX_PHOTOS_PER_ALBUM_UPLOAD = 30;
 
 export const GALLERY_ALBUM_PREVIEW_COUNT = 8;
 
