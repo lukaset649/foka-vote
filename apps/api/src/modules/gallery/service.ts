@@ -299,9 +299,12 @@ export async function getPublicAlbum(
     createdAt: album.createdAt.toISOString(),
     hasAccessCode: album.accessCode !== null,
     canUpload: hasAlbumUploadAccess(album, signedCookies),
-    photos: album.submissions.flatMap(({ photos, ...submission }) =>
-      photos.map((photo) => toAlbumPhotoDto({ ...photo, submission })),
-    ),
+    submissions: album.submissions.map(({ photos, ...submission }) => ({
+      id: submission.id,
+      authorName: `${submission.firstName} ${submission.lastName}`,
+      createdAt: submission.createdAt.toISOString(),
+      photos: photos.map((photo) => toAlbumPhotoDto({ ...photo, submission })),
+    })),
   };
 }
 

@@ -41,6 +41,13 @@ export interface AlbumPhotoDto {
   createdAt: string;
 }
 
+export interface AlbumSubmissionDto {
+  id: string;
+  authorName: string;
+  createdAt: string;
+  photos: AlbumPhotoDto[];
+}
+
 export interface AlbumDetailDto {
   id: string;
   slug: string;
@@ -49,7 +56,7 @@ export interface AlbumDetailDto {
   createdAt: string;
   hasAccessCode: boolean;
   canUpload: boolean;
-  photos: AlbumPhotoDto[];
+  submissions: AlbumSubmissionDto[];
 }
 
 export interface CreateAlbumDto {
