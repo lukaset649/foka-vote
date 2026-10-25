@@ -3,6 +3,7 @@ import type {
   AdminAlbumPhotoDto,
   AlbumDetailDto,
   CreateAlbumDto,
+  CreateAlbumSubmissionDto,
   GalleryAlbumDto,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
@@ -43,6 +44,20 @@ export async function verifyAlbumAccessCode(slug: string, code: string): Promise
   });
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to verify access code');
+  }
+}
+
+export async function createAlbumSubmission(
+  slug: string,
+  input: CreateAlbumSubmissionDto,
+): Promise<void> {
+  const response = await apiRequest(`/api/gallery/albums/${slug}/submissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw await apiErrorFrom(response, 'Failed to submit photos');
   }
 }
 

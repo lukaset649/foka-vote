@@ -77,8 +77,6 @@
       "firstNameLabel": "First name",
       "lastNameLabel": "Last name",
       "photosHeading": "Photos (up to {{max}})",
-      "photoLegend": "Photo {{index}}",
-      "addAnotherPhoto": "Add another photo",
       "rulesLabel": "I accept the <rulesLink>gallery rules</rulesLink>.",
       "submit": "Add photos",
       "errors": {
@@ -467,7 +465,9 @@
         "uploading": "Uploading photos: {{done}} of {{total}}",
         "done": "All photos uploaded",
         "failed": "Some photos could not be uploaded. Retry or remove them."
-      }
+      },
+      "waitForUploads": "Wait until all photos have been uploaded.",
+      "fixFailedUploads": "Retry or remove the photos that could not be uploaded."
     }
   }
 }

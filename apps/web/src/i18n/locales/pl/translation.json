@@ -77,8 +77,6 @@
       "firstNameLabel": "Imię",
       "lastNameLabel": "Nazwisko",
       "photosHeading": "Zdjęcia (maksymalnie {{max}})",
-      "photoLegend": "Zdjęcie {{index}}",
-      "addAnotherPhoto": "Dodaj kolejne zdjęcie",
       "rulesLabel": "Akceptuję <rulesLink>regulamin galerii</rulesLink>.",
       "submit": "Dodaj zdjęcia",
       "errors": {
@@ -477,7 +475,9 @@
         "uploading": "Wysyłanie zdjęć: {{done}} z {{total}}",
         "done": "Wszystkie zdjęcia wysłane",
         "failed": "Części zdjęć nie udało się wysłać. Ponów wysyłkę lub usuń te zdjęcia."
-      }
+      },
+      "waitForUploads": "Poczekaj, aż wszystkie zdjęcia zostaną wysłane.",
+      "fixFailedUploads": "Ponów wysyłkę lub usuń zdjęcia, których nie udało się wysłać."
     }
   }
 }
