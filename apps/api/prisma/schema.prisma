@@ -32,6 +32,7 @@ model Contest {
   submissions       Submission[]
   voteCards         VoteCard[]
   aliasReservations AliasReservation[]
+  pendingUploads    PendingUpload[]
 }
 
 model AliasReservation {
@@ -123,7 +124,8 @@ model Album {
   hidden      Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  submissions AlbumSubmission[]
+  submissions    AlbumSubmission[]
+  pendingUploads PendingUpload[]
 
   @@index([hidden, createdAt])
 }
@@ -160,3 +162,20 @@ model AlbumPhoto {
   @@index([submissionId, sortOrder])
 }
 
+// A processed photo waiting to be attached to a submission; exactly one of albumId / contestId is set.
+model PendingUpload {
+  id          String   @id @default(uuid())
+  albumId     String?
+  contestId   String?
+  filePath    String
+  previewPath String
+  thumbPath   String
+  width       Int?
+  height      Int?
+  createdAt   DateTime @default(now())
+
+  album   Album?   @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  contest Contest? @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}

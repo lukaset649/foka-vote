@@ -19,12 +19,21 @@ export function apiRequest(path: string, init?: RequestInit): Promise<Response> 
   });
 }
 
+export function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && err.name === 'AbortError';
+}
+
 export function apiUploadWithProgress(
   path: string,
   formData: FormData,
   onProgress?: (fraction: number) => void,
+  signal?: AbortSignal,
 ): Promise<Response> {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Upload aborted', 'AbortError'));
+      return;
+    }
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `${API_URL}${path}`);
     xhr.withCredentials = true;
@@ -37,6 +46,8 @@ export function apiUploadWithProgress(
       resolve(new Response(xhr.responseText, { status: xhr.status, statusText: xhr.statusText }));
     };
     xhr.onerror = () => reject(new NetworkError());
+    xhr.onabort = () => reject(new DOMException('Upload aborted', 'AbortError'));
+    signal?.addEventListener('abort', () => xhr.abort(), { once: true });
     xhr.send(formData);
   });
 }

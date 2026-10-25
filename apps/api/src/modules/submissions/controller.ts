@@ -1,7 +1,14 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
-import { parseArtworkMeta } from '../../lib/artwork-meta.js';
-import { createSubmission, listSubmissions, reserveAlias } from './service.js';
+import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
+import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
+import {
+  addPendingContestUpload,
+  createSubmission,
+  listSubmissions,
+  removePendingContestUpload,
+  reserveAlias,
+} from './service.js';
 
 function requireSlugParam(request: Request): string {
   const { slug } = request.params;
@@ -30,36 +37,51 @@ export async function reserveAliasHandler(request: Request, response: Response):
   response.status(201).json(reservation);
 }
 
+export async function uploadArtwork(request: Request, response: Response): Promise<void> {
+  const upload = await addPendingContestUpload(
+    requireSlugParam(request),
+    requireSingleUpload(request),
+    request.signedCookies as Record<string, string | undefined>,
+  );
+  response.status(201).json(upload);
+}
+
+export async function removeUpload(request: Request, response: Response): Promise<void> {
+  await removePendingContestUpload(
+    requireSlugParam(request),
+    requireUploadIdParam(request),
+    request.signedCookies as Record<string, string | undefined>,
+  );
+  response.status(204).end();
+}
+
 export async function create(request: Request, response: Response): Promise<void> {
   const slug = requireSlugParam(request);
-  const { firstName, lastName, description, meta, reservationId, rulesAccepted } =
-    request.body as Record<string, unknown>;
+  const body = (request.body ?? {}) as Record<string, unknown>;
+  const { firstName, lastName, description, reservationId, rulesAccepted, artworks } = body;
 
-  if (typeof firstName !== 'string' || firstName.length === 0) {
+  if (typeof firstName !== 'string' || firstName.trim().length === 0) {
     throw badRequest('firstName is required');
   }
-  if (typeof lastName !== 'string' || lastName.length === 0) {
+  if (typeof lastName !== 'string' || lastName.trim().length === 0) {
     throw badRequest('lastName is required');
   }
-  if (rulesAccepted !== 'true') {
+  if (rulesAccepted !== true) {
     throw badRequest('rulesAccepted must be accepted');
   }
 
-  const files = (request.files as Express.Multer.File[] | undefined) ?? [];
-  const artworksMeta = parseArtworkMeta(meta);
   const descriptionValue = optionalString(description);
   const reservationIdValue = optionalString(reservationId);
 
   const submission = await createSubmission(
     slug,
     {
-      firstName,
-      lastName,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
       ...(descriptionValue !== undefined ? { description: descriptionValue } : {}),
       ...(reservationIdValue !== undefined ? { reservationId: reservationIdValue } : {}),
     },
-    files,
-    artworksMeta,
+    parseSubmissionPhotos(artworks, 'artworks'),
     request.signedCookies as Record<string, string | undefined>,
   );
 

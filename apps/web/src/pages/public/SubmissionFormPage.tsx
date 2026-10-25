@@ -1,50 +1,52 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
-import { MAX_ARTWORK_FILE_SIZE_MB, type ContestDto } from '@foka-vote/shared';
+import type { ContestDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
+import useLeaveWarning from '../../lib/useLeaveWarning';
+import usePhotoUploadQueue, {
+  type PhotoUploadItem,
+  type UploadedPhotoDraft,
+} from '../../lib/usePhotoUploadQueue';
 import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
+import PhotoUploadList from '../../components/PhotoUploadList';
 import RulesModal from '../../components/RulesModal';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import Label from '../../components/ui/Label';
 import Button from '../../components/ui/Button';
-import LinkButton from '../../components/ui/LinkButton';
 import Alert from '../../components/ui/Alert';
 import Spinner from '../../components/ui/Spinner';
-
-export interface SubmissionArtworkDraft {
-  file: File;
-  title: string;
-  description: string;
-}
 
 export interface SubmissionDraftState {
   firstName: string;
   lastName: string;
   description: string;
-  artworks: SubmissionArtworkDraft[];
+  artworks: UploadedPhotoDraft[];
   alias: string;
   reservationId: string;
   rulesAccepted: boolean;
 }
 
-interface ArtworkSlot {
-  file: File | null;
-  title: string;
-  description: string;
-}
-
-function emptySlot(): ArtworkSlot {
-  return { file: null, title: '', description: '' };
+function uploadedDraft(item: PhotoUploadItem): UploadedPhotoDraft[] {
+  return item.uploadId && item.thumbUrl
+    ? [
+        {
+          uploadId: item.uploadId,
+          thumbUrl: item.thumbUrl,
+          title: item.title,
+          description: item.description,
+        },
+      ]
+    : [];
 }
 
 const SubmissionFormPage = () => {
   const { t } = useTranslation();
-  const { slug } = useParams<{ slug: string }>();
+  const { slug = '' } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const draft = (location.state as SubmissionDraftState | null) ?? null;
@@ -55,15 +57,6 @@ const SubmissionFormPage = () => {
   const [firstName, setFirstName] = useState(draft?.firstName ?? '');
   const [lastName, setLastName] = useState(draft?.lastName ?? '');
   const [description, setDescription] = useState(draft?.description ?? '');
-  const [slots, setSlots] = useState<ArtworkSlot[]>(
-    draft
-      ? draft.artworks.map((artwork) => ({
-          file: artwork.file,
-          title: artwork.title,
-          description: artwork.description,
-        }))
-      : [emptySlot()],
-  );
   const [formError, setFormError] = useState<string | null>(null);
   const [rulesAccepted, setRulesAccepted] = useState(draft?.rulesAccepted ?? false);
   const [rulesModalOpen, setRulesModalOpen] = useState(false);
@@ -71,6 +64,7 @@ const SubmissionFormPage = () => {
   const [alias, setAlias] = useState(draft?.alias ?? '');
   const [reservationId, setReservationId] = useState(draft?.reservationId ?? '');
   const [aliasError, setAliasError] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -130,23 +124,46 @@ const SubmissionFormPage = () => {
   }, [slug, contest, reservationId, navigate]);
 
   const maxArtworks = contest?.maxArtworksPerSubmission ?? 1;
+  const formPath = `/contest/${slug}/submit`;
 
-  const updateSlot = (index: number, patch: Partial<ArtworkSlot>) => {
-    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, ...patch } : slot)));
-  };
+  const buildDraft = (artworks: UploadedPhotoDraft[]): SubmissionDraftState => ({
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
+    description,
+    artworks,
+    alias,
+    reservationId,
+    rulesAccepted,
+  });
 
-  const addSlot = () => {
-    if (slots.length < maxArtworks) {
-      setSlots((prev) => [...prev, emptySlot()]);
-    }
-  };
+  const queue = usePhotoUploadQueue({ kind: 'contest', slug }, maxArtworks, {
+    initialPhotos: draft?.artworks ?? [],
+    onUnauthorized: () => {
+      // The draft carries the uploaded photos through the gate and back to the form.
+      queue.keep();
+      void navigate(contestGatePath(slug, formPath), {
+        replace: true,
+        state: buildDraft(queue.items.flatMap(uploadedDraft)),
+      });
+    },
+  });
+  const { summary, uploadedPhotos } = queue;
 
-  const removeSlot = (index: number) => {
-    setSlots((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
-  };
+  useLeaveWarning(summary.total > 0);
 
-  const handleFileChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
-    updateSlot(index, { file: event.target.files?.[0] ?? null });
+  const uploadsBlockedReason =
+    summary.total === 0
+      ? null
+      : summary.busy
+        ? t('components.photoUpload.waitForUploads')
+        : summary.failed > 0
+          ? t('components.photoUpload.fixFailedUploads')
+          : null;
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    await queue.clear();
+    void navigate(`/contest/${slug}`);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -158,15 +175,8 @@ const SubmissionFormPage = () => {
       return;
     }
 
-    const artworks: SubmissionArtworkDraft[] = [];
-    for (const slot of slots) {
-      if (slot.file) {
-        artworks.push({ file: slot.file, title: slot.title, description: slot.description });
-      }
-    }
-
-    if (artworks.length === 0) {
-      setFormError(t('pages.submissionForm.errors.artworkRequired'));
+    if (!uploadedPhotos) {
+      setFormError(uploadsBlockedReason ?? t('pages.submissionForm.errors.artworkRequired'));
       return;
     }
 
@@ -180,17 +190,8 @@ const SubmissionFormPage = () => {
       return;
     }
 
-    const draft: SubmissionDraftState = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      description,
-      artworks,
-      alias,
-      reservationId,
-      rulesAccepted,
-    };
-
-    void navigate(`/contest/${slug}/submit/preview`, { state: draft });
+    queue.keep();
+    void navigate(`${formPath}/preview`, { state: buildDraft(uploadedPhotos) });
   };
 
   if (loadError) {
@@ -264,84 +265,10 @@ const SubmissionFormPage = () => {
       </Card>
 
       <div className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900">
-            {t('pages.submissionForm.artworksHeading', { max: maxArtworks })}
-          </h2>
-          <p className="text-sm text-zinc-500">
-            {t('pages.submissionForm.maxFileSize', { size: MAX_ARTWORK_FILE_SIZE_MB })}
-          </p>
-        </div>
-
-        {slots.map((slot, index) => (
-          <fieldset
-            key={index}
-            className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6"
-          >
-            <legend className="px-1 text-sm font-semibold text-zinc-700">
-              {t('pages.submissionForm.artworkLegend', { index: index + 1 })}
-            </legend>
-
-            <div>
-              <Label htmlFor={`file-${index}`}>
-                <i className="bi bi-upload" aria-hidden="true" />{' '}
-                {t('pages.submissionForm.fileLabel')}
-              </Label>
-              <input
-                id={`file-${index}`}
-                type="file"
-                accept="image/jpeg,image/png"
-                onChange={handleFileChange(index)}
-                className="block w-full text-sm text-zinc-700 file:mr-3 file:min-h-10 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200"
-              />
-              {slot.file && (
-                <p className="mt-1 text-sm text-zinc-500">
-                  {t('pages.submissionForm.currentlyAttached', { filename: slot.file.name })}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor={`title-${index}`}>{t('common.titleOptional')}</Label>
-              <Input
-                id={`title-${index}`}
-                value={slot.title}
-                onChange={(event) => updateSlot(index, { title: event.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor={`artwork-description-${index}`}>
-                {t('common.descriptionOptional')}
-              </Label>
-              <Input
-                id={`artwork-description-${index}`}
-                value={slot.description}
-                onChange={(event) => updateSlot(index, { description: event.target.value })}
-              />
-            </div>
-
-            {slots.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="w-fit"
-                onClick={() => removeSlot(index)}
-              >
-                <i className="bi bi-trash" aria-hidden="true" />
-                {t('common.remove')}
-              </Button>
-            )}
-          </fieldset>
-        ))}
-
-        {slots.length < maxArtworks && (
-          <Button type="button" variant="secondary" className="w-fit" onClick={addSlot}>
-            <i className="bi bi-plus-circle" aria-hidden="true" />
-            {t('pages.submissionForm.addAnotherArtwork')}
-          </Button>
-        )}
+        <h2 className="text-lg font-semibold text-zinc-900">
+          {t('pages.submissionForm.artworksHeading', { max: maxArtworks })}
+        </h2>
+        <PhotoUploadList queue={queue} />
       </div>
 
       <label className="flex items-start gap-2 text-sm text-zinc-700">
@@ -373,14 +300,24 @@ const SubmissionFormPage = () => {
         onClose={() => setRulesModalOpen(false)}
       />
 
-      <div className="flex flex-wrap justify-between gap-3">
-        <LinkButton to={`/contest/${slug}`} variant="secondaryDanger">
-          {t('common.cancel')}
-        </LinkButton>
-        <Button type="submit">
-          <i className="bi bi-send" aria-hidden="true" />
-          {t('pages.submissionForm.continueToPreview')}
-        </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap justify-between gap-3">
+          <Button
+            type="button"
+            variant="secondaryDanger"
+            disabled={cancelling}
+            onClick={() => void handleCancel()}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" disabled={cancelling || uploadsBlockedReason !== null}>
+            <i className="bi bi-send" aria-hidden="true" />
+            {t('pages.submissionForm.continueToPreview')}
+          </Button>
+        </div>
+        {uploadsBlockedReason && (
+          <p className="text-right text-sm text-zinc-500">{uploadsBlockedReason}</p>
+        )}
       </div>
 
       {formError && <Alert variant="error">{formError}</Alert>}

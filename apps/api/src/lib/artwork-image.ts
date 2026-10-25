@@ -27,7 +27,19 @@ async function readMetadata(buffer: Buffer) {
   }
 }
 
-export async function processArtworkImage(buffer: Buffer): Promise<ArtworkImageResult> {
+let processingQueue: Promise<unknown> = Promise.resolve();
+
+function runExclusive<T>(task: () => Promise<T>): Promise<T> {
+  const result = processingQueue.then(task);
+  processingQueue = result.catch(() => undefined);
+  return result;
+}
+
+export function processArtworkImage(buffer: Buffer): Promise<ArtworkImageResult> {
+  return runExclusive(() => processImage(buffer));
+}
+
+async function processImage(buffer: Buffer): Promise<ArtworkImageResult> {
   const metadata = await readMetadata(buffer);
 
   if (metadata.format !== 'jpeg' && metadata.format !== 'png') {

@@ -1,10 +1,12 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './lib/logger.js';
+import { removeExpiredPendingUploads } from './lib/pending-uploads.js';
 import { prisma } from './lib/prisma.js';
 import { ensureUploadDirs } from './lib/storage.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
+const PENDING_UPLOAD_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
 
 await ensureUploadDirs();
 
@@ -12,6 +14,16 @@ const app = createApp();
 const server = app.listen(env.PORT, env.HOST, () => {
   logger.info(`API listening on http://${env.HOST}:${env.PORT}`);
 });
+
+function cleanUpPendingUploads(): void {
+  removeExpiredPendingUploads().catch((error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error('Failed to remove expired pending uploads', { error: message });
+  });
+}
+
+cleanUpPendingUploads();
+setInterval(cleanUpPendingUploads, PENDING_UPLOAD_CLEANUP_INTERVAL_MS).unref();
 
 let shuttingDown = false;
 

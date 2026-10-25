@@ -3,11 +3,12 @@ import type {
   AdminAlbumPhotoDto,
   AlbumDetailDto,
   CreateAlbumDto,
+  CreateAlbumSubmissionDto,
   GalleryAlbumDto,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
-import { apiErrorFrom, apiRequest, apiUploadWithProgress } from './apiClient';
+import { apiErrorFrom, apiRequest } from './apiClient';
 
 export async function fetchGalleryAlbums(): Promise<GalleryAlbumDto[]> {
   const response = await apiRequest('/api/gallery/albums');
@@ -46,40 +47,17 @@ export async function verifyAlbumAccessCode(slug: string, code: string): Promise
   }
 }
 
-export interface AlbumPhotoUpload {
-  file: File;
-  title: string;
-  description: string;
-}
-
-export async function addAlbumPhotos(
+export async function createAlbumSubmission(
   slug: string,
-  author: { firstName: string; lastName: string },
-  photos: AlbumPhotoUpload[],
-  onProgress?: (fraction: number) => void,
+  input: CreateAlbumSubmissionDto,
 ): Promise<void> {
-  const formData = new FormData();
-  formData.append('firstName', author.firstName);
-  formData.append('lastName', author.lastName);
-  formData.append('rulesAccepted', 'true');
-  formData.append(
-    'meta',
-    JSON.stringify(
-      photos.map((photo) => ({
-        title: photo.title || undefined,
-        description: photo.description || undefined,
-      })),
-    ),
-  );
-  photos.forEach((photo) => formData.append('photos', photo.file));
-
-  const response = await apiUploadWithProgress(
-    `/api/gallery/albums/${slug}/photos`,
-    formData,
-    onProgress,
-  );
+  const response = await apiRequest(`/api/gallery/albums/${slug}/submissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
   if (!response.ok) {
-    throw await apiErrorFrom(response, 'Failed to upload photos');
+    throw await apiErrorFrom(response, 'Failed to submit photos');
   }
 }
 

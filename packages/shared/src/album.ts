@@ -1,3 +1,5 @@
+import type { SubmissionPhotoDto } from './upload.js';
+
 export type AlbumKind = 'CONTEST' | 'STANDALONE';
 
 export interface GalleryPreviewImageDto {
@@ -66,6 +68,13 @@ export interface CreateAlbumDto {
 }
 
 export type UpdateAlbumDto = Partial<CreateAlbumDto>;
+
+export interface CreateAlbumSubmissionDto {
+  firstName: string;
+  lastName: string;
+  rulesAccepted: true;
+  photos: SubmissionPhotoDto[];
+}
 
 export interface AdminAlbumDto {
   kind: AlbumKind;

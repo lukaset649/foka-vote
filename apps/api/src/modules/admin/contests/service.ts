@@ -8,6 +8,7 @@ import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
+import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
 import { removeStoredFiles } from '../../../lib/storage.js';
 
 function toAdminContestDto(contest: Contest): AdminContestDto {
@@ -172,12 +173,14 @@ export async function deleteContest(id: string): Promise<void> {
     where: { submission: { contestId: id } },
     select: { filePath: true, previewPath: true, thumbPath: true },
   });
+  const pendingPaths = await pendingUploadPaths({ contestId: id });
 
-  // The DB cascades submissions, artworks, vote cards and vote items; only the
-  // files on disk need explicit cleanup.
+  // The DB cascades submissions, artworks, pending uploads, vote cards and vote items;
+  // only the files on disk need explicit cleanup.
   await prisma.contest.delete({ where: { id } });
 
-  await removeStoredFiles(
-    artworks.flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath]),
-  );
+  await removeStoredFiles([
+    ...artworks.flatMap((artwork) => [artwork.filePath, artwork.previewPath, artwork.thumbPath]),
+    ...pendingPaths,
+  ]);
 }

@@ -1,15 +1,30 @@
-import type { AliasReservationDto, ArtworkDto, SubmissionDto } from '@foka-vote/shared';
-import type { AliasReservation, Artwork, Submission } from '../../generated/prisma/client.js';
+import type {
+  AliasReservationDto,
+  ArtworkDto,
+  PendingUploadDto,
+  SubmissionDto,
+} from '@foka-vote/shared';
+import type {
+  AliasReservation,
+  Artwork,
+  Contest,
+  PendingUpload,
+  Submission,
+} from '../../generated/prisma/client.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { assertContestAccess } from '../contests/service.js';
 import { badRequest, conflict, forbidden, notFound } from '../../errors/app-error.js';
-import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
-import type { ArtworkImageResult } from '../../lib/artwork-image.js';
-import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
+import {
+  claimPendingUploads,
+  createPendingUpload,
+  deletePendingUpload,
+  toPendingUploadDto,
+} from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
-import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
+import { mediaUrl } from '../../lib/storage.js';
+import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
 const ALIAS_RESERVATION_TTL_MS = 20 * 60 * 1000;
@@ -122,19 +137,23 @@ export async function reserveAlias(
   throw conflict('Could not allocate a unique nickname, please try again');
 }
 
-async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
-  await removeStoredFiles(
-    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
-  );
-}
+type ArtworkSource = Pick<
+  PendingUpload,
+  'filePath' | 'previewPath' | 'thumbPath' | 'width' | 'height'
+> & {
+  title: string | null;
+  description: string | null;
+};
+
+/** Supplies the artworks inside the submission transaction, so claiming uploads rolls back with it. */
+type ArtworkSourceLoader = (tx: Prisma.TransactionClient) => Promise<ArtworkSource[]>;
 
 async function createSubmissionWithRetry(
   contestId: string,
   input: CreateSubmissionInput,
-  processed: ArtworkImageResult[],
-  meta: ArtworkMetaInput[],
-  reservationId: string | undefined,
+  loadArtworks: ArtworkSourceLoader,
 ): Promise<{ submission: Submission; artworks: Artwork[] }> {
+  const { reservationId } = input;
   for (let attempt = 0; attempt < MAX_ALIAS_ATTEMPTS; attempt++) {
     const now = new Date();
     let reservedAlias: { id: string; alias: string } | null = null;
@@ -165,6 +184,7 @@ async function createSubmissionWithRetry(
     try {
       // eslint-disable-next-line no-await-in-loop -- each attempt depends on the previous one's outcome
       return await prisma.$transaction(async (tx) => {
+        const sources = await loadArtworks(tx);
         const submission = await tx.submission.create({
           data: {
             contestId,
@@ -181,21 +201,19 @@ async function createSubmissionWithRetry(
         }
 
         const artworks: Artwork[] = [];
-        for (let i = 0; i < processed.length; i++) {
-          const file = processed[i] as ArtworkImageResult;
-          const fileMeta = meta[i];
+        for (const [index, source] of sources.entries()) {
           // eslint-disable-next-line no-await-in-loop -- artwork rows must be created in order for sortOrder
           const artwork = await tx.artwork.create({
             data: {
               submissionId: submission.id,
-              title: fileMeta?.title ?? null,
-              description: fileMeta?.description ?? null,
-              filePath: file.filePath,
-              previewPath: file.previewPath,
-              thumbPath: file.thumbPath,
-              width: file.width,
-              height: file.height,
-              sortOrder: i,
+              title: source.title,
+              description: source.description,
+              filePath: source.filePath,
+              previewPath: source.previewPath,
+              thumbPath: source.thumbPath,
+              width: source.width,
+              height: source.height,
+              sortOrder: index,
             },
           });
           artworks.push(artwork);
@@ -240,60 +258,70 @@ export async function listSubmissions(slug: string): Promise<SubmissionDto[]> {
 export async function createSubmission(
   slug: string,
   input: CreateSubmissionInput,
-  files: Express.Multer.File[],
-  meta: ArtworkMetaInput[],
+  artworks: SubmissionPhotoInput[],
   signedCookies: Record<string, string | undefined>,
 ): Promise<SubmissionDto> {
-  const contest = await prisma.contest.findUnique({ where: { slug } });
-  if (!contest) {
-    throw notFound('Contest not found');
-  }
-
-  const status = computeContestStatus(new Date(), contest);
-  if (status !== 'SUBMISSIONS') {
+  const contest = await findContestForUpload(slug, signedCookies);
+  if (computeContestStatus(new Date(), contest) !== 'SUBMISSIONS') {
     throw conflict('This contest is not currently accepting submissions');
   }
 
-  assertContestAccess(contest, signedCookies);
-
-  if (files.length < 1 || files.length > contest.maxArtworksPerSubmission) {
+  if (artworks.length < 1 || artworks.length > contest.maxArtworksPerSubmission) {
     throw badRequest(
       `Submission must include between 1 and ${contest.maxArtworksPerSubmission} artworks`,
     );
   }
 
-  if (meta.length !== files.length) {
-    throw badRequest('artworks metadata length must match the number of uploaded files');
-  }
-
-  const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
-
-  const processed: ArtworkImageResult[] = [];
-  let firstError: Error | undefined;
-  for (const result of settled) {
-    if (result.status === 'fulfilled') {
-      processed.push(result.value);
-    } else if (firstError === undefined) {
-      firstError = result.reason as Error;
-    }
-  }
-
-  if (firstError !== undefined) {
-    await removeProcessedFiles(processed);
-    throw firstError;
-  }
-
-  try {
-    const { submission, artworks } = await createSubmissionWithRetry(
-      contest.id,
-      input,
-      processed,
-      meta,
-      input.reservationId,
+  const created = await createSubmissionWithRetry(contest.id, input, async (tx) => {
+    const uploads = await claimPendingUploads(
+      tx,
+      { contestId: contest.id },
+      artworks.map((artwork) => artwork.uploadId),
     );
-    return toSubmissionDto(submission, artworks, false);
-  } catch (error) {
-    await removeProcessedFiles(processed);
-    throw error;
+    return uploads.map((upload, index) => ({
+      filePath: upload.filePath,
+      previewPath: upload.previewPath,
+      thumbPath: upload.thumbPath,
+      width: upload.width,
+      height: upload.height,
+      title: artworks[index]?.title ?? null,
+      description: artworks[index]?.description ?? null,
+    }));
+  });
+  return toSubmissionDto(created.submission, created.artworks, false);
+}
+
+async function findContestForUpload(
+  slug: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<Contest> {
+  const contest = await prisma.contest.findUnique({ where: { slug } });
+  if (!contest) {
+    throw notFound('Contest not found');
   }
+  assertContestAccess(contest, signedCookies);
+  return contest;
+}
+
+export async function addPendingContestUpload(
+  slug: string,
+  file: Express.Multer.File,
+  signedCookies: Record<string, string | undefined>,
+): Promise<PendingUploadDto> {
+  const contest = await findContestForUpload(slug, signedCookies);
+  if (computeContestStatus(new Date(), contest) !== 'SUBMISSIONS') {
+    throw conflict('This contest is not currently accepting submissions');
+  }
+  const upload = await createPendingUpload({ contestId: contest.id }, file.buffer);
+  return toPendingUploadDto(upload);
+}
+
+// Allowed after the submission phase ends too, so a form left open can still clean up after itself.
+export async function removePendingContestUpload(
+  slug: string,
+  uploadId: string,
+  signedCookies: Record<string, string | undefined>,
+): Promise<void> {
+  const contest = await findContestForUpload(slug, signedCookies);
+  await deletePendingUpload({ contestId: contest.id }, uploadId);
 }

@@ -1,11 +1,12 @@
 import type {
   AdminSubmissionDto,
   AliasReservationDto,
+  CreateSubmissionDto,
   SubmissionDto,
   UpdateArtworkDto,
   UpdateSubmissionDto,
 } from '@foka-vote/shared';
-import { apiErrorFrom, apiRequest, apiUploadWithProgress } from './apiClient';
+import { apiErrorFrom, apiRequest } from './apiClient';
 
 export async function fetchSubmissions(slug: string): Promise<SubmissionDto[]> {
   const response = await apiRequest(`/api/contests/${slug}/submissions`);
@@ -31,52 +32,15 @@ export async function reserveAlias(slug: string): Promise<AliasReservationDto> {
   return response.json() as Promise<AliasReservationDto>;
 }
 
-export interface CreateSubmissionData {
-  firstName: string;
-  lastName: string;
-  description: string;
-  reservationId?: string;
-  rulesAccepted: boolean;
-}
-
-export interface CreateSubmissionArtwork {
-  file: File;
-  title: string;
-  description: string;
-}
-
 export async function createSubmission(
   slug: string,
-  data: CreateSubmissionData,
-  artworks: CreateSubmissionArtwork[],
-  onProgress?: (fraction: number) => void,
+  input: CreateSubmissionDto,
 ): Promise<SubmissionDto> {
-  const formData = new FormData();
-  formData.append('firstName', data.firstName);
-  formData.append('lastName', data.lastName);
-  if (data.description) {
-    formData.append('description', data.description);
-  }
-  if (data.reservationId) {
-    formData.append('reservationId', data.reservationId);
-  }
-  formData.append('rulesAccepted', String(data.rulesAccepted));
-  formData.append(
-    'meta',
-    JSON.stringify(
-      artworks.map((artwork) => ({
-        title: artwork.title || undefined,
-        description: artwork.description || undefined,
-      })),
-    ),
-  );
-  artworks.forEach((artwork) => formData.append('artworks', artwork.file));
-
-  const response = await apiUploadWithProgress(
-    `/api/contests/${slug}/submissions`,
-    formData,
-    onProgress,
-  );
+  const response = await apiRequest(`/api/contests/${slug}/submissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to submit');
   }

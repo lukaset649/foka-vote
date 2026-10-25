@@ -77,8 +77,6 @@
       "firstNameLabel": "Imię",
       "lastNameLabel": "Nazwisko",
       "photosHeading": "Zdjęcia (maksymalnie {{max}})",
-      "photoLegend": "Zdjęcie {{index}}",
-      "addAnotherPhoto": "Dodaj kolejne zdjęcie",
       "rulesLabel": "Akceptuję <rulesLink>regulamin galerii</rulesLink>.",
       "submit": "Dodaj zdjęcia",
       "errors": {
@@ -108,11 +106,6 @@
       "firstNameLabel": "Imię",
       "lastNameLabel": "Nazwisko",
       "artworksHeading": "Prace (maksymalnie {{max}})",
-      "maxFileSize": "Maksymalny rozmiar pliku na zdjęcie: {{size}} MB",
-      "artworkLegend": "Praca {{index}}",
-      "fileLabel": "Plik",
-      "currentlyAttached": "Aktualnie dołączono: {{filename}}",
-      "addAnotherArtwork": "Dodaj kolejną pracę",
       "continueToPreview": "Przejdź do podglądu",
       "rulesLabel": "Akceptuję <rulesLink>regulamin konkursu</rulesLink>.",
       "errors": {
@@ -127,10 +120,7 @@
       "goBackToForm": "Wróć do formularza",
       "heading": "Podgląd zgłoszenia",
       "artworkFallbackAlt": "Praca {{index}}",
-      "edit": "Edytuj",
-      "uploading": "Przesyłanie zgłoszenia…",
-      "processing": "Przetwarzanie…",
-      "almostDone": "Prawie gotowe…"
+      "edit": "Edytuj"
     },
     "submissionConfirmation": {
       "title": "Zgłoszenie przyjęte",
@@ -450,6 +440,36 @@
           ]
         }
       ]
+    },
+    "photoUpload": {
+      "pickPhotos": "Wybierz zdjęcia",
+      "addMore": "Dodaj kolejne zdjęcia",
+      "counter": "Zdjęcia: {{count}} z {{max}}",
+      "hint": "Możesz zaznaczyć kilka zdjęć naraz (JPEG lub PNG, maksymalnie {{size}} MB każde). Wysyłanie zaczyna się od razu, a w tym czasie możesz ustawić kolejność i opisy.",
+      "photoLabel": "Zdjęcie {{index}}",
+      "status": {
+        "queued": "W kolejce",
+        "uploading": "Wysyłanie {{percent}}%",
+        "processing": "Przetwarzanie…",
+        "done": "Wysłane",
+        "error": "Błąd wysyłania"
+      },
+      "retry": "Ponów",
+      "moveUp": "Przesuń wyżej",
+      "moveDown": "Przesuń niżej",
+      "invalidPhoto": "Nie udało się przetworzyć zdjęcia. Użyj pliku JPEG lub PNG o dłuższym boku co najmniej {{minSize}} px.",
+      "rejected": {
+        "type": "{{name}}: dozwolone są tylko pliki JPEG i PNG",
+        "size": "{{name}}: plik jest większy niż {{size}} MB",
+        "limit": "{{name}}: osiągnięto limit {{max}} zdjęć"
+      },
+      "summary": {
+        "uploading": "Wysyłanie zdjęć: {{done}} z {{total}}",
+        "done": "Wszystkie zdjęcia wysłane",
+        "failed": "Części zdjęć nie udało się wysłać. Ponów wysyłkę lub usuń te zdjęcia."
+      },
+      "waitForUploads": "Poczekaj, aż wszystkie zdjęcia zostaną wysłane.",
+      "fixFailedUploads": "Ponów wysyłkę lub usuń zdjęcia, których nie udało się wysłać."
     }
   }
 }

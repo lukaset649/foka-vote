@@ -3,6 +3,7 @@ import type {
   AlbumPhotoDto,
   GalleryAlbumDto,
   GalleryAlbumPreviewDto,
+  PendingUploadDto,
 } from '@foka-vote/shared';
 import {
   GALLERY_ALBUM_PREVIEW_COUNT,
@@ -12,12 +13,16 @@ import {
 } from '@foka-vote/shared';
 import type { AlbumPhoto, AlbumSubmission } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
-import type { ArtworkImageResult } from '../../lib/artwork-image.js';
-import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
-import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
+import {
+  claimPendingUploads,
+  createPendingUpload,
+  deletePendingUpload,
+  toPendingUploadDto,
+} from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
-import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
+import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
+import { mediaUrl } from '../../lib/storage.js';
 
 type SignedCookies = Record<string, string | undefined>;
 
@@ -308,24 +313,7 @@ export async function getPublicAlbum(
   };
 }
 
-export interface AddAlbumPhotosInput {
-  firstName: string;
-  lastName: string;
-}
-
-async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<void> {
-  await removeStoredFiles(
-    processed.flatMap((file) => [file.filePath, file.previewPath, file.thumbPath]),
-  );
-}
-
-export async function addAlbumPhotos(
-  slug: string,
-  input: AddAlbumPhotosInput,
-  files: Express.Multer.File[],
-  meta: ArtworkMetaInput[],
-  signedCookies: SignedCookies,
-): Promise<void> {
+async function findAlbumForUpload(slug: string, signedCookies: SignedCookies) {
   const album = await prisma.album.findFirst({
     where: { slug, hidden: false },
     select: { id: true, accessCode: true },
@@ -333,62 +321,76 @@ export async function addAlbumPhotos(
   if (!album) {
     throw notFound('Album not found');
   }
-
   if (!hasAlbumUploadAccess(album, signedCookies)) {
     throw unauthorized('Access code required');
   }
+  return album;
+}
 
-  if (files.length < 1 || files.length > MAX_PHOTOS_PER_ALBUM_UPLOAD) {
+export async function addPendingAlbumUpload(
+  slug: string,
+  file: Express.Multer.File,
+  signedCookies: SignedCookies,
+): Promise<PendingUploadDto> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+  const upload = await createPendingUpload({ albumId: album.id }, file.buffer);
+  return toPendingUploadDto(upload);
+}
+
+export async function removePendingAlbumUpload(
+  slug: string,
+  uploadId: string,
+  signedCookies: SignedCookies,
+): Promise<void> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+  await deletePendingUpload({ albumId: album.id }, uploadId);
+}
+
+export interface CreateAlbumSubmissionInput {
+  firstName: string;
+  lastName: string;
+  photos: SubmissionPhotoInput[];
+}
+
+export async function createAlbumSubmission(
+  slug: string,
+  input: CreateAlbumSubmissionInput,
+  signedCookies: SignedCookies,
+): Promise<void> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+
+  if (input.photos.length < 1 || input.photos.length > MAX_PHOTOS_PER_ALBUM_UPLOAD) {
     throw badRequest(`Upload must include between 1 and ${MAX_PHOTOS_PER_ALBUM_UPLOAD} photos`);
   }
-  if (meta.length !== files.length) {
-    throw badRequest('photos metadata length must match the number of uploaded files');
-  }
-  // Checked before any image is processed, so a rejected caption leaves no orphan files.
-  for (const entry of meta) {
-    assertValidPhotoCaption(entry.title ?? null, entry.description ?? null);
+  for (const photo of input.photos) {
+    assertValidPhotoCaption(photo.title, photo.description);
   }
 
-  const settled = await Promise.allSettled(files.map((file) => processArtworkImage(file.buffer)));
-
-  const processed: ArtworkImageResult[] = [];
-  let firstError: Error | undefined;
-  for (const result of settled) {
-    if (result.status === 'fulfilled') {
-      processed.push(result.value);
-    } else if (firstError === undefined) {
-      firstError = result.reason as Error;
-    }
-  }
-
-  if (firstError !== undefined) {
-    await removeProcessedFiles(processed);
-    throw firstError;
-  }
-
-  try {
-    await prisma.albumSubmission.create({
+  await prisma.$transaction(async (tx) => {
+    const uploads = await claimPendingUploads(
+      tx,
+      { albumId: album.id },
+      input.photos.map((photo) => photo.uploadId),
+    );
+    await tx.albumSubmission.create({
       data: {
         albumId: album.id,
         firstName: input.firstName,
         lastName: input.lastName,
         rulesAcceptedAt: new Date(),
         photos: {
-          create: processed.map((file, index) => ({
-            title: meta[index]?.title ?? null,
-            description: meta[index]?.description ?? null,
-            filePath: file.filePath,
-            previewPath: file.previewPath,
-            thumbPath: file.thumbPath,
-            width: file.width,
-            height: file.height,
+          create: uploads.map((upload, index) => ({
+            title: input.photos[index]?.title ?? null,
+            description: input.photos[index]?.description ?? null,
+            filePath: upload.filePath,
+            previewPath: upload.previewPath,
+            thumbPath: upload.thumbPath,
+            width: upload.width,
+            height: upload.height,
             sortOrder: index,
           })),
         },
       },
     });
-  } catch (error) {
-    await removeProcessedFiles(processed);
-    throw error;
-  }
+  });
 }

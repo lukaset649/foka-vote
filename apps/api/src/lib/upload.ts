@@ -26,3 +26,19 @@ export function uploadArtworks(fieldName: string, maxCount: number) {
     });
   };
 }
+
+export function requireSingleUpload(request: Request): Express.Multer.File {
+  const file = (request.files as Express.Multer.File[] | undefined)?.[0];
+  if (!file) {
+    throw badRequest('photo is required');
+  }
+  return file;
+}
+
+export function requireUploadIdParam(request: Request): string {
+  const { uploadId } = request.params;
+  if (typeof uploadId !== 'string' || uploadId.length === 0) {
+    throw badRequest('uploadId is required');
+  }
+  return uploadId;
+}

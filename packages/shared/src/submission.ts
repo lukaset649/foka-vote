@@ -1,3 +1,5 @@
+import type { SubmissionPhotoDto } from './upload.js';
+
 export interface ArtworkDto {
   id: string;
   title: string | null;
@@ -23,6 +25,15 @@ export interface SubmissionDto {
 export interface AdminSubmissionDto extends SubmissionDto {
   firstName: string;
   lastName: string;
+}
+
+export interface CreateSubmissionDto {
+  firstName: string;
+  lastName: string;
+  description?: string;
+  reservationId?: string;
+  rulesAccepted: true;
+  artworks: SubmissionPhotoDto[];
 }
 
 export interface AliasReservationDto {
