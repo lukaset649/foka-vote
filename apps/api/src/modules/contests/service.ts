@@ -44,10 +44,7 @@ function toPublicContestDto(contest: Contest, now = new Date()): ContestDto {
   };
 }
 
-/**
- * Current contests (open for submissions or voting) are returned in full and never searched or
- * paginated; only the remaining contests are. The date filters mirror `computeContestStatus`.
- */
+// The date filters mirror `computeContestStatus`: current means SUBMISSIONS or VOTING.
 export async function listPublicContests(
   listQuery: ParsedListQuery,
 ): Promise<PublicContestListDto> {
@@ -66,7 +63,6 @@ export async function listPublicContests(
     }),
   ]);
 
-  // Contest rows are small, so all of them are sorted and paged without a second query.
   const page = paginateKeys(others, listQuery);
 
   return {

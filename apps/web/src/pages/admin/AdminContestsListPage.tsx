@@ -66,7 +66,6 @@ const AdminContestsListPage = () => {
     setActionError(null);
     deleteContest(contest.id)
       .then(() => {
-        // Reloading pulls the next contest onto this page; an emptied last page gets clamped.
         setReloadCount((count) => count + 1);
       })
       .catch(() => {

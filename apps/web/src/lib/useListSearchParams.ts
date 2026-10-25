@@ -25,10 +25,6 @@ function parsePage(value: string | null): number {
   return value !== null && /^\d+$/.test(value) && Number(value) >= 1 ? Number(value) : 1;
 }
 
-/**
- * Keeps a server-side list's search, sort and page in the URL so reloads and the back button
- * restore it. Default values are left out of the URL; any change other than the page resets it to 1.
- */
 export function useListSearchParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -117,7 +113,6 @@ export function useListSearchParams() {
   return { query, searchInput, setSearchInput, sortOption, setSortOption, setPage };
 }
 
-/** Moves a page left behind by a shrinking list (or typed into the URL) to the last one. */
 export function useClampedPage(
   page: number | undefined,
   totalPages: number,

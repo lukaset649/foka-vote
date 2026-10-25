@@ -195,11 +195,6 @@ async function listStandaloneAlbums(ids: string[]): Promise<GalleryAlbumDto[]> {
 
 type AlbumListKey = ListKey & { kind: AlbumKind };
 
-/**
- * Contest albums and standalone albums come from two tables, so the page is cut from their
- * merged keys and only the albums on it are loaded, each kind by its own loader. Shared with
- * the admin listing, which loads different DTOs.
- */
 export function paginateAlbums<T extends { kind: AlbumKind; id: string }>(
   contestKeys: ListKey[],
   standaloneKeys: ListKey[],
@@ -225,7 +220,7 @@ export function paginateAlbums<T extends { kind: AlbumKind; id: string }>(
   );
 }
 
-/** A contest shows up once its voting has started (VOTING or CLOSED in `computeContestStatus`). */
+// A contest shows up once its voting has started (VOTING or CLOSED in `computeContestStatus`).
 export async function listGalleryAlbums(
   listQuery: ParsedListQuery,
 ): Promise<PaginatedDto<GalleryAlbumDto>> {

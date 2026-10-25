@@ -116,7 +116,6 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
 export async function listContests(
   listQuery: ParsedListQuery,
 ): Promise<PaginatedDto<AdminContestDto>> {
-  // Contest rows are small, so all of them are sorted and paged without a second query.
   const contests = await prisma.contest.findMany({ where: titleSearchFilter(listQuery.q) });
   const page = paginateKeys(contests, listQuery);
 

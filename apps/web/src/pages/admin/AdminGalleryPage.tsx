@@ -97,7 +97,6 @@ const AdminGalleryPage = () => {
     setBusyId(album.id);
     setActionError(null);
     deleteAdminAlbum(album.id)
-      // Reloading pulls the next album onto this page; an emptied last page gets clamped.
       .then(() => setReloadCount((count) => count + 1))
       .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyId(null));

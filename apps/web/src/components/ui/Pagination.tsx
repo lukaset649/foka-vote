@@ -12,8 +12,7 @@ const PAGE_BUTTON_CLASS_NAME = 'max-sm:h-9 max-sm:w-9 max-sm:text-base';
 
 type PageItem = number | 'gap';
 
-// Always shows the first, the last and the neighbours of the current page; a single hidden
-// page is shown as its number, since an ellipsis would take the same space.
+// A single hidden page is shown as its number, since an ellipsis would take the same space.
 function pageItems(page: number, totalPages: number): PageItem[] {
   const visible = [1, page - 1, page, page + 1, totalPages]
     .filter((value) => value >= 1 && value <= totalPages)

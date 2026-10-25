@@ -93,7 +93,6 @@ function compareKeys(a: ListKey, b: ListKey, sort: ListSort): number {
   return primary !== 0 ? primary : a.id.localeCompare(b.id);
 }
 
-/** Sorts the full key list and cuts out the requested page; the caller loads full rows for it. */
 export function paginateKeys<K extends ListKey>(
   keys: K[],
   listQuery: ParsedListQuery,
@@ -110,11 +109,8 @@ export function paginateKeys<K extends ListKey>(
   };
 }
 
-/**
- * For lists whose full rows are too heavy to load for every key: cuts the page out of the keys,
- * loads rows only for it and returns them in page order. `identify` must give a key and its row
- * the same value; a row deleted between the two queries is left out of the page.
- */
+// `identify` must give a key and its row the same value; a row deleted between the two
+// queries is left out of the page.
 export async function paginateRows<K extends ListKey, T>(
   keys: K[],
   listQuery: ParsedListQuery,

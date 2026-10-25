@@ -157,7 +157,6 @@ async function getContestAlbum(contestId: string): Promise<AdminAlbumDto> {
   return album;
 }
 
-/** Same paging as the public gallery listing, without its visibility filters. */
 export async function listAdminAlbums(
   listQuery: ParsedListQuery,
 ): Promise<PaginatedDto<AdminAlbumDto>> {
