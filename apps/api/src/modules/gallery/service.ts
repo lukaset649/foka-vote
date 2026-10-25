@@ -10,7 +10,7 @@ import {
   MAX_ALBUM_TITLE_LENGTH,
   MAX_PHOTOS_PER_ALBUM_UPLOAD,
 } from '@foka-vote/shared';
-import type { AlbumPhoto } from '../../generated/prisma/client.js';
+import type { AlbumPhoto, AlbumSubmission } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import type { ArtworkImageResult } from '../../lib/artwork-image.js';
 import { processArtworkImage } from '../../lib/artwork-image.js';
@@ -135,37 +135,45 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
       title: true,
       description: true,
       createdAt: true,
-      photos: {
+      submissions: {
         orderBy: { createdAt: 'asc' },
-        take: GALLERY_ALBUM_PREVIEW_COUNT,
         select: {
-          id: true,
-          title: true,
-          description: true,
           firstName: true,
           lastName: true,
-          previewPath: true,
-          thumbPath: true,
-          width: true,
-          height: true,
+          photos: {
+            orderBy: { sortOrder: 'asc' },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              previewPath: true,
+              thumbPath: true,
+              width: true,
+              height: true,
+            },
+          },
         },
       },
-      _count: { select: { photos: true } },
     },
   });
 
-  return albums.map((album) => ({
-    kind: 'STANDALONE',
-    id: album.id,
-    slug: album.slug,
-    title: album.title,
-    description: album.description,
-    createdAt: album.createdAt.toISOString(),
-    itemCount: album._count.photos,
-    previews: album.photos.map((photo) => {
-      const author = `${photo.firstName} ${photo.lastName}`;
+  return albums.map((album) => {
+    const photos = album.submissions.flatMap((submission) =>
+      submission.photos.map((photo) => ({
+        ...photo,
+        author: `${submission.firstName} ${submission.lastName}`,
+      })),
+    );
 
-      return {
+    return {
+      kind: 'STANDALONE' as const,
+      id: album.id,
+      slug: album.slug,
+      title: album.title,
+      description: album.description,
+      createdAt: album.createdAt.toISOString(),
+      itemCount: photos.length,
+      previews: photos.slice(0, GALLERY_ALBUM_PREVIEW_COUNT).map(({ author, ...photo }) => ({
         id: photo.id,
         thumbUrl: mediaUrl(photo.thumbPath),
         label: author,
@@ -180,9 +188,9 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
             author,
           },
         ],
-      };
-    }),
-  }));
+      })),
+    };
+  });
 }
 
 export async function listGalleryAlbums(): Promise<GalleryAlbumDto[]> {
@@ -220,11 +228,13 @@ export function assertValidPhotoCaption(title: string | null, description: strin
   }
 }
 
-export function toAlbumPhotoDto(photo: AlbumPhoto): AlbumPhotoDto {
+export type AlbumPhotoWithSubmission = AlbumPhoto & { submission: AlbumSubmission };
+
+export function toAlbumPhotoDto(photo: AlbumPhotoWithSubmission): AlbumPhotoDto {
   return {
     id: photo.id,
     // Album photos are never anonymised: there is no voting phase to protect.
-    authorName: `${photo.firstName} ${photo.lastName}`,
+    authorName: `${photo.submission.firstName} ${photo.submission.lastName}`,
     title: photo.title,
     description: photo.description,
     fullUrl: mediaUrl(photo.filePath),
@@ -272,7 +282,10 @@ export async function getPublicAlbum(
   const album = await prisma.album.findFirst({
     where: { slug, hidden: false },
     include: {
-      photos: { orderBy: { createdAt: 'asc' } },
+      submissions: {
+        orderBy: { createdAt: 'asc' },
+        include: { photos: { orderBy: { sortOrder: 'asc' } } },
+      },
     },
   });
 
@@ -288,7 +301,9 @@ export async function getPublicAlbum(
     createdAt: album.createdAt.toISOString(),
     hasAccessCode: album.accessCode !== null,
     canUpload: hasAlbumUploadAccess(album, signedCookies),
-    photos: album.photos.map(toAlbumPhotoDto),
+    photos: album.submissions.flatMap(({ photos, ...submission }) =>
+      photos.map((photo) => toAlbumPhotoDto({ ...photo, submission })),
+    ),
   };
 }
 
@@ -350,23 +365,26 @@ export async function addAlbumPhotos(
     throw firstError;
   }
 
-  const rulesAcceptedAt = new Date();
-
   try {
-    await prisma.albumPhoto.createMany({
-      data: processed.map((file, index) => ({
+    await prisma.albumSubmission.create({
+      data: {
         albumId: album.id,
         firstName: input.firstName,
         lastName: input.lastName,
-        title: meta[index]?.title ?? null,
-        description: meta[index]?.description ?? null,
-        filePath: file.filePath,
-        previewPath: file.previewPath,
-        thumbPath: file.thumbPath,
-        width: file.width,
-        height: file.height,
-        rulesAcceptedAt,
-      })),
+        rulesAcceptedAt: new Date(),
+        photos: {
+          create: processed.map((file, index) => ({
+            title: meta[index]?.title ?? null,
+            description: meta[index]?.description ?? null,
+            filePath: file.filePath,
+            previewPath: file.previewPath,
+            thumbPath: file.thumbPath,
+            width: file.width,
+            height: file.height,
+            sortOrder: index,
+          })),
+        },
+      },
     });
   } catch (error) {
     await removeProcessedFiles(processed);
