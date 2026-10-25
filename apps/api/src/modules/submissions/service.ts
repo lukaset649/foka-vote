@@ -19,12 +19,14 @@ import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import { pickAvailableAlias } from '../../lib/nickname.js';
 import {
+  claimPendingUploads,
   createPendingUpload,
   deletePendingUpload,
   toPendingUploadDto,
 } from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
 import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
+import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
 
 const MAX_ALIAS_ATTEMPTS = 3;
 const ALIAS_RESERVATION_TTL_MS = 20 * 60 * 1000;
@@ -143,13 +145,22 @@ async function removeProcessedFiles(processed: ArtworkImageResult[]): Promise<vo
   );
 }
 
+type ArtworkSource = Omit<ArtworkImageResult, 'width' | 'height'> & {
+  width: number | null;
+  height: number | null;
+  title: string | null;
+  description: string | null;
+};
+
+/** Supplies the artworks inside the submission transaction, so claiming uploads rolls back with it. */
+type ArtworkSourceLoader = (tx: Prisma.TransactionClient) => Promise<ArtworkSource[]>;
+
 async function createSubmissionWithRetry(
   contestId: string,
   input: CreateSubmissionInput,
-  processed: ArtworkImageResult[],
-  meta: ArtworkMetaInput[],
-  reservationId: string | undefined,
+  loadArtworks: ArtworkSourceLoader,
 ): Promise<{ submission: Submission; artworks: Artwork[] }> {
+  const { reservationId } = input;
   for (let attempt = 0; attempt < MAX_ALIAS_ATTEMPTS; attempt++) {
     const now = new Date();
     let reservedAlias: { id: string; alias: string } | null = null;
@@ -180,6 +191,7 @@ async function createSubmissionWithRetry(
     try {
       // eslint-disable-next-line no-await-in-loop -- each attempt depends on the previous one's outcome
       return await prisma.$transaction(async (tx) => {
+        const sources = await loadArtworks(tx);
         const submission = await tx.submission.create({
           data: {
             contestId,
@@ -196,21 +208,19 @@ async function createSubmissionWithRetry(
         }
 
         const artworks: Artwork[] = [];
-        for (let i = 0; i < processed.length; i++) {
-          const file = processed[i] as ArtworkImageResult;
-          const fileMeta = meta[i];
+        for (const [index, source] of sources.entries()) {
           // eslint-disable-next-line no-await-in-loop -- artwork rows must be created in order for sortOrder
           const artwork = await tx.artwork.create({
             data: {
               submissionId: submission.id,
-              title: fileMeta?.title ?? null,
-              description: fileMeta?.description ?? null,
-              filePath: file.filePath,
-              previewPath: file.previewPath,
-              thumbPath: file.thumbPath,
-              width: file.width,
-              height: file.height,
-              sortOrder: i,
+              title: source.title,
+              description: source.description,
+              filePath: source.filePath,
+              previewPath: source.previewPath,
+              thumbPath: source.thumbPath,
+              width: source.width,
+              height: source.height,
+              sortOrder: index,
             },
           });
           artworks.push(artwork);
@@ -299,18 +309,56 @@ export async function createSubmission(
   }
 
   try {
-    const { submission, artworks } = await createSubmissionWithRetry(
-      contest.id,
-      input,
-      processed,
-      meta,
-      input.reservationId,
+    const { submission, artworks } = await createSubmissionWithRetry(contest.id, input, () =>
+      Promise.resolve(
+        processed.map((file, index) => ({
+          ...file,
+          title: meta[index]?.title ?? null,
+          description: meta[index]?.description ?? null,
+        })),
+      ),
     );
     return toSubmissionDto(submission, artworks, false);
   } catch (error) {
     await removeProcessedFiles(processed);
     throw error;
   }
+}
+
+export async function createSubmissionFromUploads(
+  slug: string,
+  input: CreateSubmissionInput,
+  artworks: SubmissionPhotoInput[],
+  signedCookies: Record<string, string | undefined>,
+): Promise<SubmissionDto> {
+  const contest = await findContestForUpload(slug, signedCookies);
+  if (computeContestStatus(new Date(), contest) !== 'SUBMISSIONS') {
+    throw conflict('This contest is not currently accepting submissions');
+  }
+
+  if (artworks.length < 1 || artworks.length > contest.maxArtworksPerSubmission) {
+    throw badRequest(
+      `Submission must include between 1 and ${contest.maxArtworksPerSubmission} artworks`,
+    );
+  }
+
+  const created = await createSubmissionWithRetry(contest.id, input, async (tx) => {
+    const uploads = await claimPendingUploads(
+      tx,
+      { contestId: contest.id },
+      artworks.map((artwork) => artwork.uploadId),
+    );
+    return uploads.map((upload, index) => ({
+      filePath: upload.filePath,
+      previewPath: upload.previewPath,
+      thumbPath: upload.thumbPath,
+      width: upload.width,
+      height: upload.height,
+      title: artworks[index]?.title ?? null,
+      description: artworks[index]?.description ?? null,
+    }));
+  });
+  return toSubmissionDto(created.submission, created.artworks, false);
 }
 
 async function findContestForUpload(
