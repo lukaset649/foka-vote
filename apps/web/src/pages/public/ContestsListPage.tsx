@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
 import { fetchContests, isGalleryVisible } from '../../services/contests';
+import { useListSearchParams } from '../../lib/useListSearchParams';
+import ListToolbar from '../../components/ListToolbar';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
 import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
+import Pagination from '../../components/ui/Pagination';
 import Spinner from '../../components/ui/Spinner';
 
 const ContestListItem = ({ contest }: { contest: ContestDto }) => {
@@ -87,16 +90,19 @@ const ContestListItem = ({ contest }: { contest: ContestDto }) => {
 
 const ContestsListPage = () => {
   const { t } = useTranslation();
+  const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
+    useListSearchParams();
   const [contests, setContests] = useState<PublicContestListDto | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchContests()
+    fetchContests(query)
       .then((data) => {
         if (!cancelled) {
           setContests(data);
+          setError(false);
         }
       })
       .catch(() => {
@@ -108,9 +114,18 @@ const ContestsListPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [query]);
 
-  if (error) {
+  const totalPages = contests ? Math.ceil(contests.others.total / contests.others.pageSize) : 0;
+
+  // A page left behind by a shrinking list (or typed into the URL) falls back to the last one.
+  useEffect(() => {
+    if (totalPages > 0 && query.page !== undefined && query.page > totalPages) {
+      setPage(totalPages, true);
+    }
+  }, [totalPages, query.page, setPage]);
+
+  if (error && contests === null) {
     return <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>;
   }
 
@@ -118,15 +133,21 @@ const ContestsListPage = () => {
     return <Spinner />;
   }
 
-  const { current } = contests;
-  const rest = contests.others.items;
+  const { current, others } = contests;
+  const isSearching = query.q !== undefined;
+  const hasOthers = others.total > 0 || isSearching;
 
-  if (current.length === 0 && rest.length === 0) {
+  if (current.length === 0 && !hasOthers) {
     return <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />;
   }
 
   return (
     <div>
+      {error && (
+        <Alert variant="error" className="mb-4">
+          {t('pages.contestsList.failedToLoad')}
+        </Alert>
+      )}
       {current.length > 0 && (
         <section>
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
@@ -139,18 +160,32 @@ const ContestsListPage = () => {
           </ul>
         </section>
       )}
-      <section>
-        {current.length > 0 && (
+      {hasOthers && (
+        <section>
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">
             {t('pages.contestsList.allContests')}
           </h2>
-        )}
-        <ul className="flex flex-col gap-3">
-          {rest.map((contest) => (
-            <ContestListItem key={contest.id} contest={contest} />
-          ))}
-        </ul>
-      </section>
+          <ListToolbar
+            searchInput={searchInput}
+            onSearchInputChange={setSearchInput}
+            sortOption={sortOption}
+            onSortOptionChange={setSortOption}
+          />
+          {others.items.length === 0 ? (
+            <EmptyState
+              icon="bi-search"
+              text={t('pages.contestsList.noResults', { query: query.q ?? '' })}
+            />
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {others.items.map((contest) => (
+                <ContestListItem key={contest.id} contest={contest} />
+              ))}
+            </ul>
+          )}
+          <Pagination page={others.page} totalPages={totalPages} onPageChange={setPage} />
+        </section>
+      )}
     </div>
   );
 };
