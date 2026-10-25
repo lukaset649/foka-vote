@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
 import { fetchContests, isGalleryVisible } from '../../services/contests';
-import { useListSearchParams } from '../../lib/useListSearchParams';
+import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
 import ListToolbar from '../../components/ListToolbar';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
@@ -118,12 +118,7 @@ const ContestsListPage = () => {
 
   const totalPages = contests ? Math.ceil(contests.others.total / contests.others.pageSize) : 0;
 
-  // A page left behind by a shrinking list (or typed into the URL) falls back to the last one.
-  useEffect(() => {
-    if (totalPages > 0 && query.page !== undefined && query.page > totalPages) {
-      setPage(totalPages, true);
-    }
-  }, [totalPages, query.page, setPage]);
+  useClampedPage(query.page, totalPages, setPage);
 
   if (error && contests === null) {
     return <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>;

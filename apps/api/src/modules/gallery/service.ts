@@ -3,6 +3,7 @@ import type {
   AlbumPhotoDto,
   GalleryAlbumDto,
   GalleryAlbumPreviewDto,
+  PaginatedDto,
   PendingUploadDto,
 } from '@foka-vote/shared';
 import {
@@ -14,6 +15,8 @@ import {
 import type { AlbumPhoto, AlbumSubmission } from '../../generated/prisma/client.js';
 import { badRequest, notFound, unauthorized } from '../../errors/app-error.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
+import type { ListKey, ParsedListQuery } from '../../lib/list-query.js';
+import { paginateKeys, titleSearchFilter } from '../../lib/list-query.js';
 import {
   claimPendingUploads,
   createPendingUpload,
@@ -36,10 +39,9 @@ export function albumAccessCookieName(albumId: string): string {
  * Contest albums have no rows of their own, they are projected from the contests, so the
  * album's title, description and date always come straight from the contest itself.
  */
-async function listContestAlbums(): Promise<GalleryAlbumDto[]> {
+async function listContestAlbums(ids: string[]): Promise<GalleryAlbumDto[]> {
   const contests = await prisma.contest.findMany({
-    where: { hiddenInGallery: false },
-    orderBy: { createdAt: 'desc' },
+    where: { id: { in: ids } },
     select: {
       id: true,
       slug: true,
@@ -86,54 +88,48 @@ async function listContestAlbums(): Promise<GalleryAlbumDto[]> {
 
   const now = new Date();
 
-  return contests
-    .filter((contest) => {
-      const status = computeContestStatus(now, contest);
-      return status === 'VOTING' || status === 'CLOSED';
-    })
-    .map((contest) => {
-      const revealNames = computeContestStatus(now, contest) === 'CLOSED';
+  return contests.map((contest) => {
+    const revealNames = computeContestStatus(now, contest) === 'CLOSED';
 
-      const previews: GalleryAlbumPreviewDto[] = contest.submissions
-        .filter((submission) => submission.artworks.length > 0)
-        .map((submission) => {
-          const author = revealNames
-            ? `${submission.firstName} ${submission.lastName}`
-            : submission.alias;
+    const previews: GalleryAlbumPreviewDto[] = contest.submissions
+      .filter((submission) => submission.artworks.length > 0)
+      .map((submission) => {
+        const author = revealNames
+          ? `${submission.firstName} ${submission.lastName}`
+          : submission.alias;
 
-          return {
-            id: submission.id,
-            thumbUrl: mediaUrl((submission.artworks[0] as { thumbPath: string }).thumbPath),
-            label: author,
-            images: submission.artworks.map((artwork) => ({
-              id: artwork.id,
-              title: artwork.title,
-              description: artwork.description,
-              previewUrl: mediaUrl(artwork.previewPath),
-              width: artwork.width,
-              height: artwork.height,
-              author,
-            })),
-          };
-        });
+        return {
+          id: submission.id,
+          thumbUrl: mediaUrl((submission.artworks[0] as { thumbPath: string }).thumbPath),
+          label: author,
+          images: submission.artworks.map((artwork) => ({
+            id: artwork.id,
+            title: artwork.title,
+            description: artwork.description,
+            previewUrl: mediaUrl(artwork.previewPath),
+            width: artwork.width,
+            height: artwork.height,
+            author,
+          })),
+        };
+      });
 
-      return {
-        kind: 'CONTEST',
-        id: contest.id,
-        slug: contest.slug,
-        title: contest.title,
-        description: contest.description,
-        createdAt: contest.createdAt.toISOString(),
-        itemCount: countByContestId.get(contest.id) ?? 0,
-        previews,
-      };
-    });
+    return {
+      kind: 'CONTEST',
+      id: contest.id,
+      slug: contest.slug,
+      title: contest.title,
+      description: contest.description,
+      createdAt: contest.createdAt.toISOString(),
+      itemCount: countByContestId.get(contest.id) ?? 0,
+      previews,
+    };
+  });
 }
 
-async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
+async function listStandaloneAlbums(ids: string[]): Promise<GalleryAlbumDto[]> {
   const albums = await prisma.album.findMany({
-    where: { hidden: false },
-    orderBy: { createdAt: 'desc' },
+    where: { id: { in: ids } },
     select: {
       id: true,
       slug: true,
@@ -196,16 +192,52 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
   }));
 }
 
-export async function listGalleryAlbums(): Promise<GalleryAlbumDto[]> {
-  const [contestAlbums, standaloneAlbums] = await Promise.all([
-    listContestAlbums(),
-    listStandaloneAlbums(),
+type GalleryAlbumKey = ListKey & { kind: GalleryAlbumDto['kind'] };
+
+/**
+ * Contest albums and standalone albums come from two tables, so the page is cut from their
+ * merged keys first and only the albums on it are loaded in full. A contest shows up once its
+ * voting has started (VOTING or CLOSED in `computeContestStatus`).
+ */
+export async function listGalleryAlbums(
+  listQuery: ParsedListQuery,
+): Promise<PaginatedDto<GalleryAlbumDto>> {
+  const keySelect = { id: true, title: true, createdAt: true } as const;
+  const titleFilter = titleSearchFilter(listQuery.q);
+
+  const [contestKeys, albumKeys] = await Promise.all([
+    prisma.contest.findMany({
+      where: { hiddenInGallery: false, votingStart: { lte: new Date() }, ...titleFilter },
+      select: keySelect,
+    }),
+    prisma.album.findMany({ where: { hidden: false, ...titleFilter }, select: keySelect }),
   ]);
 
-  // Both sides produce ISO-8601 UTC timestamps, which sort chronologically as strings.
-  return [...contestAlbums, ...standaloneAlbums].sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
+  const page = paginateKeys<GalleryAlbumKey>(
+    [
+      ...contestKeys.map((key) => ({ ...key, kind: 'CONTEST' as const })),
+      ...albumKeys.map((key) => ({ ...key, kind: 'STANDALONE' as const })),
+    ],
+    listQuery,
   );
+
+  const idsOf = (kind: GalleryAlbumKey['kind']) =>
+    page.items.filter((key) => key.kind === kind).map((key) => key.id);
+  const [contestAlbums, standaloneAlbums] = await Promise.all([
+    listContestAlbums(idsOf('CONTEST')),
+    listStandaloneAlbums(idsOf('STANDALONE')),
+  ]);
+  const albumByKey = new Map(
+    [...contestAlbums, ...standaloneAlbums].map((album) => [`${album.kind}-${album.id}`, album]),
+  );
+
+  return {
+    ...page,
+    items: page.items.flatMap((key) => {
+      const album = albumByKey.get(`${key.kind}-${key.id}`);
+      return album ? [album] : [];
+    }),
+  };
 }
 
 export function assertValidAlbumInput(title: string, description: string): void {

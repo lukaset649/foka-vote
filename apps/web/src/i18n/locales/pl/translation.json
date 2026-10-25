@@ -60,7 +60,8 @@
     "galleryAlbums": {
       "title": "Galeria",
       "noAlbumsYet": "Brak albumów",
-      "failedToLoad": "Nie udało się wczytać galerii"
+      "failedToLoad": "Nie udało się wczytać galerii",
+      "noResults": "Brak wyników dla: {{query}}"
     },
     "album": {
       "title": "Album",

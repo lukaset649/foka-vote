@@ -60,7 +60,8 @@
     "galleryAlbums": {
       "title": "Gallery",
       "noAlbumsYet": "No albums yet",
-      "failedToLoad": "Failed to load the gallery"
+      "failedToLoad": "Failed to load the gallery",
+      "noResults": "No results for: {{query}}"
     },
     "album": {
       "title": "Album",

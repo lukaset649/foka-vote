@@ -111,3 +111,16 @@ export function useListSearchParams() {
 
   return { query, searchInput, setSearchInput, sortOption, setSortOption, setPage };
 }
+
+/** Moves a page left behind by a shrinking list (or typed into the URL) to the last one. */
+export function useClampedPage(
+  page: number | undefined,
+  totalPages: number,
+  setPage: (page: number, replace?: boolean) => void,
+): void {
+  useEffect(() => {
+    if (totalPages > 0 && page !== undefined && page > totalPages) {
+      setPage(totalPages, true);
+    }
+  }, [page, totalPages, setPage]);
+}

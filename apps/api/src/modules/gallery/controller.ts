@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
+import { parseListQuery } from '../../lib/list-query.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
 import {
@@ -22,8 +23,8 @@ function requireSlugParam(request: Request): string {
   return slug;
 }
 
-export async function list(_request: Request, response: Response): Promise<void> {
-  const albums = await listGalleryAlbums();
+export async function list(request: Request, response: Response): Promise<void> {
+  const albums = await listGalleryAlbums(parseListQuery(request.query));
   response.json(albums);
 }
 

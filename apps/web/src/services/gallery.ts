@@ -5,17 +5,21 @@ import type {
   CreateAlbumDto,
   CreateAlbumSubmissionDto,
   GalleryAlbumDto,
+  ListQuery,
+  PaginatedDto,
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
-import { apiErrorFrom, apiRequest } from './apiClient';
+import { apiErrorFrom, apiRequest, listQueryString } from './apiClient';
 
-export async function fetchGalleryAlbums(): Promise<GalleryAlbumDto[]> {
-  const response = await apiRequest('/api/gallery/albums');
+export async function fetchGalleryAlbums(
+  query: ListQuery = {},
+): Promise<PaginatedDto<GalleryAlbumDto>> {
+  const response = await apiRequest(`/api/gallery/albums${listQueryString(query)}`);
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch albums');
   }
-  return response.json() as Promise<GalleryAlbumDto[]>;
+  return response.json() as Promise<PaginatedDto<GalleryAlbumDto>>;
 }
 
 export function albumPath(album: GalleryAlbumDto): string {
