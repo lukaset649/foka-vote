@@ -45,7 +45,7 @@ interface StandaloneAlbumRow {
   submissions: { photos: { thumbPath: string }[] }[];
 }
 
-function toAdminAlbumDto(album: StandaloneAlbumRow, photoCount: number): AdminAlbumDto {
+function toAdminAlbumDto(album: StandaloneAlbumRow, itemCount: number): AdminAlbumDto {
   const coverThumbPath = album.submissions[0]?.photos[0]?.thumbPath;
 
   return {
@@ -57,7 +57,7 @@ function toAdminAlbumDto(album: StandaloneAlbumRow, photoCount: number): AdminAl
     createdAt: album.createdAt.toISOString(),
     accessCode: album.accessCode,
     hidden: album.hidden,
-    photoCount,
+    itemCount,
     coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
   };
 }
@@ -108,7 +108,7 @@ async function listContestAlbums(): Promise<AdminAlbumDto[]> {
       createdAt: contest.createdAt.toISOString(),
       accessCode: contest.accessCode,
       hidden: contest.hiddenInGallery,
-      photoCount: countByContestId.get(contest.id) ?? 0,
+      itemCount: countByContestId.get(contest.id) ?? 0,
       coverThumbUrl: coverThumbPath ? mediaUrl(coverThumbPath) : null,
     };
   });
@@ -120,16 +120,13 @@ async function listStandaloneAlbums(): Promise<AdminAlbumDto[]> {
     select: standaloneAlbumSelect,
   });
 
-  const photoCounts = await prisma.albumSubmission.findMany({
-    select: { albumId: true, _count: { select: { photos: true } } },
+  const submissionCounts = await prisma.albumSubmission.groupBy({
+    by: ['albumId'],
+    _count: { _all: true },
   });
-  const countByAlbumId = new Map<string, number>();
-  for (const entry of photoCounts) {
-    countByAlbumId.set(
-      entry.albumId,
-      (countByAlbumId.get(entry.albumId) ?? 0) + entry._count.photos,
-    );
-  }
+  const countByAlbumId = new Map(
+    submissionCounts.map((entry) => [entry.albumId, entry._count._all]),
+  );
 
   return albums.map((album) => toAdminAlbumDto(album, countByAlbumId.get(album.id) ?? 0));
 }
@@ -140,9 +137,9 @@ async function getStandaloneAlbum(id: string): Promise<AdminAlbumDto> {
     throw notFound('Album not found');
   }
 
-  const photoCount = await prisma.albumPhoto.count({ where: { submission: { albumId: id } } });
+  const submissionCount = await prisma.albumSubmission.count({ where: { albumId: id } });
 
-  return toAdminAlbumDto(album, photoCount);
+  return toAdminAlbumDto(album, submissionCount);
 }
 
 async function getContestAlbum(contestId: string): Promise<AdminAlbumDto> {

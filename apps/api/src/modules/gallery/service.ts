@@ -137,7 +137,9 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
       createdAt: true,
       submissions: {
         orderBy: { createdAt: 'asc' },
+        take: GALLERY_ALBUM_PREVIEW_COUNT,
         select: {
+          id: true,
           firstName: true,
           lastName: true,
           photos: {
@@ -154,31 +156,28 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
           },
         },
       },
+      _count: { select: { submissions: true } },
     },
   });
 
-  return albums.map((album) => {
-    const photos = album.submissions.flatMap((submission) =>
-      submission.photos.map((photo) => ({
-        ...photo,
-        author: `${submission.firstName} ${submission.lastName}`,
-      })),
-    );
+  return albums.map((album) => ({
+    kind: 'STANDALONE',
+    id: album.id,
+    slug: album.slug,
+    title: album.title,
+    description: album.description,
+    createdAt: album.createdAt.toISOString(),
+    itemCount: album._count.submissions,
+    previews: album.submissions
+      .filter((submission) => submission.photos.length > 0)
+      .map((submission) => {
+        const author = `${submission.firstName} ${submission.lastName}`;
 
-    return {
-      kind: 'STANDALONE' as const,
-      id: album.id,
-      slug: album.slug,
-      title: album.title,
-      description: album.description,
-      createdAt: album.createdAt.toISOString(),
-      itemCount: photos.length,
-      previews: photos.slice(0, GALLERY_ALBUM_PREVIEW_COUNT).map(({ author, ...photo }) => ({
-        id: photo.id,
-        thumbUrl: mediaUrl(photo.thumbPath),
-        label: author,
-        images: [
-          {
+        return {
+          id: submission.id,
+          thumbUrl: mediaUrl((submission.photos[0] as { thumbPath: string }).thumbPath),
+          label: author,
+          images: submission.photos.map((photo) => ({
             id: photo.id,
             title: photo.title,
             description: photo.description,
@@ -186,11 +185,10 @@ async function listStandaloneAlbums(): Promise<GalleryAlbumDto[]> {
             width: photo.width,
             height: photo.height,
             author,
-          },
-        ],
-      })),
-    };
-  });
+          })),
+        };
+      }),
+  }));
 }
 
 export async function listGalleryAlbums(): Promise<GalleryAlbumDto[]> {

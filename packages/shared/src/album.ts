@@ -69,7 +69,7 @@ export interface AdminAlbumDto {
   createdAt: string;
   accessCode: string | null;
   hidden: boolean;
-  photoCount: number;
+  itemCount: number;
   coverThumbUrl: string | null;
 }
 
