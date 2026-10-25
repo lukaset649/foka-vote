@@ -4,6 +4,7 @@ import type {
   ContestStatus,
   CreateContestDto,
   ListQuery,
+  PaginatedDto,
   PublicContestListDto,
   UpdateContestDto,
 } from '@foka-vote/shared';
@@ -44,12 +45,14 @@ export async function verifyContestAccessCode(slug: string, code: string): Promi
   }
 }
 
-export async function fetchAdminContests(): Promise<AdminContestDto[]> {
-  const response = await apiRequest('/api/admin/contests');
+export async function fetchAdminContests(
+  query: ListQuery = {},
+): Promise<PaginatedDto<AdminContestDto>> {
+  const response = await apiRequest(`/api/admin/contests${listQueryString(query)}`);
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch contests');
   }
-  return response.json() as Promise<AdminContestDto[]>;
+  return response.json() as Promise<PaginatedDto<AdminContestDto>>;
 }
 
 export async function fetchAdminContest(id: string): Promise<AdminContestDto> {
