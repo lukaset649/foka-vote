@@ -7,6 +7,9 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
+// Nine items (arrows, five pages, two gaps) must fit one row on a 360px phone.
+const PAGE_BUTTON_CLASS_NAME = 'max-sm:h-9 max-sm:w-9 max-sm:text-base';
+
 type PageItem = number | 'gap';
 
 // Always shows the first, the last and the neighbours of the current page; a single hidden
@@ -39,12 +42,13 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
 
   return (
     <nav aria-label={t('components.pagination.label')} className="mt-4">
-      <ul className="flex flex-wrap items-center justify-center gap-1">
+      <ul className="flex flex-wrap items-center justify-center gap-0.5 sm:gap-1">
         <li>
           <Button
             type="button"
             variant="secondary"
             size="icon"
+            className={PAGE_BUTTON_CLASS_NAME}
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
             aria-label={t('components.pagination.previous')}
@@ -64,6 +68,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
                 type="button"
                 variant={item === page ? 'primary' : 'secondary'}
                 size="icon"
+                className={PAGE_BUTTON_CLASS_NAME}
                 aria-current={item === page ? 'page' : undefined}
                 aria-label={t('components.pagination.page', { page: item })}
                 onClick={() => onPageChange(item)}
@@ -78,6 +83,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
             type="button"
             variant="secondary"
             size="icon"
+            className={PAGE_BUTTON_CLASS_NAME}
             disabled={page >= totalPages}
             onClick={() => onPageChange(page + 1)}
             aria-label={t('components.pagination.next')}
