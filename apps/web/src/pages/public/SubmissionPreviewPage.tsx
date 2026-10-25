@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import useOnlineStatus from '../../lib/useOnlineStatus';
-import { ApiError } from '../../services/apiClient';
+import { ApiError, mediaUrl } from '../../services/apiClient';
 import { createSubmission } from '../../services/submissions';
 import type { SubmissionDraftState } from './SubmissionFormPage';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
-import Modal from '../../components/ui/Modal';
 
 const SubmissionPreviewPage = () => {
   const { t } = useTranslation();
@@ -20,26 +19,8 @@ const SubmissionPreviewPage = () => {
   const draft = (location.state as SubmissionDraftState | null) ?? null;
   const isOnline = useOnlineStatus();
 
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!draft) {
-      return;
-    }
-    const urls = draft.artworks.map((artwork) => URL.createObjectURL(artwork.file));
-    // Object URLs are an external resource: created and revoked per effect run, which keeps
-    // them valid under StrictMode's mount-unmount-mount cycle.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPreviewUrls(urls);
-
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- draft is a one-time navigation payload, not expected to change
-  }, []);
 
   if (!draft) {
     return (
@@ -64,21 +45,20 @@ const SubmissionPreviewPage = () => {
 
     setSubmitting(true);
     setError(null);
-    setUploadProgress(0);
 
     try {
-      const submission = await createSubmission(
-        slug,
-        {
-          firstName: draft.firstName,
-          lastName: draft.lastName,
-          description: draft.description,
-          reservationId: draft.reservationId,
-          rulesAccepted: draft.rulesAccepted,
-        },
-        draft.artworks,
-        (fraction) => setUploadProgress(Math.round(fraction * 100)),
-      );
+      const submission = await createSubmission(slug, {
+        firstName: draft.firstName,
+        lastName: draft.lastName,
+        ...(draft.description ? { description: draft.description } : {}),
+        ...(draft.reservationId ? { reservationId: draft.reservationId } : {}),
+        rulesAccepted: true,
+        artworks: draft.artworks.map((artwork) => ({
+          uploadId: artwork.uploadId,
+          ...(artwork.title ? { title: artwork.title } : {}),
+          ...(artwork.description ? { description: artwork.description } : {}),
+        })),
+      });
       void navigate(`/contest/${slug}/submit/confirmation`, { state: { submission } });
     } catch (err) {
       if (err instanceof ApiError && err.code === ErrorCode.UNAUTHORIZED) {
@@ -113,10 +93,10 @@ const SubmissionPreviewPage = () => {
 
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {draft.artworks.map((artwork, index) => (
-          <li key={index}>
+          <li key={artwork.uploadId}>
             <div className="flex flex-col gap-2 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
               <img
-                src={previewUrls[index]}
+                src={mediaUrl(artwork.thumbUrl)}
                 alt={
                   artwork.title ||
                   t('pages.submissionPreview.artworkFallbackAlt', { index: index + 1 })
@@ -145,30 +125,16 @@ const SubmissionPreviewPage = () => {
           onClick={handleSubmit}
           disabled={submitting || !isOnline}
         >
-          <i className="bi bi-send" aria-hidden="true" />
+          <i
+            className={submitting ? 'bi bi-arrow-repeat animate-spin' : 'bi bi-send'}
+            aria-hidden="true"
+          />
           {t('common.submit')}
         </Button>
       </div>
 
       {!isOnline && <Alert variant="info">{t('common.offlineSubmitHint')}</Alert>}
       {error && <Alert variant="error">{error}</Alert>}
-
-      <Modal open={submitting} className="max-w-sm p-6">
-        <p className="mb-3 text-center font-medium text-zinc-900">
-          {uploadProgress < 100
-            ? t('pages.submissionPreview.uploading')
-            : t('pages.submissionPreview.processing')}
-        </p>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
-          <div
-            className="h-full rounded-full bg-indigo-600 transition-all"
-            style={{ width: `${uploadProgress}%` }}
-          />
-        </div>
-        <p className="mt-2 text-center text-sm text-zinc-500">
-          {uploadProgress < 100 ? `${uploadProgress}%` : t('pages.submissionPreview.almostDone')}
-        </p>
-      </Modal>
     </div>
   );
 };

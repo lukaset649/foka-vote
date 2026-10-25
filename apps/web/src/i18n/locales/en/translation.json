@@ -106,11 +106,6 @@
       "firstNameLabel": "First name",
       "lastNameLabel": "Last name",
       "artworksHeading": "Artworks (up to {{max}})",
-      "maxFileSize": "Max file size per photo: {{size}} MB",
-      "artworkLegend": "Artwork {{index}}",
-      "fileLabel": "File",
-      "currentlyAttached": "Currently attached: {{filename}}",
-      "addAnotherArtwork": "Add another artwork",
       "continueToPreview": "Continue to preview",
       "rulesLabel": "I accept the <rulesLink>contest rules</rulesLink>.",
       "errors": {
@@ -125,10 +120,7 @@
       "goBackToForm": "Go back to the form",
       "heading": "Preview your submission",
       "artworkFallbackAlt": "Artwork {{index}}",
-      "edit": "Edit",
-      "uploading": "Uploading your submission…",
-      "processing": "Processing…",
-      "almostDone": "Almost done…"
+      "edit": "Edit"
     },
     "submissionConfirmation": {
       "title": "Submission received",
