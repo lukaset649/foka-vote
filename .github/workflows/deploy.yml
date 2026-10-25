@@ -29,6 +29,21 @@ jobs:
         env:
           VITE_API_URL: ''
 
+      # The VPS kills a long `npm ci`, so the API's production dependencies are installed here
+      # and shipped. The workspace manifests must all be present for the lockfile to validate.
+      - name: Install API production dependencies
+        run: |
+          mkdir -p .deploy-deps/apps/api .deploy-deps/apps/web .deploy-deps/packages/shared
+          cp package.json package-lock.json .deploy-deps/
+          cp apps/api/package.json .deploy-deps/apps/api/
+          cp apps/web/package.json .deploy-deps/apps/web/
+          cp -r packages/shared/package.json packages/shared/dist .deploy-deps/packages/shared/
+          cd .deploy-deps
+          npm ci --omit=dev --no-audit --no-fund -w apps/api
+          uname -m
+          ldd --version | head -n 1
+          openssl version
+
       - uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MIKRUS_SSH_KEY }}
@@ -37,6 +52,19 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ env.MIKRUS_PORT }} ${{ env.MIKRUS_HOST }} >> ~/.ssh/known_hosts
+
+      # sharp and the Prisma migration engine ship native binaries for the runner's platform.
+      - name: Check server platform matches the runner
+        run: |
+          ssh -p ${{ env.MIKRUS_PORT }} root@${{ env.MIKRUS_HOST }} '
+            set -e
+            uname -m
+            ldd --version | head -n 1
+            openssl version
+            test "$(uname -m)" = x86_64
+            ldd --version 2>&1 | grep -qiE "glibc|gnu libc"
+            openssl version | grep -q "^OpenSSL 3\."
+          '
 
       - name: Ship built files
         run: |
@@ -60,13 +88,15 @@ jobs:
             package.json package-lock.json tsconfig.base.json \
             root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/
 
-      - name: Install, migrate, restart
+          rsync -az --delete \
+            -e "ssh -p ${{ env.MIKRUS_PORT }}" \
+            .deploy-deps/node_modules/ root@${{ env.MIKRUS_HOST }}:/var/www/foka-vote/node_modules/
+
+      - name: Migrate, restart
         run: |
           ssh -p ${{ env.MIKRUS_PORT }} root@${{ env.MIKRUS_HOST }} '
             set -e
-            cd /var/www/foka-vote &&
-            npm ci --omit=dev -w apps/api &&
-            cd apps/api &&
-            npx prisma migrate deploy &&
+            cd /var/www/foka-vote/apps/api
+            npx prisma migrate deploy
             pm2 reload foka-api
           '
