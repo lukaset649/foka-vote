@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AdminContestDto } from '@foka-vote/shared';
+import type { AdminContestDto, PaginatedDto } from '@foka-vote/shared';
 import { deleteContest, fetchAdminContests } from '../../services/contests';
+import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
+import ListToolbar from '../../components/ListToolbar';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
@@ -10,13 +12,17 @@ import Button from '../../components/ui/Button';
 import LinkButton from '../../components/ui/LinkButton';
 import Alert from '../../components/ui/Alert';
 import EmptyState from '../../components/ui/EmptyState';
+import Pagination from '../../components/ui/Pagination';
 import Spinner from '../../components/ui/Spinner';
 import useConfirm from '../../lib/useConfirm';
 
 const AdminContestsListPage = () => {
   const { t } = useTranslation();
   const { confirm, confirmDialog } = useConfirm();
-  const [contests, setContests] = useState<AdminContestDto[] | null>(null);
+  const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
+    useListSearchParams();
+  const [contests, setContests] = useState<PaginatedDto<AdminContestDto> | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -24,10 +30,11 @@ const AdminContestsListPage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    fetchAdminContests()
+    fetchAdminContests(query)
       .then((data) => {
         if (!cancelled) {
           setContests(data);
+          setLoadError(false);
         }
       })
       .catch(() => {
@@ -39,7 +46,11 @@ const AdminContestsListPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [query, reloadCount]);
+
+  const totalPages = contests ? Math.ceil(contests.total / contests.pageSize) : 0;
+  useClampedPage(query.page, totalPages, setPage);
+  const isSearching = query.q !== undefined;
 
   const handleDelete = async (contest: AdminContestDto) => {
     const confirmed = await confirm({
@@ -55,7 +66,7 @@ const AdminContestsListPage = () => {
     setActionError(null);
     deleteContest(contest.id)
       .then(() => {
-        setContests((prev) => prev?.filter((c) => c.id !== contest.id) ?? prev);
+        setReloadCount((count) => count + 1);
       })
       .catch(() => {
         setActionError(t('pages.adminContestsList.deleteFailed'));
@@ -76,12 +87,26 @@ const AdminContestsListPage = () => {
         </Alert>
       )}
       {!loadError && contests === null && <Spinner />}
-      {contests !== null && contests.length === 0 && (
+      {contests !== null && contests.total === 0 && !isSearching && (
         <EmptyState icon="bi-images" text={t('pages.contestsList.noContestsYet')} />
       )}
-      {contests !== null && contests.length > 0 && (
+      {contests !== null && (contests.total > 0 || isSearching) && (
+        <ListToolbar
+          searchInput={searchInput}
+          onSearchInputChange={setSearchInput}
+          sortOption={sortOption}
+          onSortOptionChange={setSortOption}
+        />
+      )}
+      {contests !== null && isSearching && contests.total === 0 && (
+        <EmptyState
+          icon="bi-search"
+          text={t('pages.contestsList.noResults', { query: query.q ?? '' })}
+        />
+      )}
+      {contests !== null && contests.items.length > 0 && (
         <ul className="flex flex-col gap-3">
-          {contests.map((contest) => (
+          {contests.items.map((contest) => (
             <li key={contest.id}>
               <Card className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -96,8 +121,13 @@ const AdminContestsListPage = () => {
                     contest={contest}
                     onUpdated={(updated) => {
                       setActionError(null);
-                      setContests(
-                        (prev) => prev?.map((c) => (c.id === updated.id ? updated : c)) ?? prev,
+                      setContests((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              items: prev.items.map((c) => (c.id === updated.id ? updated : c)),
+                            }
+                          : prev,
                       );
                     }}
                     onError={setActionError}
@@ -135,6 +165,9 @@ const AdminContestsListPage = () => {
             </li>
           ))}
         </ul>
+      )}
+      {contests !== null && (
+        <Pagination page={contests.page} totalPages={totalPages} onPageChange={setPage} />
       )}
 
       {confirmDialog}

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
+import { parseListQuery } from '../../lib/list-query.js';
 import {
   CONTEST_ACCESS_COOKIE_MAX_AGE_MS,
   contestAccessCookieName,
@@ -17,8 +18,8 @@ function requireSlugParam(request: Request): string {
   return slug;
 }
 
-export async function list(_request: Request, response: Response): Promise<void> {
-  const contests = await listPublicContests();
+export async function list(request: Request, response: Response): Promise<void> {
+  const contests = await listPublicContests(parseListQuery(request.query));
   response.json(contests);
 }
 

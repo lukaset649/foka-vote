@@ -27,7 +27,7 @@ Public:
 | Method | Path                                                 | Notes                                                                            |
 | ------ | ---------------------------------------------------- | -------------------------------------------------------------------------------- |
 | GET    | `/api/health`                                        | liveness plus a live database check                                              |
-| GET    | `/api/contests`                                      | all contests                                                                     |
+| GET    | `/api/contests`                                      | `{ current, others }`: current contests in full, the rest as a list page         |
 | GET    | `/api/contests/:slug`                                | open, no code needed                                                             |
 | POST   | `/api/contests/:slug/access`                         | verifies the contest code, sets a signed cookie                                  |
 | GET    | `/api/contests/:slug/submissions`                    | open; `403` until the submission phase ends                                      |
@@ -38,7 +38,7 @@ Public:
 | GET    | `/api/contests/:slug/votes/me`                       | needs the contest code                                                           |
 | POST   | `/api/contests/:slug/votes`                          | needs the contest code                                                           |
 | GET    | `/api/contests/:slug/results`                        | open                                                                             |
-| GET    | `/api/gallery/albums`                                | contest and standalone albums in one list                                        |
+| GET    | `/api/gallery/albums`                                | list page of contest and standalone albums                                       |
 | GET    | `/api/gallery/albums/:slug`                          | returns `hasAccessCode` and `canUpload`, never the code                          |
 | POST   | `/api/gallery/albums/:slug/access`                   | verifies the album code, sets a signed cookie                                    |
 | POST   | `/api/gallery/albums/:slug/uploads`                  | one photo (multipart field `photo`); needs the album code when the album has one |
@@ -70,6 +70,22 @@ Admin (`/api/admin`, everything past `/login` and `/logout` requires the session
 | PATCH              | `/gallery/contests/:contestId/visibility`                                    |
 
 Deleting a contest, an album, a submission or a photo also removes the stored image files.
+
+## List pages
+
+`GET /api/contests` (its `others` part), `/api/gallery/albums`, `/api/admin/contests` and `/api/admin/gallery/albums`
+return `PaginatedDto<T>`: `{ items, total, page, pageSize }`.
+
+| Query      | Values                         | Default                            |
+| ---------- | ------------------------------ | ---------------------------------- |
+| `q`        | title search, case-insensitive | none                               |
+| `sort`     | `createdAt`, `title`           | `createdAt`                        |
+| `order`    | `asc`, `desc`                  | `desc` for `createdAt`, else `asc` |
+| `page`     | integer >= 1                   | `1`                                |
+| `pageSize` | 1 to `MAX_LIST_PAGE_SIZE`      | `LIST_PAGE_SIZE`                   |
+
+Invalid values return `400`; a page past the end returns empty `items` with the real `total`.
+Sorting happens in `lib/list-query.ts` with a Polish collator, since the alpine Postgres image compares text bytewise.
 
 ## Error response contract
 

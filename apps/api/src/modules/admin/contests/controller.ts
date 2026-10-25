@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
+import { parseListQuery } from '../../../lib/list-query.js';
 import {
   createContest,
   deleteContest,
@@ -42,8 +43,8 @@ export async function create(request: Request, response: Response): Promise<void
   response.status(201).json(contest);
 }
 
-export async function list(_request: Request, response: Response): Promise<void> {
-  const contests = await listContests();
+export async function list(request: Request, response: Response): Promise<void> {
+  const contests = await listContests(parseListQuery(request.query));
   response.json(contests);
 }
 

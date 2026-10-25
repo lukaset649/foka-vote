@@ -3,9 +3,12 @@ import type {
   ContestDto,
   ContestStatus,
   CreateContestDto,
+  ListQuery,
+  PaginatedDto,
+  PublicContestListDto,
   UpdateContestDto,
 } from '@foka-vote/shared';
-import { apiErrorFrom, apiRequest } from './apiClient';
+import { apiErrorFrom, apiRequest, listQueryString } from './apiClient';
 
 export function contestGatePath(slug: string, redirectTo: string): string {
   return `/contest/${slug}/gate?redirect=${encodeURIComponent(redirectTo)}`;
@@ -15,12 +18,12 @@ export function isGalleryVisible(status: ContestStatus): boolean {
   return status === 'VOTING' || status === 'CLOSED';
 }
 
-export async function fetchContests(): Promise<ContestDto[]> {
-  const response = await apiRequest('/api/contests');
+export async function fetchContests(query: ListQuery = {}): Promise<PublicContestListDto> {
+  const response = await apiRequest(`/api/contests${listQueryString(query)}`);
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch contests');
   }
-  return response.json() as Promise<ContestDto[]>;
+  return response.json() as Promise<PublicContestListDto>;
 }
 
 export async function fetchContest(slug: string): Promise<ContestDto> {
@@ -42,12 +45,14 @@ export async function verifyContestAccessCode(slug: string, code: string): Promi
   }
 }
 
-export async function fetchAdminContests(): Promise<AdminContestDto[]> {
-  const response = await apiRequest('/api/admin/contests');
+export async function fetchAdminContests(
+  query: ListQuery = {},
+): Promise<PaginatedDto<AdminContestDto>> {
+  const response = await apiRequest(`/api/admin/contests${listQueryString(query)}`);
   if (!response.ok) {
     throw await apiErrorFrom(response, 'Failed to fetch contests');
   }
-  return response.json() as Promise<AdminContestDto[]>;
+  return response.json() as Promise<PaginatedDto<AdminContestDto>>;
 }
 
 export async function fetchAdminContest(id: string): Promise<AdminContestDto> {

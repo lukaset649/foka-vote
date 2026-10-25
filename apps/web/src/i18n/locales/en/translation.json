@@ -54,12 +54,14 @@
       "current": "Current",
       "allContests": "All contests",
       "noContestsYet": "No contests yet",
-      "failedToLoad": "Failed to load contests"
+      "failedToLoad": "Failed to load contests",
+      "noResults": "No results for: {{query}}"
     },
     "galleryAlbums": {
       "title": "Gallery",
       "noAlbumsYet": "No albums yet",
-      "failedToLoad": "Failed to load the gallery"
+      "failedToLoad": "Failed to load the gallery",
+      "noResults": "No results for: {{query}}"
     },
     "album": {
       "title": "Album",
@@ -460,6 +462,22 @@
       },
       "waitForUploads": "Wait until all photos have been uploaded.",
       "fixFailedUploads": "Retry or remove the photos that could not be uploaded."
+    },
+    "listToolbar": {
+      "searchPlaceholder": "Search by name",
+      "sortLabel": "Sort order",
+      "sort": {
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "titleAsc": "Name A-Z",
+        "titleDesc": "Name Z-A"
+      }
+    },
+    "pagination": {
+      "label": "List pages",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {{page}}"
     }
   }
 }

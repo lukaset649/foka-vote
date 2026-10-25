@@ -2,10 +2,17 @@ import {
   DEFAULT_MAX_ARTWORKS_PER_SUBMISSION,
   MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
 } from '@foka-vote/shared';
-import type { AdminContestDto, CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
+import type {
+  AdminContestDto,
+  CreateContestDto,
+  PaginatedDto,
+  UpdateContestDto,
+} from '@foka-vote/shared';
 import type { Contest } from '../../../generated/prisma/client.js';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
+import type { ParsedListQuery } from '../../../lib/list-query.js';
+import { paginateKeys, titleSearchFilter } from '../../../lib/list-query.js';
 import { prisma } from '../../../lib/prisma.js';
 import { slugify } from '../../../lib/slugify.js';
 import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
@@ -106,9 +113,13 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
   return toAdminContestDto(contest);
 }
 
-export async function listContests(): Promise<AdminContestDto[]> {
-  const contests = await prisma.contest.findMany({ orderBy: { createdAt: 'desc' } });
-  return contests.map(toAdminContestDto);
+export async function listContests(
+  listQuery: ParsedListQuery,
+): Promise<PaginatedDto<AdminContestDto>> {
+  const contests = await prisma.contest.findMany({ where: titleSearchFilter(listQuery.q) });
+  const page = paginateKeys(contests, listQuery);
+
+  return { ...page, items: page.items.map(toAdminContestDto) };
 }
 
 export async function getContestById(id: string): Promise<AdminContestDto> {

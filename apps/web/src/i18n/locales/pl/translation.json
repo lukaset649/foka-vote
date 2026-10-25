@@ -54,12 +54,14 @@
       "current": "Aktualne",
       "allContests": "Wszystkie konkursy",
       "noContestsYet": "Brak konkursów",
-      "failedToLoad": "Nie udało się wczytać konkursów"
+      "failedToLoad": "Nie udało się wczytać konkursów",
+      "noResults": "Brak wyników dla: {{query}}"
     },
     "galleryAlbums": {
       "title": "Galeria",
       "noAlbumsYet": "Brak albumów",
-      "failedToLoad": "Nie udało się wczytać galerii"
+      "failedToLoad": "Nie udało się wczytać galerii",
+      "noResults": "Brak wyników dla: {{query}}"
     },
     "album": {
       "title": "Album",
@@ -470,6 +472,22 @@
       },
       "waitForUploads": "Poczekaj, aż wszystkie zdjęcia zostaną wysłane.",
       "fixFailedUploads": "Ponów wysyłkę lub usuń zdjęcia, których nie udało się wysłać."
+    },
+    "listToolbar": {
+      "searchPlaceholder": "Szukaj po nazwie",
+      "sortLabel": "Sortowanie",
+      "sort": {
+        "newest": "Najnowsze",
+        "oldest": "Najstarsze",
+        "titleAsc": "Nazwa A-Z",
+        "titleDesc": "Nazwa Z-A"
+      }
+    },
+    "pagination": {
+      "label": "Strony listy",
+      "previous": "Poprzednia strona",
+      "next": "Następna strona",
+      "page": "Strona {{page}}"
     }
   }
 }

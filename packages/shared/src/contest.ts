@@ -1,3 +1,5 @@
+import type { PaginatedDto } from './list.js';
+
 export type ContestStatus = 'DRAFT' | 'SUBMISSIONS' | 'VOTING' | 'CLOSED';
 
 export interface ContestDto {
@@ -13,6 +15,11 @@ export interface ContestDto {
   status: ContestStatus;
   hasAccessCode: boolean;
   createdAt: string;
+}
+
+export interface PublicContestListDto {
+  current: ContestDto[];
+  others: PaginatedDto<ContestDto>;
 }
 
 export interface AdminContestDto extends ContestDto {
