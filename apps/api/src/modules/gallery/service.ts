@@ -18,11 +18,13 @@ import { processArtworkImage } from '../../lib/artwork-image.js';
 import { computeContestStatus } from '../../lib/contest-status.js';
 import type { ArtworkMetaInput } from '../../lib/artwork-meta.js';
 import {
+  claimPendingUploads,
   createPendingUpload,
   deletePendingUpload,
   toPendingUploadDto,
 } from '../../lib/pending-uploads.js';
 import { prisma } from '../../lib/prisma.js';
+import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
 import { mediaUrl, removeStoredFiles } from '../../lib/storage.js';
 
 type SignedCookies = Record<string, string | undefined>;
@@ -430,4 +432,53 @@ export async function removePendingAlbumUpload(
 ): Promise<void> {
   const album = await findAlbumForUpload(slug, signedCookies);
   await deletePendingUpload({ albumId: album.id }, uploadId);
+}
+
+export interface CreateAlbumSubmissionInput {
+  firstName: string;
+  lastName: string;
+  photos: SubmissionPhotoInput[];
+}
+
+export async function createAlbumSubmission(
+  slug: string,
+  input: CreateAlbumSubmissionInput,
+  signedCookies: SignedCookies,
+): Promise<void> {
+  const album = await findAlbumForUpload(slug, signedCookies);
+
+  if (input.photos.length < 1 || input.photos.length > MAX_PHOTOS_PER_ALBUM_UPLOAD) {
+    throw badRequest(`Upload must include between 1 and ${MAX_PHOTOS_PER_ALBUM_UPLOAD} photos`);
+  }
+  for (const photo of input.photos) {
+    assertValidPhotoCaption(photo.title, photo.description);
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const uploads = await claimPendingUploads(
+      tx,
+      { albumId: album.id },
+      input.photos.map((photo) => photo.uploadId),
+    );
+    await tx.albumSubmission.create({
+      data: {
+        albumId: album.id,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        rulesAcceptedAt: new Date(),
+        photos: {
+          create: uploads.map((upload, index) => ({
+            title: input.photos[index]?.title ?? null,
+            description: input.photos[index]?.description ?? null,
+            filePath: upload.filePath,
+            previewPath: upload.previewPath,
+            thumbPath: upload.thumbPath,
+            width: upload.width,
+            height: upload.height,
+            sortOrder: index,
+          })),
+        },
+      },
+    });
+  });
 }

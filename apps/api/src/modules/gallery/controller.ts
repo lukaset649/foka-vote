@@ -2,12 +2,14 @@ import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
 import { parseArtworkMeta } from '../../lib/artwork-meta.js';
+import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
 import {
   addAlbumPhotos,
   addPendingAlbumUpload,
   ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
   albumAccessCookieName,
+  createAlbumSubmission,
   getPublicAlbum,
   listGalleryAlbums,
   removePendingAlbumUpload,
@@ -99,4 +101,32 @@ export async function removeUpload(request: Request, response: Response): Promis
     request.signedCookies as Record<string, string | undefined>,
   );
   response.status(204).end();
+}
+
+export async function createSubmission(request: Request, response: Response): Promise<void> {
+  const slug = requireSlugParam(request);
+  const body = (request.body ?? {}) as Record<string, unknown>;
+  const { firstName, lastName, photos, rulesAccepted } = body;
+
+  if (typeof firstName !== 'string' || firstName.trim().length === 0) {
+    throw badRequest('firstName is required');
+  }
+  if (typeof lastName !== 'string' || lastName.trim().length === 0) {
+    throw badRequest('lastName is required');
+  }
+  if (rulesAccepted !== true) {
+    throw badRequest('rulesAccepted must be accepted');
+  }
+
+  await createAlbumSubmission(
+    slug,
+    {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      photos: parseSubmissionPhotos(photos, 'photos'),
+    },
+    request.signedCookies as Record<string, string | undefined>,
+  );
+
+  response.status(201).end();
 }
