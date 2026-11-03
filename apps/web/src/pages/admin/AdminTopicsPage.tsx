@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { ErrorCode, MAX_CONTEST_TOPIC_TITLE_LENGTH, type ContestTopicDto } from '@foka-vote/shared';
@@ -10,6 +10,7 @@ import {
   fetchContestTopics,
   updateContestTopic,
 } from '../../services/contestTopics';
+import ContestTopicRow from '../../components/ContestTopicRow';
 import FortuneWheel, { type FortuneWheelHandle } from '../../components/FortuneWheel';
 import Alert from '../../components/ui/Alert';
 import Button from '../../components/ui/Button';
@@ -37,8 +38,6 @@ const AdminTopicsPage = () => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState('');
   const [adding, setAdding] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
   const wheelRef = useRef<FortuneWheelHandle>(null);
   const [spinning, setSpinning] = useState(false);
@@ -106,40 +105,17 @@ const AdminTopicsPage = () => {
       .finally(() => setAdding(false));
   };
 
-  const startEditing = (topic: ContestTopicDto) => {
-    setEditingId(topic.id);
-    setEditTitle(topic.title);
+  const saveTitle = (topic: ContestTopicDto, title: string): Promise<boolean> => {
     setActionError(null);
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditTitle('');
-  };
-
-  const saveEdit = (topic: ContestTopicDto) => {
-    if (editTitle.trim().length === 0) {
-      return;
-    }
-
-    setBusyId(topic.id);
-    setActionError(null);
-    updateContestTopic(topic.id, { title: editTitle })
+    return updateContestTopic(topic.id, { title })
       .then((updated) => {
         setTopics((prev) => prev?.map((item) => (item.id === updated.id ? updated : item)) ?? prev);
-        cancelEditing();
+        return true;
       })
-      .catch((err: unknown) => setActionError(topicErrorMessage(err, t)))
-      .finally(() => setBusyId(null));
-  };
-
-  const handleEditKeyDown = (event: KeyboardEvent<HTMLInputElement>, topic: ContestTopicDto) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      saveEdit(topic);
-    } else if (event.key === 'Escape') {
-      cancelEditing();
-    }
+      .catch((err: unknown) => {
+        setActionError(topicErrorMessage(err, t));
+        return false;
+      });
   };
 
   const handleDelete = async (topic: ContestTopicDto) => {
@@ -244,71 +220,13 @@ const AdminTopicsPage = () => {
               </h2>
               <ul className="flex flex-col divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white shadow-sm">
                 {topics.map((topic) => (
-                  <li
+                  <ContestTopicRow
                     key={topic.id}
-                    className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    {editingId === topic.id ? (
-                      <>
-                        <Input
-                          aria-label={t('pages.adminTopics.editLabel')}
-                          value={editTitle}
-                          maxLength={MAX_CONTEST_TOPIC_TITLE_LENGTH}
-                          autoFocus
-                          onChange={(event) => setEditTitle(event.target.value)}
-                          onKeyDown={(event) => handleEditKeyDown(event, topic)}
-                        />
-                        <div className="flex gap-2 sm:shrink-0">
-                          <Button
-                            type="button"
-                            size="sm"
-                            disabled={
-                              busyId === topic.id || spinning || editTitle.trim().length === 0
-                            }
-                            onClick={() => saveEdit(topic)}
-                          >
-                            <i className="bi bi-check-lg" aria-hidden="true" />
-                            {t('pages.adminTopics.save')}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            disabled={busyId === topic.id}
-                            onClick={cancelEditing}
-                          >
-                            {t('common.cancel')}
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <span className="min-w-0 break-words text-zinc-900">{topic.title}</span>
-                        <div className="flex gap-2 sm:shrink-0">
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            disabled={busyId === topic.id || spinning}
-                            onClick={() => startEditing(topic)}
-                          >
-                            <i className="bi bi-pencil-square" aria-hidden="true" />
-                            {t('pages.submissionPreview.edit')}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="danger"
-                            size="sm"
-                            disabled={busyId === topic.id || spinning}
-                            onClick={() => void handleDelete(topic)}
-                          >
-                            <i className="bi bi-trash" aria-hidden="true" />
-                            {t('common.remove')}
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </li>
+                    topic={topic}
+                    disabled={busyId === topic.id || spinning}
+                    onSave={(title) => saveTitle(topic, title)}
+                    onDelete={() => void handleDelete(topic)}
+                  />
                 ))}
               </ul>
             </section>
