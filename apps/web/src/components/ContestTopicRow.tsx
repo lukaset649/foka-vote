@@ -42,7 +42,7 @@ const ContestTopicRow = ({ topic, disabled, onSave, onDelete }: ContestTopicRowP
     if (event.key === 'Enter') {
       event.preventDefault();
       save();
-    } else if (event.key === 'Escape') {
+    } else if (event.key === 'Escape' && !saving) {
       setEditing(false);
     }
   };

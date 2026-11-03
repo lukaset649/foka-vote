@@ -227,7 +227,8 @@
       "saveChanges": "Save changes",
       "createContest": "Create contest",
       "saveFailed": "Failed to save contest",
-      "fromTopic": "Contest from the drawn topic \"{{title}}\". The topic leaves the wheel once the contest is created."
+      "fromTopic": "Contest from the drawn topic \"{{title}}\". The topic leaves the wheel once the contest is created.",
+      "topicLoadFailed": "Failed to load the drawn topic. Go back to the Topics tab and try again, otherwise the topic stays on the wheel."
     },
     "adminSubmissions": {
       "loadingSubmissions": "Loading submissions…",

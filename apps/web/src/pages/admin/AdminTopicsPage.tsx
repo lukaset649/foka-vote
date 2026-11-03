@@ -100,6 +100,8 @@ const AdminTopicsPage = () => {
       .then((created) => {
         setTopics((prev) => [...(prev ?? []), created]);
         setNewTitle('');
+        // New segments shift the wheel, so the pointer no longer marks the drawn topic.
+        setResultId(null);
       })
       .catch((err: unknown) => setActionError(topicErrorMessage(err, t)))
       .finally(() => setAdding(false));
@@ -131,7 +133,10 @@ const AdminTopicsPage = () => {
     setBusyId(topic.id);
     setActionError(null);
     deleteContestTopic(topic.id)
-      .then(() => setTopics((prev) => prev?.filter((item) => item.id !== topic.id) ?? prev))
+      .then(() => {
+        setTopics((prev) => prev?.filter((item) => item.id !== topic.id) ?? prev);
+        setResultId(null);
+      })
       .catch((err: unknown) => setActionError(errorMessage(err, t)))
       .finally(() => setBusyId(null));
   };

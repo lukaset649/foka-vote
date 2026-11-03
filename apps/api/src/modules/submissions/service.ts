@@ -22,7 +22,7 @@ import {
   deletePendingUpload,
   toPendingUploadDto,
 } from '../../lib/pending-uploads.js';
-import { prisma } from '../../lib/prisma.js';
+import { isUniqueConstraintError, prisma } from '../../lib/prisma.js';
 import { mediaUrl } from '../../lib/storage.js';
 import type { SubmissionPhotoInput } from '../../lib/submission-photos.js';
 
@@ -34,10 +34,6 @@ export interface CreateSubmissionInput {
   lastName: string;
   description?: string;
   reservationId?: string;
-}
-
-function isUniqueConstraintError(error: unknown): boolean {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 }
 
 function toArtworkDto(artwork: Artwork): ArtworkDto {

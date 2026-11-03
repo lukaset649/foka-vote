@@ -2,7 +2,7 @@ import { MAX_CONTEST_TOPIC_TITLE_LENGTH } from '@foka-vote/shared';
 import type { ContestTopicDto, SaveContestTopicDto } from '@foka-vote/shared';
 import type { ContestTopic } from '../../../generated/prisma/client.js';
 import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
-import { prisma } from '../../../lib/prisma.js';
+import { isUniqueConstraintError, prisma } from '../../../lib/prisma.js';
 
 function toContestTopicDto(topic: ContestTopic): ContestTopicDto {
   return {
@@ -13,7 +13,7 @@ function toContestTopicDto(topic: ContestTopic): ContestTopicDto {
 }
 
 function normalizeTitle(title: string): string {
-  const trimmed = title.trim();
+  const trimmed = title.trim().replace(/\s+/g, ' ');
   if (trimmed.length === 0) {
     throw badRequest('title must not be empty');
   }
@@ -23,10 +23,32 @@ function normalizeTitle(title: string): string {
   return trimmed;
 }
 
+function duplicateTitle(title: string) {
+  return conflict(`Topic "${title}" already exists`);
+}
+
+// Titles differing only in letter case count as the same topic, so the wheel never gets
+// two segments for one idea; the unique index still catches exact duplicates under a race.
 async function ensureUniqueTitle(title: string, excludeId?: string): Promise<void> {
-  const existing = await prisma.contestTopic.findUnique({ where: { title } });
-  if (existing && existing.id !== excludeId) {
-    throw conflict(`Topic "${title}" already exists`);
+  const existing = await prisma.contestTopic.findFirst({
+    where: {
+      title: { equals: title, mode: 'insensitive' },
+      ...(excludeId ? { id: { not: excludeId } } : {}),
+    },
+  });
+  if (existing) {
+    throw duplicateTitle(existing.title);
+  }
+}
+
+async function saveTopic<T>(title: string, write: () => Promise<T>): Promise<T> {
+  try {
+    return await write();
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      throw duplicateTitle(title);
+    }
+    throw error;
   }
 }
 
@@ -47,7 +69,7 @@ export async function createContestTopic(input: SaveContestTopicDto): Promise<Co
   const title = normalizeTitle(input.title);
   await ensureUniqueTitle(title);
 
-  const topic = await prisma.contestTopic.create({ data: { title } });
+  const topic = await saveTopic(title, () => prisma.contestTopic.create({ data: { title } }));
   return toContestTopicDto(topic);
 }
 
@@ -59,7 +81,9 @@ export async function updateContestTopic(
   const title = normalizeTitle(input.title);
   await ensureUniqueTitle(title, id);
 
-  const topic = await prisma.contestTopic.update({ where: { id }, data: { title } });
+  const topic = await saveTopic(title, () =>
+    prisma.contestTopic.update({ where: { id }, data: { title } }),
+  );
   return toContestTopicDto(topic);
 }
 

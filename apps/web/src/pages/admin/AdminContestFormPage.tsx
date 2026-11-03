@@ -79,7 +79,7 @@ const AdminContestFormPage = () => {
   const isEditing = id !== undefined;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const topicId = isEditing ? null : searchParams.get('topicId');
+  const topicId = isEditing ? null : searchParams.get('topicId') || null;
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [contest, setContest] = useState<AdminContestDto | null>(null);
@@ -119,11 +119,13 @@ const AdminContestFormPage = () => {
           setForm((prev) => ({ ...prev, title: found.title }));
         }
       })
-      .catch(() => undefined)
+      .catch(() => {
+        setError(t('pages.adminContestForm.topicLoadFailed'));
+      })
       .finally(() => {
         setLoading(false);
       });
-  }, [topicId]);
+  }, [topicId, t]);
 
   const updateField =
     (field: keyof FormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

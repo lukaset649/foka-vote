@@ -1,4 +1,4 @@
-import { useState, useImperativeHandle, type Ref } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 
 const SIZE = 400;
 const CENTER = SIZE / 2;
@@ -10,6 +10,8 @@ const GLYPH_WIDTH_RATIO = 0.5;
 const FULL_TURNS = 6;
 const SPIN_DURATION_MS = 5000;
 const REDUCED_MOTION_DURATION_MS = 300;
+// Extra time before the fallback timer ends a spin whose transitionend never arrived.
+const SPIN_END_GRACE_MS = 500;
 const SEGMENT_COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ec4899', '#0ea5e9', '#f97316'] as const;
 
 export interface FortuneWheelHandle {
@@ -55,6 +57,32 @@ const FortuneWheel = ({ labels, onSpinEnd, ref }: FortuneWheelProps) => {
   const [durationMs, setDurationMs] = useState(0);
   const segmentAngle = 360 / labels.length;
   const fontSize = labels.length > 16 ? 9 : labels.length > 8 ? 12 : 15;
+  const onSpinEndRef = useRef(onSpinEnd);
+  const fallbackTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    onSpinEndRef.current = onSpinEnd;
+  }, [onSpinEnd]);
+
+  useEffect(
+    () => () => {
+      if (fallbackTimerRef.current !== null) {
+        window.clearTimeout(fallbackTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  // Called by transitionend or, when that never fires (transitions disabled, interrupted),
+  // by the fallback timer; whichever comes first ends the spin, the other is ignored.
+  const finishSpin = () => {
+    if (fallbackTimerRef.current === null) {
+      return;
+    }
+    window.clearTimeout(fallbackTimerRef.current);
+    fallbackTimerRef.current = null;
+    onSpinEndRef.current();
+  };
 
   useImperativeHandle(
     ref,
@@ -63,8 +91,13 @@ const FortuneWheel = ({ labels, onSpinEnd, ref }: FortuneWheelProps) => {
         const jitter = (Math.random() - 0.5) * segmentAngle * 0.7;
         const target = (index + 0.5) * segmentAngle + jitter;
         const reducedMotion = prefersReducedMotion();
+        const duration = reducedMotion ? REDUCED_MOTION_DURATION_MS : SPIN_DURATION_MS;
 
-        setDurationMs(reducedMotion ? REDUCED_MOTION_DURATION_MS : SPIN_DURATION_MS);
+        if (fallbackTimerRef.current !== null) {
+          window.clearTimeout(fallbackTimerRef.current);
+        }
+        fallbackTimerRef.current = window.setTimeout(finishSpin, duration + SPIN_END_GRACE_MS);
+        setDurationMs(duration);
         setRotation((current) => {
           const delta = (((-target - current) % 360) + 360) % 360;
           const turns = reducedMotion && delta > 0 ? 0 : FULL_TURNS;
@@ -84,7 +117,7 @@ const FortuneWheel = ({ labels, onSpinEnd, ref }: FortuneWheelProps) => {
           transform: `rotate(${rotation}deg)`,
           transition: `transform ${durationMs}ms cubic-bezier(0.15, 0.85, 0.25, 1)`,
         }}
-        onTransitionEnd={onSpinEnd}
+        onTransitionEnd={finishSpin}
         aria-hidden="true"
       >
         {labels.length === 1 ? (
