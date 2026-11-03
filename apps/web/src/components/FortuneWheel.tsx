@@ -104,13 +104,19 @@ const FortuneWheel = ({ labels, onSpinEnd, ref }: FortuneWheelProps) => {
         )}
         {labels.map((label, index) => {
           const angle = (index + 0.5) * segmentAngle;
+          const restingAngle = (((angle + rotation) % 360) + 360) % 360;
+          const flipped = restingAngle > 180;
           return (
             <text
               key={index}
-              x={CENTER + RADIUS - LABEL_EDGE_PADDING}
+              x={
+                flipped
+                  ? CENTER - RADIUS + LABEL_EDGE_PADDING
+                  : CENTER + RADIUS - LABEL_EDGE_PADDING
+              }
               y={CENTER}
-              transform={`rotate(${angle - 90} ${CENTER} ${CENTER})`}
-              textAnchor="end"
+              transform={`rotate(${flipped ? angle + 90 : angle - 90} ${CENTER} ${CENTER})`}
+              textAnchor={flipped ? 'start' : 'end'}
               dominantBaseline="central"
               fill="#fff"
               fontSize={fontSize}
