@@ -26,6 +26,8 @@ export const MAX_ALBUM_DESCRIPTION_LENGTH = 2000;
 // the gallery's own sub-routes.
 export const RESERVED_ALBUM_SLUGS = ['new', 'gate'] as const;
 
+export const MAX_CONTEST_TOPIC_TITLE_LENGTH = 120;
+
 export const LIST_PAGE_SIZE = 10;
 export const MAX_LIST_PAGE_SIZE = 50;
 export const MAX_LIST_SEARCH_LENGTH = 100;

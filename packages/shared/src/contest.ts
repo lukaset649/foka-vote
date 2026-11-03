@@ -36,6 +36,7 @@ export interface CreateContestDto {
   votingEnd: string;
   maxArtworksPerSubmission?: number;
   accessCode?: string;
+  topicId?: string;
 }
 
-export type UpdateContestDto = Partial<CreateContestDto>;
+export type UpdateContestDto = Partial<Omit<CreateContestDto, 'topicId'>>;

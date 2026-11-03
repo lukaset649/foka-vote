@@ -179,3 +179,10 @@ model PendingUpload {
 
   @@index([createdAt])
 }
+
+// A proposed contest topic for the admin's fortune wheel; deleted once a contest is created from it.
+model ContestTopic {
+  id        String   @id @default(cuid())
+  title     String   @unique
+  createdAt DateTime @default(now())
+}
