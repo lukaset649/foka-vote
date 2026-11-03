@@ -25,6 +25,9 @@ function assertCreatePayload(body: unknown): CreateContestDto {
       'title, submissionStart, submissionDeadline, votingStart and votingEnd are required',
     );
   }
+  if (input.topicId !== undefined && typeof input.topicId !== 'string') {
+    throw badRequest('topicId must be a string');
+  }
 
   return input as CreateContestDto;
 }

@@ -96,7 +96,7 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
     input.maxArtworksPerSubmission ?? DEFAULT_MAX_ARTWORKS_PER_SUBMISSION;
   assertValidMaxArtworks(maxArtworksPerSubmission);
 
-  const contest = await prisma.contest.create({
+  const createContestRow = prisma.contest.create({
     data: {
       slug,
       title: input.title,
@@ -109,6 +109,15 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
       accessCode: input.accessCode ?? null,
     },
   });
+
+  const contest = input.topicId
+    ? (
+        await prisma.$transaction([
+          createContestRow,
+          prisma.contestTopic.deleteMany({ where: { id: input.topicId } }),
+        ])
+      )[0]
+    : await createContestRow;
 
   return toAdminContestDto(contest);
 }
