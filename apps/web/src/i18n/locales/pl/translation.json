@@ -192,6 +192,22 @@
       "codeBadge": "Kod: {{code}}",
       "photos": "Zdjęcia"
     },
+    "adminTopics": {
+      "title": "Tematy",
+      "failedToLoad": "Nie udało się wczytać tematów.",
+      "newTopicLabel": "Nowy temat konkursu",
+      "newTopicPlaceholder": "np. Jesienne światło",
+      "add": "Dodaj",
+      "noTopicsYet": "Nie ma jeszcze żadnych tematów. Dodaj pierwszy, aby móc losować.",
+      "listHeading_one": "{{count}} temat",
+      "listHeading_few": "{{count}} tematy",
+      "listHeading_many": "{{count}} tematów",
+      "listHeading_other": "{{count}} tematu",
+      "editLabel": "Nazwa tematu",
+      "save": "Zapisz",
+      "duplicate": "Taki temat już istnieje.",
+      "confirmDelete": "Usunąć temat \"{{title}}\"?"
+    },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",
       "basicInfo": "Podstawowe informacje",

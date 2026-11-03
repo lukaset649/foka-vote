@@ -190,6 +190,20 @@
       "codeBadge": "Code: {{code}}",
       "photos": "Photos"
     },
+    "adminTopics": {
+      "title": "Topics",
+      "failedToLoad": "Failed to load topics.",
+      "newTopicLabel": "New contest topic",
+      "newTopicPlaceholder": "e.g. Autumn light",
+      "add": "Add",
+      "noTopicsYet": "There are no topics yet. Add the first one to start drawing.",
+      "listHeading_one": "{{count}} topic",
+      "listHeading_other": "{{count}} topics",
+      "editLabel": "Topic name",
+      "save": "Save",
+      "duplicate": "This topic already exists.",
+      "confirmDelete": "Delete the topic \"{{title}}\"?"
+    },
     "adminContestForm": {
       "editContest": "Edit contest",
       "basicInfo": "Basic info",

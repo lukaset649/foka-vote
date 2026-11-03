@@ -18,6 +18,11 @@ const SECTIONS = [
     createTo: '/admin/gallery/albums/new',
     createLabelKey: 'pages.adminGallery.createAlbum',
   },
+  {
+    key: 'topics',
+    to: '/admin/topics',
+    labelKey: 'pages.adminTopics.title',
+  },
 ] as const;
 
 const AdminNav = () => {
@@ -38,10 +43,12 @@ const AdminNav = () => {
           }))}
         />
 
-        <LinkButton to={activeSection.createTo} variant="success" size="sm">
-          <i className="bi bi-plus-circle" aria-hidden="true" />
-          {t(activeSection.createLabelKey)}
-        </LinkButton>
+        {'createTo' in activeSection && (
+          <LinkButton to={activeSection.createTo} variant="success" size="sm">
+            <i className="bi bi-plus-circle" aria-hidden="true" />
+            {t(activeSection.createLabelKey)}
+          </LinkButton>
+        )}
       </div>
 
       <Outlet />
