@@ -1,7 +1,11 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
-import { MAX_ARTWORKS_PER_SUBMISSION_LIMIT, type AdminContestDto } from '@foka-vote/shared';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import {
+  MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
+  type AdminContestDto,
+  type ContestTopicDto,
+} from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import {
   createContest,
@@ -9,6 +13,7 @@ import {
   fetchAdminContest,
   updateContest,
 } from '../../services/contests';
+import { fetchContestTopics } from '../../services/contestTopics';
 import ContestPhaseActions from '../../components/ContestPhaseActions';
 import PageHeader from '../../components/ui/PageHeader';
 import ActionBar from '../../components/ui/ActionBar';
@@ -73,10 +78,13 @@ const AdminContestFormPage = () => {
   const { id } = useParams();
   const isEditing = id !== undefined;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const topicId = isEditing ? null : searchParams.get('topicId');
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [contest, setContest] = useState<AdminContestDto | null>(null);
-  const [loading, setLoading] = useState(isEditing);
+  const [topic, setTopic] = useState<ContestTopicDto | null>(null);
+  const [loading, setLoading] = useState(isEditing || topicId !== null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,6 +105,25 @@ const AdminContestFormPage = () => {
         setLoading(false);
       });
   }, [id, t]);
+
+  useEffect(() => {
+    if (!topicId) {
+      return;
+    }
+    // A topic deleted in the meantime just leaves the form empty.
+    fetchContestTopics()
+      .then((topics) => {
+        const found = topics.find((item) => item.id === topicId);
+        if (found) {
+          setTopic(found);
+          setForm((prev) => ({ ...prev, title: found.title }));
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [topicId]);
 
   const updateField =
     (field: keyof FormState) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,7 +153,7 @@ const AdminContestFormPage = () => {
       if (id) {
         await updateContest(id, payload);
       } else {
-        await createContest(payload);
+        await createContest({ ...payload, ...(topic ? { topicId: topic.id } : {}) });
       }
       void navigate('/admin/contests');
     } catch (err) {
@@ -191,6 +218,12 @@ const AdminContestFormPage = () => {
       </PageHeader>
 
       <div className="flex flex-col gap-6">
+        {topic && (
+          <Alert variant="info">
+            {t('pages.adminContestForm.fromTopic', { title: topic.title })}
+          </Alert>
+        )}
+
         <Card className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
             {t('pages.adminContestForm.basicInfo')}

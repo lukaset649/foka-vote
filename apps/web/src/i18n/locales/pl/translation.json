@@ -206,7 +206,12 @@
       "editLabel": "Nazwa tematu",
       "save": "Zapisz",
       "duplicate": "Taki temat już istnieje.",
-      "confirmDelete": "Usunąć temat \"{{title}}\"?"
+      "confirmDelete": "Usunąć temat \"{{title}}\"?",
+      "spin": "Losuj temat",
+      "spinning": "Losowanie…",
+      "spinAgain": "Losuj ponownie",
+      "drawnTopic": "Wylosowany temat",
+      "createContest": "Utwórz konkurs"
     },
     "adminContestForm": {
       "editContest": "Edytuj konkurs",
@@ -225,7 +230,8 @@
       "deleteContest": "Usuń konkurs",
       "saveChanges": "Zapisz zmiany",
       "createContest": "Utwórz konkurs",
-      "saveFailed": "Nie udało się zapisać konkursu"
+      "saveFailed": "Nie udało się zapisać konkursu",
+      "fromTopic": "Konkurs z wylosowanego tematu \"{{title}}\". Po utworzeniu konkursu temat zniknie z koła."
     },
     "adminSubmissions": {
       "loadingSubmissions": "Wczytywanie zgłoszeń…",

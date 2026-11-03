@@ -202,7 +202,12 @@
       "editLabel": "Topic name",
       "save": "Save",
       "duplicate": "This topic already exists.",
-      "confirmDelete": "Delete the topic \"{{title}}\"?"
+      "confirmDelete": "Delete the topic \"{{title}}\"?",
+      "spin": "Draw a topic",
+      "spinning": "Drawing…",
+      "spinAgain": "Draw again",
+      "drawnTopic": "Drawn topic",
+      "createContest": "Create contest"
     },
     "adminContestForm": {
       "editContest": "Edit contest",
@@ -221,7 +226,8 @@
       "deleteContest": "Delete contest",
       "saveChanges": "Save changes",
       "createContest": "Create contest",
-      "saveFailed": "Failed to save contest"
+      "saveFailed": "Failed to save contest",
+      "fromTopic": "Contest from the drawn topic \"{{title}}\". The topic leaves the wheel once the contest is created."
     },
     "adminSubmissions": {
       "loadingSubmissions": "Loading submissions…",
