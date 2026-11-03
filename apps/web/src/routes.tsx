@@ -25,6 +25,7 @@ import AdminSubmissionEditPage from './pages/admin/AdminSubmissionEditPage';
 import AdminGalleryPage from './pages/admin/AdminGalleryPage';
 import AdminAlbumFormPage from './pages/admin/AdminAlbumFormPage';
 import AdminAlbumPhotosPage from './pages/admin/AdminAlbumPhotosPage';
+import AdminTopicsPage from './pages/admin/AdminTopicsPage';
 
 export interface RouteHandle {
   wide?: boolean;
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
             children: [
               { path: '/admin/contests', element: <AdminContestsListPage /> },
               { path: '/admin/gallery', element: <AdminGalleryPage /> },
+              { path: '/admin/topics', element: <AdminTopicsPage /> },
             ],
           },
           { path: '/admin/contests/new', element: <AdminContestFormPage /> },

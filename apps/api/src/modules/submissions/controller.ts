@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
-import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
+import { requireSingleUpload } from '../../lib/upload.js';
+import { requireParam } from '../../lib/request-params.js';
 import {
   addPendingContestUpload,
   createSubmission,
@@ -10,26 +11,18 @@ import {
   reserveAlias,
 } from './service.js';
 
-function requireSlugParam(request: Request): string {
-  const { slug } = request.params;
-  if (typeof slug !== 'string' || slug.length === 0) {
-    throw badRequest('slug is required');
-  }
-  return slug;
-}
-
 function optionalString(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
 export async function list(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const submissions = await listSubmissions(slug);
   response.json(submissions);
 }
 
 export async function reserveAliasHandler(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const reservation = await reserveAlias(
     slug,
     request.signedCookies as Record<string, string | undefined>,
@@ -39,7 +32,7 @@ export async function reserveAliasHandler(request: Request, response: Response):
 
 export async function uploadArtwork(request: Request, response: Response): Promise<void> {
   const upload = await addPendingContestUpload(
-    requireSlugParam(request),
+    requireParam(request, 'slug'),
     requireSingleUpload(request),
     request.signedCookies as Record<string, string | undefined>,
   );
@@ -48,15 +41,15 @@ export async function uploadArtwork(request: Request, response: Response): Promi
 
 export async function removeUpload(request: Request, response: Response): Promise<void> {
   await removePendingContestUpload(
-    requireSlugParam(request),
-    requireUploadIdParam(request),
+    requireParam(request, 'slug'),
+    requireParam(request, 'uploadId'),
     request.signedCookies as Record<string, string | undefined>,
   );
   response.status(204).end();
 }
 
 export async function create(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const body = (request.body ?? {}) as Record<string, unknown>;
   const { firstName, lastName, description, reservationId, rulesAccepted, artworks } = body;
 

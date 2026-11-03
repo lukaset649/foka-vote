@@ -30,6 +30,7 @@ export * from './nickname-pool.js';
 export * from './constants.js';
 export * from './list.js';
 export * from './contest.js';
+export * from './contest-topic.js';
 export * from './album.js';
 export * from './submission.js';
 export * from './upload.js';

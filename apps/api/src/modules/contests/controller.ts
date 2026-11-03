@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
 import { parseListQuery } from '../../lib/list-query.js';
+import { requireParam } from '../../lib/request-params.js';
 import {
   CONTEST_ACCESS_COOKIE_MAX_AGE_MS,
   contestAccessCookieName,
@@ -10,26 +11,18 @@ import {
   verifyContestAccessCode,
 } from './service.js';
 
-function requireSlugParam(request: Request): string {
-  const { slug } = request.params;
-  if (typeof slug !== 'string' || slug.length === 0) {
-    throw badRequest('slug is required');
-  }
-  return slug;
-}
-
 export async function list(request: Request, response: Response): Promise<void> {
   const contests = await listPublicContests(parseListQuery(request.query));
   response.json(contests);
 }
 
 export async function getOne(request: Request, response: Response): Promise<void> {
-  const contest = await getPublicContestBySlug(requireSlugParam(request));
+  const contest = await getPublicContestBySlug(requireParam(request, 'slug'));
   response.json(contest);
 }
 
 export async function verifyAccess(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const { code } = request.body as { code?: unknown };
 
   if (typeof code !== 'string' || code.length === 0) {

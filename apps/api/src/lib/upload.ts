@@ -34,11 +34,3 @@ export function requireSingleUpload(request: Request): Express.Multer.File {
   }
   return file;
 }
-
-export function requireUploadIdParam(request: Request): string {
-  const { uploadId } = request.params;
-  if (typeof uploadId !== 'string' || uploadId.length === 0) {
-    throw badRequest('uploadId is required');
-  }
-  return uploadId;
-}

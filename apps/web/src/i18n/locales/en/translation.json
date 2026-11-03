@@ -190,6 +190,25 @@
       "codeBadge": "Code: {{code}}",
       "photos": "Photos"
     },
+    "adminTopics": {
+      "title": "Topics",
+      "failedToLoad": "Failed to load topics.",
+      "newTopicLabel": "New contest topic",
+      "newTopicPlaceholder": "e.g. Autumn light",
+      "add": "Add",
+      "noTopicsYet": "There are no topics yet. Add the first one to start drawing.",
+      "listHeading_one": "{{count}} topic",
+      "listHeading_other": "{{count}} topics",
+      "editLabel": "Topic name",
+      "save": "Save",
+      "duplicate": "This topic already exists.",
+      "confirmDelete": "Delete the topic \"{{title}}\"?",
+      "spin": "Draw a topic",
+      "spinning": "Drawing…",
+      "spinAgain": "Draw again",
+      "drawnTopic": "Drawn topic",
+      "createContest": "Create contest"
+    },
     "adminContestForm": {
       "editContest": "Edit contest",
       "basicInfo": "Basic info",
@@ -207,7 +226,9 @@
       "deleteContest": "Delete contest",
       "saveChanges": "Save changes",
       "createContest": "Create contest",
-      "saveFailed": "Failed to save contest"
+      "saveFailed": "Failed to save contest",
+      "fromTopic": "Contest from the drawn topic \"{{title}}\". The topic leaves the wheel once the contest is created.",
+      "topicLoadFailed": "Failed to load the drawn topic. Go back to the Topics tab and try again, otherwise the topic stays on the wheel."
     },
     "adminSubmissions": {
       "loadingSubmissions": "Loading submissions…",

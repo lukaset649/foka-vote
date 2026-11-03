@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { login, logout, me } from './controller.js';
 import { adminContestsRoutes } from './contests/routes.js';
+import { adminContestTopicsRoutes } from './contest-topics/routes.js';
 import { adminGalleryRoutes } from './gallery/routes.js';
 import { requireAdmin } from './require-admin.middleware.js';
 
@@ -13,4 +14,5 @@ adminRoutes.use(requireAdmin);
 
 adminRoutes.get('/me', me);
 adminRoutes.use('/contests', adminContestsRoutes);
+adminRoutes.use('/contest-topics', adminContestTopicsRoutes);
 adminRoutes.use('/gallery', adminGalleryRoutes);
