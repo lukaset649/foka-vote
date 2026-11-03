@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
+import { requireParam } from '../../../lib/request-params.js';
 import {
   createContest,
   deleteContest,
@@ -32,14 +33,6 @@ function assertCreatePayload(body: unknown): CreateContestDto {
   return input as CreateContestDto;
 }
 
-function requireIdParam(request: Request): string {
-  const { id } = request.params;
-  if (typeof id !== 'string' || id.length === 0) {
-    throw badRequest('id is required');
-  }
-  return id;
-}
-
 export async function create(request: Request, response: Response): Promise<void> {
   const input = assertCreatePayload(request.body);
   const contest = await createContest(input);
@@ -52,17 +45,17 @@ export async function list(request: Request, response: Response): Promise<void> 
 }
 
 export async function getOne(request: Request, response: Response): Promise<void> {
-  const contest = await getContestById(requireIdParam(request));
+  const contest = await getContestById(requireParam(request, 'id'));
   response.json(contest);
 }
 
 export async function update(request: Request, response: Response): Promise<void> {
   const input = request.body as UpdateContestDto;
-  const contest = await updateContest(requireIdParam(request), input);
+  const contest = await updateContest(requireParam(request, 'id'), input);
   response.json(contest);
 }
 
 export async function remove(request: Request, response: Response): Promise<void> {
-  await deleteContest(requireIdParam(request));
+  await deleteContest(requireParam(request, 'id'));
   response.status(204).end();
 }

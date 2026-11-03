@@ -3,7 +3,8 @@ import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
 import { parseListQuery } from '../../lib/list-query.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
-import { requireSingleUpload, requireUploadIdParam } from '../../lib/upload.js';
+import { requireSingleUpload } from '../../lib/upload.js';
+import { requireParam } from '../../lib/request-params.js';
 import {
   addPendingAlbumUpload,
   ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
@@ -15,14 +16,6 @@ import {
   verifyAlbumAccessCode,
 } from './service.js';
 
-function requireSlugParam(request: Request): string {
-  const { slug } = request.params;
-  if (typeof slug !== 'string' || slug.length === 0) {
-    throw badRequest('slug is required');
-  }
-  return slug;
-}
-
 export async function list(request: Request, response: Response): Promise<void> {
   const albums = await listGalleryAlbums(parseListQuery(request.query));
   response.json(albums);
@@ -30,14 +23,14 @@ export async function list(request: Request, response: Response): Promise<void> 
 
 export async function getOne(request: Request, response: Response): Promise<void> {
   const album = await getPublicAlbum(
-    requireSlugParam(request),
+    requireParam(request, 'slug'),
     request.signedCookies as Record<string, string | undefined>,
   );
   response.json(album);
 }
 
 export async function verifyAccess(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const { code } = request.body as { code?: unknown };
 
   if (typeof code !== 'string' || code.length === 0) {
@@ -58,7 +51,7 @@ export async function verifyAccess(request: Request, response: Response): Promis
 
 export async function uploadPhoto(request: Request, response: Response): Promise<void> {
   const upload = await addPendingAlbumUpload(
-    requireSlugParam(request),
+    requireParam(request, 'slug'),
     requireSingleUpload(request),
     request.signedCookies as Record<string, string | undefined>,
   );
@@ -67,15 +60,15 @@ export async function uploadPhoto(request: Request, response: Response): Promise
 
 export async function removeUpload(request: Request, response: Response): Promise<void> {
   await removePendingAlbumUpload(
-    requireSlugParam(request),
-    requireUploadIdParam(request),
+    requireParam(request, 'slug'),
+    requireParam(request, 'uploadId'),
     request.signedCookies as Record<string, string | undefined>,
   );
   response.status(204).end();
 }
 
 export async function createSubmission(request: Request, response: Response): Promise<void> {
-  const slug = requireSlugParam(request);
+  const slug = requireParam(request, 'slug');
   const body = (request.body ?? {}) as Record<string, unknown>;
   const { firstName, lastName, photos, rulesAccepted } = body;
 

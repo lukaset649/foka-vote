@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { UpdateArtworkDto, UpdateSubmissionDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
+import { requireParam } from '../../../lib/request-params.js';
 import {
   deleteArtwork,
   deleteSubmission,
@@ -11,30 +12,6 @@ import {
   updateArtwork,
   updateSubmission,
 } from './service.js';
-
-function requireContestIdParam(request: Request): string {
-  const { contestId } = request.params;
-  if (typeof contestId !== 'string' || contestId.length === 0) {
-    throw badRequest('contestId is required');
-  }
-  return contestId;
-}
-
-function requireSubmissionIdParam(request: Request): string {
-  const { submissionId } = request.params;
-  if (typeof submissionId !== 'string' || submissionId.length === 0) {
-    throw badRequest('submissionId is required');
-  }
-  return submissionId;
-}
-
-function requireArtworkIdParam(request: Request): string {
-  const { artworkId } = request.params;
-  if (typeof artworkId !== 'string' || artworkId.length === 0) {
-    throw badRequest('artworkId is required');
-  }
-  return artworkId;
-}
 
 function parseUpdateSubmissionBody(body: unknown): UpdateSubmissionDto {
   const input = (body ?? {}) as Record<string, unknown>;
@@ -96,62 +73,62 @@ function parseOrderBody(body: unknown): string[] {
 }
 
 export async function list(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
+  const contestId = requireParam(request, 'contestId');
   const submissions = await listAdminSubmissions(contestId);
   response.json(submissions);
 }
 
 export async function getOne(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
   const submission = await getAdminSubmission(contestId, submissionId);
   response.json(submission);
 }
 
 export async function remove(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
   await deleteSubmission(contestId, submissionId);
   response.status(204).end();
 }
 
 export async function update(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
   const input = parseUpdateSubmissionBody(request.body);
   const submission = await updateSubmission(contestId, submissionId, input);
   response.json(submission);
 }
 
 export async function updateArtworkTitle(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
-  const artworkId = requireArtworkIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
+  const artworkId = requireParam(request, 'artworkId');
   const input = parseUpdateArtworkBody(request.body);
   const submission = await updateArtwork(contestId, submissionId, artworkId, input);
   response.json(submission);
 }
 
 export async function removeArtwork(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
-  const artworkId = requireArtworkIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
+  const artworkId = requireParam(request, 'artworkId');
   const submission = await deleteArtwork(contestId, submissionId, artworkId);
   response.json(submission);
 }
 
 export async function reorder(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
   const order = parseOrderBody(request.body);
   const submission = await reorderArtworks(contestId, submissionId, order);
   response.json(submission);
 }
 
 export async function replace(request: Request, response: Response): Promise<void> {
-  const contestId = requireContestIdParam(request);
-  const submissionId = requireSubmissionIdParam(request);
-  const artworkId = requireArtworkIdParam(request);
+  const contestId = requireParam(request, 'contestId');
+  const submissionId = requireParam(request, 'submissionId');
+  const artworkId = requireParam(request, 'artworkId');
   const files = (request.files as Express.Multer.File[] | undefined) ?? [];
   const file = files[0];
   if (!file) {

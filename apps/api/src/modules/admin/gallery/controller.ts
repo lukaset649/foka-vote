@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { CreateAlbumDto, UpdateAlbumDto, UpdateAlbumPhotoDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
+import { requireParam } from '../../../lib/request-params.js';
 import {
   createAdminAlbum,
   deleteAdminAlbum,
@@ -14,14 +15,6 @@ import {
   updateAdminAlbum,
   updateAdminAlbumPhoto,
 } from './service.js';
-
-function requireIdParam(request: Request, name: 'id' | 'contestId' | 'photoId'): string {
-  const value = request.params[name];
-  if (typeof value !== 'string' || value.length === 0) {
-    throw badRequest(`${name} is required`);
-  }
-  return value;
-}
 
 function parseHidden(body: unknown): boolean {
   const { hidden } = (body ?? {}) as Record<string, unknown>;
@@ -37,7 +30,7 @@ export async function list(request: Request, response: Response): Promise<void> 
 }
 
 export async function getOne(request: Request, response: Response): Promise<void> {
-  const album = await getAdminAlbum(requireIdParam(request, 'id'));
+  const album = await getAdminAlbum(requireParam(request, 'id'));
   response.json(album);
 }
 
@@ -73,36 +66,33 @@ export async function create(request: Request, response: Response): Promise<void
 }
 
 export async function update(request: Request, response: Response): Promise<void> {
-  const album = await updateAdminAlbum(
-    requireIdParam(request, 'id'),
-    parseAlbumFields(request.body),
-  );
+  const album = await updateAdminAlbum(requireParam(request, 'id'), parseAlbumFields(request.body));
   response.json(album);
 }
 
 export async function setVisibility(request: Request, response: Response): Promise<void> {
   const album = await setAdminAlbumVisibility(
-    requireIdParam(request, 'id'),
+    requireParam(request, 'id'),
     parseHidden(request.body),
   );
   response.json(album);
 }
 
 export async function remove(request: Request, response: Response): Promise<void> {
-  await deleteAdminAlbum(requireIdParam(request, 'id'));
+  await deleteAdminAlbum(requireParam(request, 'id'));
   response.status(204).end();
 }
 
 export async function setContestVisibility(request: Request, response: Response): Promise<void> {
   const album = await setContestAlbumVisibility(
-    requireIdParam(request, 'contestId'),
+    requireParam(request, 'contestId'),
     parseHidden(request.body),
   );
   response.json(album);
 }
 
 export async function listPhotos(request: Request, response: Response): Promise<void> {
-  const photos = await listAdminAlbumPhotos(requireIdParam(request, 'id'));
+  const photos = await listAdminAlbumPhotos(requireParam(request, 'id'));
   response.json(photos);
 }
 
@@ -122,14 +112,14 @@ export async function updatePhoto(request: Request, response: Response): Promise
   };
 
   const photo = await updateAdminAlbumPhoto(
-    requireIdParam(request, 'id'),
-    requireIdParam(request, 'photoId'),
+    requireParam(request, 'id'),
+    requireParam(request, 'photoId'),
     input,
   );
   response.json(photo);
 }
 
 export async function removePhoto(request: Request, response: Response): Promise<void> {
-  await deleteAdminAlbumPhoto(requireIdParam(request, 'id'), requireIdParam(request, 'photoId'));
+  await deleteAdminAlbumPhoto(requireParam(request, 'id'), requireParam(request, 'photoId'));
   response.status(204).end();
 }
