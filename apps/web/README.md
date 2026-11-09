@@ -60,8 +60,12 @@ Everything past the login sits behind `RequireAdmin`. `AdminNav`, the panel's ow
 ## PWA
 
 - Config: `VitePWA` in `vite.config.ts` (manifest, Workbox `generateSW`, `registerType: 'prompt'`).
-- Registration and update banner: `src/components/UpdatePrompt.tsx`, mounted in `Layout`.
-- Precache: app shell only. `/api/*` and `/media/*` are never cached and bypass the SPA fallback.
+- Registration and update banner: `src/components/UpdatePrompt.tsx`, mounted in `Layout`; checks for a new version every hour.
+- Precache: app shell. `/api/*` and `/media/*` bypass the SPA fallback.
+- Runtime caching (same-origin only, so production; responses with status 200 only):
+  - `media-thumbs` / `media-previews`: `CacheFirst` for `/media/*-thumb.webp` (500 entries) and `/media/*-preview.webp` (150 entries), 30 days. Originals are not cached.
+  - `api-v1`: `NetworkFirst` without timeout for public GETs (`/api/contests`, `/api/contests/:slug`, `.../submissions`, `.../results`, `/api/gallery/albums`, `/api/gallery/albums/:slug`), 60 entries, 7 days. Used only when the network fails; `OfflineBanner` warns the data may be stale. Everything else under `/api` (votes, admin) is never cached.
+  - Bump `API_CACHE_NAME` in `vite.config.ts` when a public API response shape changes.
 - Icons: generated from `public/logo.svg` via `npm run generate-pwa-assets` (config: `pwa-assets.config.ts`).
 - The service worker is disabled in dev. Test it same-origin like production: `VITE_API_URL= npm run build` + `npm run preview` (port 4173, proxies `/api` and `/media` to `localhost:3000`). Unregister it in DevTools (Application) when done.
 - Production nginx must send the cache headers from `deploy/nginx.conf` (`no-cache` for `sw.js`, manifest and `index.html`).
