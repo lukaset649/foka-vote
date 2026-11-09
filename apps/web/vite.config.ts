@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// 30 days
+const MEDIA_CACHE_MAX_AGE_SECONDS = 2592000;
+
 export default defineConfig({
   plugins: [
     react(),
@@ -40,6 +43,40 @@ export default defineConfig({
         ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^[0-9a-f]{32}$/],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/media\//],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
+              url.pathname.startsWith('/media/') &&
+              url.pathname.endsWith('-thumb.webp'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'media-thumbs',
+              expiration: {
+                maxEntries: 500,
+                maxAgeSeconds: MEDIA_CACHE_MAX_AGE_SECONDS,
+                purgeOnQuotaError: true,
+              },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
+              url.pathname.startsWith('/media/') &&
+              url.pathname.endsWith('-preview.webp'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'media-previews',
+              expiration: {
+                maxEntries: 150,
+                maxAgeSeconds: MEDIA_CACHE_MAX_AGE_SECONDS,
+                purgeOnQuotaError: true,
+              },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+        ],
       },
       devOptions: {
         enabled: false,
