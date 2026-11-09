@@ -2,12 +2,27 @@ import { useTranslation } from 'react-i18next';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import Button from './ui/Button';
 
+// 1 hour
+const UPDATE_CHECK_INTERVAL_MS = 3600000;
+
 const UpdatePrompt = () => {
   const { t } = useTranslation();
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW({
+    onRegisteredSW: (_swUrl, registration) => {
+      if (!registration) {
+        return;
+      }
+      setInterval(() => {
+        if (registration.installing || !navigator.onLine) {
+          return;
+        }
+        registration.update().catch(() => undefined);
+      }, UPDATE_CHECK_INTERVAL_MS);
+    },
+  });
 
   if (!needRefresh) {
     return null;
