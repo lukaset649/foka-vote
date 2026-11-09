@@ -50,4 +50,10 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
   },
+  preview: {
+    proxy: {
+      '/api': 'http://localhost:3000',
+      '/media': 'http://localhost:3000',
+    },
+  },
 });

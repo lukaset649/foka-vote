@@ -63,5 +63,5 @@ Everything past the login sits behind `RequireAdmin`. `AdminNav`, the panel's ow
 - Registration and update banner: `src/components/UpdatePrompt.tsx`, mounted in `Layout`.
 - Precache: app shell only. `/api/*` and `/media/*` are never cached and bypass the SPA fallback.
 - Icons: generated from `public/logo.svg` via `npm run generate-pwa-assets` (config: `pwa-assets.config.ts`).
-- The service worker is disabled in dev. Test with `npm run build` + `npm run preview`, then unregister it in DevTools (Application) before going back to the dev server on the same port.
+- The service worker is disabled in dev. Test it same-origin like production: `VITE_API_URL= npm run build` + `npm run preview` (port 4173, proxies `/api` and `/media` to `localhost:3000`). Unregister it in DevTools (Application) when done.
 - Production nginx must send the cache headers from `deploy/nginx.conf` (`no-cache` for `sw.js`, manifest and `index.html`).
