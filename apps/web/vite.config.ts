@@ -5,6 +5,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // 30 days
 const MEDIA_CACHE_MAX_AGE_SECONDS = 2592000;
+const API_CACHE_NAME = 'api-v1';
+// 7 days
+const API_CACHE_MAX_AGE_SECONDS = 604800;
 
 export default defineConfig({
   plugins: [
@@ -71,6 +74,23 @@ export default defineConfig({
               expiration: {
                 maxEntries: 150,
                 maxAgeSeconds: MEDIA_CACHE_MAX_AGE_SECONDS,
+                purgeOnQuotaError: true,
+              },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
+              /^\/api\/(contests(\/[^/]+(\/(submissions|results))?)?|gallery\/albums(\/[^/]+)?)$/.test(
+                url.pathname,
+              ),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: API_CACHE_NAME,
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: API_CACHE_MAX_AGE_SECONDS,
                 purgeOnQuotaError: true,
               },
               cacheableResponse: { statuses: [200] },
