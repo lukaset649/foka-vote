@@ -304,7 +304,7 @@
       "confirm": "Confirm by tapping “Add”."
     },
     "offlineBanner": {
-      "message": "No internet connection. You are seeing the last saved data, which may be out of date. Sending is unavailable."
+      "message": "No internet connection. Data shown may come from this device's storage and be out of date. Sending is unavailable."
     },
     "updatePrompt": {
       "message": "A new version of the app is available.",

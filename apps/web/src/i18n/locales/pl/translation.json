@@ -314,7 +314,7 @@
       "confirm": "Potwierdź, stukając „Dodaj”."
     },
     "offlineBanner": {
-      "message": "Brak połączenia z internetem. Widzisz ostatnio zapisane dane, które mogą być nieaktualne. Wysyłanie jest niedostępne."
+      "message": "Brak połączenia z internetem. Wyświetlane dane mogą pochodzić z pamięci urządzenia i być nieaktualne. Wysyłanie jest niedostępne."
     },
     "updatePrompt": {
       "message": "Dostępna jest nowa wersja aplikacji.",
