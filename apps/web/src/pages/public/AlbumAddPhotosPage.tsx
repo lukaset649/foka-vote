@@ -6,7 +6,7 @@ import type { AlbumDetailDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import useLeaveWarning from '../../lib/useLeaveWarning';
 import usePhotoUploadQueue from '../../lib/usePhotoUploadQueue';
-import { isUnauthorizedError } from '../../services/apiClient';
+import { isUnauthorizedError, NetworkError } from '../../services/apiClient';
 import { albumGatePath, createAlbumSubmission, fetchAlbum } from '../../services/gallery';
 import PhotoUploadList from '../../components/PhotoUploadList';
 import RulesModal from '../../components/RulesModal';
@@ -24,7 +24,7 @@ const AlbumAddPhotosPage = () => {
   const navigate = useNavigate();
 
   const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
-  const [loadError, setLoadError] = useState(false);
+  const [loadError, setLoadError] = useState<'network' | 'failed' | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(false);
@@ -61,9 +61,9 @@ const AlbumAddPhotosPage = () => {
         }
         setAlbum(data);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setLoadError(true);
+          setLoadError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -133,7 +133,11 @@ const AlbumAddPhotosPage = () => {
   };
 
   if (loadError) {
-    return <Alert variant="error">{t('pages.album.failedToLoad')}</Alert>;
+    return (
+      <Alert variant="error">
+        {loadError === 'network' ? t('errors.network') : t('pages.album.failedToLoad')}
+      </Alert>
+    );
   }
 
   if (album === null) {

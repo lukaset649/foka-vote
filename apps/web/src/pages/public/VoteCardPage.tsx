@@ -5,7 +5,7 @@ import { ErrorCode, MAX_VOTE_SLOTS, VOTE_WEIGHTS } from '@foka-vote/shared';
 import type { ContestDto, SubmissionDto, VoteCardDto, VoteCardPick } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import useOnlineStatus from '../../lib/useOnlineStatus';
-import { ApiError, isUnauthorizedError, mediaUrl } from '../../services/apiClient';
+import { ApiError, isUnauthorizedError, mediaUrl, NetworkError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { fetchSubmissions } from '../../services/submissions';
 import { fetchMyVoteCard, submitVoteCard } from '../../services/votes';
@@ -29,7 +29,7 @@ const VoteCardPage = () => {
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
   const [existingCard, setExistingCard] = useState<VoteCardDto | null | undefined>(undefined);
   const [picks, setPicks] = useState<Record<string, number>>({});
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'network' | 'failed' | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [galleryFor, setGalleryFor] = useState<SubmissionDto | null>(null);
@@ -57,7 +57,7 @@ const VoteCardPage = () => {
           void navigate(contestGatePath(slug, `/contest/${slug}/vote`), { replace: true });
           return;
         }
-        setError(true);
+        setError(err instanceof NetworkError ? 'network' : 'failed');
       });
 
     return () => {
@@ -66,7 +66,11 @@ const VoteCardPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return <Alert variant="error">{t('pages.voteCard.failedToLoad')}</Alert>;
+    return (
+      <Alert variant="error">
+        {error === 'network' ? t('errors.network') : t('pages.voteCard.failedToLoad')}
+      </Alert>
+    );
   }
 
   if (!contest || submissions === null || existingCard === undefined) {

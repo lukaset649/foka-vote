@@ -8,7 +8,7 @@ import usePhotoUploadQueue, {
   type PhotoUploadItem,
   type UploadedPhotoDraft,
 } from '../../lib/usePhotoUploadQueue';
-import { isUnauthorizedError } from '../../services/apiClient';
+import { isUnauthorizedError, NetworkError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
 import PhotoUploadList from '../../components/PhotoUploadList';
@@ -52,7 +52,7 @@ const SubmissionFormPage = () => {
   const draft = (location.state as SubmissionDraftState | null) ?? null;
 
   const [contest, setContest] = useState<ContestDto | null>(null);
-  const [loadError, setLoadError] = useState(false);
+  const [loadError, setLoadError] = useState<'network' | 'failed' | null>(null);
 
   const [firstName, setFirstName] = useState(draft?.firstName ?? '');
   const [lastName, setLastName] = useState(draft?.lastName ?? '');
@@ -78,9 +78,9 @@ const SubmissionFormPage = () => {
           setContest(data);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setLoadError(true);
+          setLoadError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -195,7 +195,11 @@ const SubmissionFormPage = () => {
   };
 
   if (loadError) {
-    return <Alert variant="error">{t('pages.contest.failedToLoad')}</Alert>;
+    return (
+      <Alert variant="error">
+        {loadError === 'network' ? t('errors.network') : t('pages.contest.failedToLoad')}
+      </Alert>
+    );
   }
 
   if (!contest) {

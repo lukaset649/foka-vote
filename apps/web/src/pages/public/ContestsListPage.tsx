@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
+import { NetworkError } from '../../services/apiClient';
 import { fetchContests, isGalleryVisible } from '../../services/contests';
 import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
 import ListToolbar from '../../components/ListToolbar';
@@ -93,7 +94,7 @@ const ContestsListPage = () => {
   const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
     useListSearchParams();
   const [contests, setContests] = useState<PublicContestListDto | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'network' | 'failed' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -102,12 +103,12 @@ const ContestsListPage = () => {
       .then((data) => {
         if (!cancelled) {
           setContests(data);
-          setError(false);
+          setError(null);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -120,8 +121,11 @@ const ContestsListPage = () => {
 
   useClampedPage(query.page, totalPages, setPage);
 
+  const errorText =
+    error === 'network' ? t('errors.network') : t('pages.contestsList.failedToLoad');
+
   if (error && contests === null) {
-    return <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>;
+    return <Alert variant="error">{errorText}</Alert>;
   }
 
   if (contests === null) {
@@ -140,7 +144,7 @@ const ContestsListPage = () => {
     <div>
       {error && (
         <Alert variant="error" className="mb-4">
-          {t('pages.contestsList.failedToLoad')}
+          {errorText}
         </Alert>
       )}
       {current.length > 0 && (

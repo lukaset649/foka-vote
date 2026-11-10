@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
 import type { AlbumDetailDto, AlbumSubmissionDto } from '@foka-vote/shared';
-import { ApiError, mediaUrl } from '../../services/apiClient';
+import { ApiError, mediaUrl, NetworkError } from '../../services/apiClient';
 import { fetchAlbum } from '../../services/gallery';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Alert from '../../components/ui/Alert';
@@ -39,7 +39,7 @@ const AlbumPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
-  const [error, setError] = useState<'notFound' | 'failed' | null>(null);
+  const [error, setError] = useState<'notFound' | 'network' | 'failed' | null>(null);
   const [lightbox, setLightbox] = useState<OpenItem | null>(null);
   const [description, setDescription] = useState<OpenItem | null>(null);
 
@@ -57,6 +57,10 @@ const AlbumPage = () => {
       })
       .catch((err: unknown) => {
         if (cancelled) {
+          return;
+        }
+        if (err instanceof NetworkError) {
+          setError('network');
           return;
         }
         setError(
@@ -78,7 +82,11 @@ const AlbumPage = () => {
           backLabel={t('pages.album.backToGallery')}
         />
         <Alert variant="error">
-          {error === 'notFound' ? t('pages.album.notFound') : t('pages.album.failedToLoad')}
+          {error === 'notFound'
+            ? t('pages.album.notFound')
+            : error === 'network'
+              ? t('errors.network')
+              : t('pages.album.failedToLoad')}
         </Alert>
       </div>
     );

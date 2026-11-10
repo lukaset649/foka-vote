@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
+import { NetworkError } from '../../services/apiClient';
 import { fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
@@ -38,7 +39,7 @@ const ResultsPage = () => {
   const navigate = useNavigate();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [results, setResults] = useState<ResultsDto | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'network' | 'failed' | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -61,9 +62,9 @@ const ResultsPage = () => {
           }
         });
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -73,7 +74,11 @@ const ResultsPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return <Alert variant="error">{t('pages.results.failedToLoad')}</Alert>;
+    return (
+      <Alert variant="error">
+        {error === 'network' ? t('errors.network') : t('pages.results.failedToLoad')}
+      </Alert>
+    );
   }
 
   if (!contest) {

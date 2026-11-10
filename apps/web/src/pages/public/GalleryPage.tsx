@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
-import { mediaUrl } from '../../services/apiClient';
+import { mediaUrl, NetworkError } from '../../services/apiClient';
 import { fetchContest, isGalleryVisible } from '../../services/contests';
 import { fetchSubmissions, submissionDisplayName } from '../../services/submissions';
 import PageHeader from '../../components/ui/PageHeader';
@@ -46,7 +46,7 @@ const GalleryPage = () => {
   const [searchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'network' | 'failed' | null>(null);
   const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
   const [description, setDescription] = useState<OpenDescription | null>(null);
 
@@ -74,9 +74,9 @@ const GalleryPage = () => {
           setSubmissions(submissionsData);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -86,7 +86,11 @@ const GalleryPage = () => {
   }, [slug, navigate, currentPath]);
 
   if (error) {
-    return <Alert variant="error">{t('pages.gallery.failedToLoad')}</Alert>;
+    return (
+      <Alert variant="error">
+        {error === 'network' ? t('errors.network') : t('pages.gallery.failedToLoad')}
+      </Alert>
+    );
   }
 
   if (submissions === null || contest === null) {

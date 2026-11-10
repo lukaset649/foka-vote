@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GalleryAlbumDto, PaginatedDto } from '@foka-vote/shared';
+import { NetworkError } from '../../services/apiClient';
 import { fetchGalleryAlbums } from '../../services/gallery';
 import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
 import AlbumCard from '../../components/AlbumCard';
@@ -16,7 +17,7 @@ const GalleryAlbumsPage = () => {
   const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
     useListSearchParams();
   const [albums, setAlbums] = useState<PaginatedDto<GalleryAlbumDto> | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<'network' | 'failed' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,12 +26,12 @@ const GalleryAlbumsPage = () => {
       .then((data) => {
         if (!cancelled) {
           setAlbums(data);
-          setError(false);
+          setError(null);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(err instanceof NetworkError ? 'network' : 'failed');
         }
       });
 
@@ -42,8 +43,11 @@ const GalleryAlbumsPage = () => {
   const totalPages = albums ? Math.ceil(albums.total / albums.pageSize) : 0;
   useClampedPage(query.page, totalPages, setPage);
 
+  const errorText =
+    error === 'network' ? t('errors.network') : t('pages.galleryAlbums.failedToLoad');
+
   if (error && albums === null) {
-    return <Alert variant="error">{t('pages.galleryAlbums.failedToLoad')}</Alert>;
+    return <Alert variant="error">{errorText}</Alert>;
   }
 
   const isSearching = query.q !== undefined;
@@ -54,7 +58,7 @@ const GalleryAlbumsPage = () => {
 
       {error && (
         <Alert variant="error" className="mb-4">
-          {t('pages.galleryAlbums.failedToLoad')}
+          {errorText}
         </Alert>
       )}
 
