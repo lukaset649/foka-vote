@@ -8,9 +8,10 @@ import usePhotoUploadQueue, {
   type PhotoUploadItem,
   type UploadedPhotoDraft,
 } from '../../lib/usePhotoUploadQueue';
-import { isUnauthorizedError, NetworkError } from '../../services/apiClient';
+import { isUnauthorizedError } from '../../services/apiClient';
 import { contestGatePath, fetchContest } from '../../services/contests';
 import { reserveAlias } from '../../services/submissions';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import PhotoUploadList from '../../components/PhotoUploadList';
 import RulesModal from '../../components/RulesModal';
 import Card from '../../components/ui/Card';
@@ -19,6 +20,7 @@ import Textarea from '../../components/ui/Textarea';
 import Label from '../../components/ui/Label';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import Spinner from '../../components/ui/Spinner';
 
 export interface SubmissionDraftState {
@@ -52,7 +54,7 @@ const SubmissionFormPage = () => {
   const draft = (location.state as SubmissionDraftState | null) ?? null;
 
   const [contest, setContest] = useState<ContestDto | null>(null);
-  const [loadError, setLoadError] = useState<'network' | 'failed' | null>(null);
+  const [loadError, setLoadError] = useState<LoadError | null>(null);
 
   const [firstName, setFirstName] = useState(draft?.firstName ?? '');
   const [lastName, setLastName] = useState(draft?.lastName ?? '');
@@ -80,7 +82,7 @@ const SubmissionFormPage = () => {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setLoadError(err instanceof NetworkError ? 'network' : 'failed');
+          setLoadError(loadErrorFrom(err));
         }
       });
 
@@ -195,11 +197,7 @@ const SubmissionFormPage = () => {
   };
 
   if (loadError) {
-    return (
-      <Alert variant="error">
-        {loadError === 'network' ? t('errors.network') : t('pages.contest.failedToLoad')}
-      </Alert>
-    );
+    return <LoadErrorAlert error={loadError} message={t('pages.contest.failedToLoad')} />;
   }
 
   if (!contest) {

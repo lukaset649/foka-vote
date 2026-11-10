@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
-import { NetworkError } from '../../services/apiClient';
 import { fetchContest, isGalleryVisible, verifyContestAccessCode } from '../../services/contests';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import ContestGalleryCard from '../../components/ContestGalleryCard';
 import ContestPhaseCard from '../../components/ContestPhaseCard';
 import ContestResultsCard from '../../components/ContestResultsCard';
 import { ContestStatusBadge } from '../../components/ui/Badge';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import Spinner from '../../components/ui/Spinner';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
@@ -18,7 +18,7 @@ const ContestPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
-  const [error, setError] = useState<'network' | 'failed' | null>(null);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -40,7 +40,7 @@ const ContestPage = () => {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof NetworkError ? 'network' : 'failed');
+          setError(loadErrorFrom(err));
         }
       }
     };
@@ -54,11 +54,7 @@ const ContestPage = () => {
   }, [slug]);
 
   if (error) {
-    return (
-      <Alert variant="error">
-        {error === 'network' ? t('errors.network') : t('pages.contest.failedToLoad')}
-      </Alert>
-    );
+    return <LoadErrorAlert error={error} message={t('pages.contest.failedToLoad')} />;
   }
 
   if (!contest) {

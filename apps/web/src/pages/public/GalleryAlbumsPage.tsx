@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GalleryAlbumDto, PaginatedDto } from '@foka-vote/shared';
-import { NetworkError } from '../../services/apiClient';
 import { fetchGalleryAlbums } from '../../services/gallery';
 import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import AlbumCard from '../../components/AlbumCard';
 import ListToolbar from '../../components/ListToolbar';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import EmptyState from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
 import Pagination from '../../components/ui/Pagination';
@@ -17,7 +17,7 @@ const GalleryAlbumsPage = () => {
   const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
     useListSearchParams();
   const [albums, setAlbums] = useState<PaginatedDto<GalleryAlbumDto> | null>(null);
-  const [error, setError] = useState<'network' | 'failed' | null>(null);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +31,7 @@ const GalleryAlbumsPage = () => {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof NetworkError ? 'network' : 'failed');
+          setError(loadErrorFrom(err));
         }
       });
 
@@ -43,11 +43,8 @@ const GalleryAlbumsPage = () => {
   const totalPages = albums ? Math.ceil(albums.total / albums.pageSize) : 0;
   useClampedPage(query.page, totalPages, setPage);
 
-  const errorText =
-    error === 'network' ? t('errors.network') : t('pages.galleryAlbums.failedToLoad');
-
   if (error && albums === null) {
-    return <Alert variant="error">{errorText}</Alert>;
+    return <LoadErrorAlert error={error} message={t('pages.galleryAlbums.failedToLoad')} />;
   }
 
   const isSearching = query.q !== undefined;
@@ -57,9 +54,11 @@ const GalleryAlbumsPage = () => {
       <PageHeader title={t('pages.galleryAlbums.title')} />
 
       {error && (
-        <Alert variant="error" className="mb-4">
-          {errorText}
-        </Alert>
+        <LoadErrorAlert
+          error={error}
+          message={t('pages.galleryAlbums.failedToLoad')}
+          className="mb-4"
+        />
       )}
 
       {albums === null ? (

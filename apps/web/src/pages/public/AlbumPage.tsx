@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { ErrorCode } from '@foka-vote/shared';
 import type { AlbumDetailDto, AlbumSubmissionDto } from '@foka-vote/shared';
-import { ApiError, mediaUrl, NetworkError } from '../../services/apiClient';
+import { ApiError, mediaUrl } from '../../services/apiClient';
 import { fetchAlbum } from '../../services/gallery';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
 import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import Card from '../../components/ui/Card';
 import ClampedText from '../../components/ui/ClampedText';
 import DescriptionModal from '../../components/ui/DescriptionModal';
@@ -39,7 +41,7 @@ const AlbumPage = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
-  const [error, setError] = useState<'notFound' | 'network' | 'failed' | null>(null);
+  const [error, setError] = useState<LoadError | 'notFound' | null>(null);
   const [lightbox, setLightbox] = useState<OpenItem | null>(null);
   const [description, setDescription] = useState<OpenItem | null>(null);
 
@@ -59,12 +61,10 @@ const AlbumPage = () => {
         if (cancelled) {
           return;
         }
-        if (err instanceof NetworkError) {
-          setError('network');
-          return;
-        }
         setError(
-          err instanceof ApiError && err.code === ErrorCode.NOT_FOUND ? 'notFound' : 'failed',
+          err instanceof ApiError && err.code === ErrorCode.NOT_FOUND
+            ? 'notFound'
+            : loadErrorFrom(err),
         );
       });
 
@@ -81,13 +81,11 @@ const AlbumPage = () => {
           backTo="/gallery"
           backLabel={t('pages.album.backToGallery')}
         />
-        <Alert variant="error">
-          {error === 'notFound'
-            ? t('pages.album.notFound')
-            : error === 'network'
-              ? t('errors.network')
-              : t('pages.album.failedToLoad')}
-        </Alert>
+        {error === 'notFound' ? (
+          <Alert variant="error">{t('pages.album.notFound')}</Alert>
+        ) : (
+          <LoadErrorAlert error={error} message={t('pages.album.failedToLoad')} />
+        )}
       </div>
     );
   }

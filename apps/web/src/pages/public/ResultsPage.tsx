@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { useNavigate, useParams } from 'react-router';
 import type { ContestDto, ResultEntryDto, ResultsDto } from '@foka-vote/shared';
-import { NetworkError } from '../../services/apiClient';
 import { fetchContest } from '../../services/contests';
 import { fetchResults } from '../../services/results';
 import { cn } from '../../lib/cn';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import PageHeader from '../../components/ui/PageHeader';
 import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import Table, {
@@ -39,7 +40,7 @@ const ResultsPage = () => {
   const navigate = useNavigate();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [results, setResults] = useState<ResultsDto | null>(null);
-  const [error, setError] = useState<'network' | 'failed' | null>(null);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -64,7 +65,7 @@ const ResultsPage = () => {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof NetworkError ? 'network' : 'failed');
+          setError(loadErrorFrom(err));
         }
       });
 
@@ -74,11 +75,7 @@ const ResultsPage = () => {
   }, [slug, navigate]);
 
   if (error) {
-    return (
-      <Alert variant="error">
-        {error === 'network' ? t('errors.network') : t('pages.results.failedToLoad')}
-      </Alert>
-    );
+    return <LoadErrorAlert error={error} message={t('pages.results.failedToLoad')} />;
   }
 
   if (!contest) {

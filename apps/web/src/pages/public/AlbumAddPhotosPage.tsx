@@ -6,11 +6,13 @@ import type { AlbumDetailDto } from '@foka-vote/shared';
 import { errorMessage } from '../../lib/errorMessage';
 import useLeaveWarning from '../../lib/useLeaveWarning';
 import usePhotoUploadQueue from '../../lib/usePhotoUploadQueue';
-import { isUnauthorizedError, NetworkError } from '../../services/apiClient';
+import { isUnauthorizedError } from '../../services/apiClient';
 import { albumGatePath, createAlbumSubmission, fetchAlbum } from '../../services/gallery';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import PhotoUploadList from '../../components/PhotoUploadList';
 import RulesModal from '../../components/RulesModal';
 import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
@@ -24,7 +26,7 @@ const AlbumAddPhotosPage = () => {
   const navigate = useNavigate();
 
   const [album, setAlbum] = useState<AlbumDetailDto | null>(null);
-  const [loadError, setLoadError] = useState<'network' | 'failed' | null>(null);
+  const [loadError, setLoadError] = useState<LoadError | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [rulesAccepted, setRulesAccepted] = useState(false);
@@ -63,7 +65,7 @@ const AlbumAddPhotosPage = () => {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setLoadError(err instanceof NetworkError ? 'network' : 'failed');
+          setLoadError(loadErrorFrom(err));
         }
       });
 
@@ -133,11 +135,7 @@ const AlbumAddPhotosPage = () => {
   };
 
   if (loadError) {
-    return (
-      <Alert variant="error">
-        {loadError === 'network' ? t('errors.network') : t('pages.album.failedToLoad')}
-      </Alert>
-    );
+    return <LoadErrorAlert error={loadError} message={t('pages.album.failedToLoad')} />;
   }
 
   if (album === null) {
