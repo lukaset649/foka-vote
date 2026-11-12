@@ -16,3 +16,12 @@ export const TEST_ENV = {
   COOKIE_SECRET: 'test-cookie-secret-that-is-at-least-32-characters-long',
   UPLOADS_DIR: TEST_UPLOADS_DIR,
 };
+
+export function assertTestDatabase(databaseUrl: string | undefined): void {
+  const name = databaseUrl ? new URL(databaseUrl).pathname.slice(1) : '';
+  if (!name.endsWith('_test')) {
+    throw new Error(
+      `Refusing to run tests against database "${name}": its name must end with "_test".`,
+    );
+  }
+}
