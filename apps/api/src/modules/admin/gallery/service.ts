@@ -6,12 +6,11 @@ import type {
   UpdateAlbumDto,
   UpdateAlbumPhotoDto,
 } from '@foka-vote/shared';
-import { RESERVED_ALBUM_SLUGS } from '@foka-vote/shared';
+import { RESERVED_ALBUM_SLUGS, slugify } from '@foka-vote/shared';
 import { conflict, notFound } from '../../../errors/app-error.js';
 import type { ParsedListQuery } from '../../../lib/list-query.js';
 import { titleSearchFilter } from '../../../lib/list-query.js';
 import { prisma } from '../../../lib/prisma.js';
-import { slugify } from '../../../lib/slugify.js';
 import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
 import { mediaUrl, removeStoredFiles } from '../../../lib/storage.js';
 import type { AlbumPhotoWithSubmission } from '../../gallery/service.js';

@@ -36,3 +36,4 @@ export * from './submission.js';
 export * from './upload.js';
 export * from './vote.js';
 export * from './results.js';
+export * from './slug.js';

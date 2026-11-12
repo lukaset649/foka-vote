@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { CreateContestDto, UpdateContestDto } from '@foka-vote/shared';
+import { SLUG_PATTERN, type CreateContestDto, type UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
 import { requireParam } from '../../../lib/request-params.js';
@@ -10,8 +10,6 @@ import {
   listContests,
   updateContest,
 } from './service.js';
-
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 type Body = Record<string, unknown>;
 

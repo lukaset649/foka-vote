@@ -1,6 +1,7 @@
 import {
   DEFAULT_MAX_ARTWORKS_PER_SUBMISSION,
   MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
+  slugify,
 } from '@foka-vote/shared';
 import type {
   AdminContestDto,
@@ -14,7 +15,6 @@ import { computeContestStatus } from '../../../lib/contest-status.js';
 import type { ParsedListQuery } from '../../../lib/list-query.js';
 import { paginateKeys, titleSearchFilter } from '../../../lib/list-query.js';
 import { prisma } from '../../../lib/prisma.js';
-import { slugify } from '../../../lib/slugify.js';
 import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
 import { removeStoredFiles } from '../../../lib/storage.js';
 
