@@ -28,8 +28,8 @@ function parseTitle(value: unknown): string {
 }
 
 function parseDate(value: unknown, field: string): string {
-  if (typeof value !== 'string') {
-    throw badRequest(`${field} must be a date string`);
+  if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
+    throw badRequest(`${field} must be a valid date string`);
   }
   return value;
 }
@@ -44,11 +44,15 @@ function parseSlug(value: unknown): string | undefined {
   return value;
 }
 
-function parseNullableString(value: unknown, field: string): string | null | undefined {
-  if (value === undefined || value === null || typeof value === 'string') {
+function parseOptionalText(value: unknown, field: string): string | null | undefined {
+  if (value === undefined || value === null) {
     return value;
   }
-  throw badRequest(`${field} must be a string or null`);
+  if (typeof value !== 'string') {
+    throw badRequest(`${field} must be a string or null`);
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 function parseMaxArtworks(value: unknown): number | undefined {
@@ -65,8 +69,8 @@ function parseCreatePayload(rawBody: unknown): CreateContestDto {
   }
 
   const slug = parseSlug(body.slug);
-  const description = parseNullableString(body.description, 'description');
-  const accessCode = parseNullableString(body.accessCode, 'accessCode');
+  const description = parseOptionalText(body.description, 'description');
+  const accessCode = parseOptionalText(body.accessCode, 'accessCode');
   const maxArtworksPerSubmission = parseMaxArtworks(body.maxArtworksPerSubmission);
 
   return {
@@ -104,11 +108,11 @@ function parseUpdatePayload(rawBody: unknown): UpdateContestDto {
       input[field] = parseDate(body[field], field);
     }
   }
-  const description = parseNullableString(body.description, 'description');
+  const description = parseOptionalText(body.description, 'description');
   if (description !== undefined) {
     input.description = description;
   }
-  const accessCode = parseNullableString(body.accessCode, 'accessCode');
+  const accessCode = parseOptionalText(body.accessCode, 'accessCode');
   if (accessCode !== undefined) {
     input.accessCode = accessCode;
   }
