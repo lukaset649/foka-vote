@@ -84,6 +84,9 @@ async function ensureUniqueSlug(slug: string, excludeId?: string): Promise<void>
 
 export async function createContest(input: CreateContestDto): Promise<AdminContestDto> {
   const slug = input.slug ?? slugify(input.title);
+  if (slug.length === 0) {
+    throw badRequest('Could not derive a slug from the title, provide a slug explicitly');
+  }
   await ensureUniqueSlug(slug);
 
   const submissionStart = new Date(input.submissionStart);
