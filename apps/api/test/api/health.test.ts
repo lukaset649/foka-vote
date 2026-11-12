@@ -1,6 +1,6 @@
 import type { ErrorResponseBody } from '@foka-vote/shared';
 import { describe, expect, it } from 'vitest';
-import { api } from './helpers/app.js';
+import { api } from '../helpers/app.js';
 
 describe('GET /api/health', () => {
   it('reports ok with a reachable database', async () => {
