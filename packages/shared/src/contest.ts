@@ -39,4 +39,9 @@ export interface CreateContestDto {
   topicId?: string;
 }
 
-export type UpdateContestDto = Partial<Omit<CreateContestDto, 'topicId'>>;
+export type UpdateContestDto = Partial<
+  Omit<CreateContestDto, 'topicId' | 'description' | 'accessCode'>
+> & {
+  description?: string | null;
+  accessCode?: string | null;
+};

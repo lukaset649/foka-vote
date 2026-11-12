@@ -17,3 +17,5 @@ export function slugify(title: string): string {
 
   return transliterated.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
+
+export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;

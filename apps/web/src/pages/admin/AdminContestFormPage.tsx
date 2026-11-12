@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
   MAX_ARTWORKS_PER_SUBMISSION_LIMIT,
+  SLUG_PATTERN,
+  slugify,
   type AdminContestDto,
   type ContestTopicDto,
 } from '@foka-vote/shared';
@@ -133,7 +135,24 @@ const AdminContestFormPage = () => {
       setForm((prev) => ({ ...prev, [field]: value }));
     };
 
+  const slugError = (slug: string): string | null => {
+    if (slug && !SLUG_PATTERN.test(slug)) {
+      return t('pages.adminContestForm.slugInvalid');
+    }
+    if (!slug && !isEditing && slugify(form.title) === '') {
+      return t('pages.adminContestForm.slugRequired');
+    }
+    return null;
+  };
+
   const submit = async () => {
+    const slug = form.slug.trim();
+    const invalidSlug = slugError(slug);
+    if (invalidSlug) {
+      setError(invalidSlug);
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -143,19 +162,26 @@ const AdminContestFormPage = () => {
       submissionDeadline: new Date(form.submissionDeadline).toISOString(),
       votingStart: new Date(form.votingStart).toISOString(),
       votingEnd: new Date(form.votingEnd).toISOString(),
-      ...(form.slug ? { slug: form.slug } : {}),
-      ...(form.description ? { description: form.description } : {}),
+      ...(slug ? { slug } : {}),
       ...(form.maxArtworksPerSubmission
         ? { maxArtworksPerSubmission: Number(form.maxArtworksPerSubmission) }
         : {}),
-      ...(form.accessCode ? { accessCode: form.accessCode } : {}),
     };
 
     try {
       if (id) {
-        await updateContest(id, payload);
+        await updateContest(id, {
+          ...payload,
+          description: form.description || null,
+          accessCode: form.accessCode || null,
+        });
       } else {
-        await createContest({ ...payload, ...(topic ? { topicId: topic.id } : {}) });
+        await createContest({
+          ...payload,
+          ...(form.description ? { description: form.description } : {}),
+          ...(form.accessCode ? { accessCode: form.accessCode } : {}),
+          ...(topic ? { topicId: topic.id } : {}),
+        });
       }
       void navigate('/admin/contests');
     } catch (err) {
@@ -238,7 +264,17 @@ const AdminContestFormPage = () => {
 
           <div>
             <Label htmlFor="slug">{t('pages.adminContestForm.slugLabel')}</Label>
-            <Input id="slug" value={form.slug} onChange={updateField('slug')} />
+            <Input
+              id="slug"
+              value={form.slug}
+              onChange={updateField('slug')}
+              placeholder={isEditing ? undefined : slugify(form.title)}
+            />
+            <p className="mt-1 text-sm text-zinc-500">
+              {isEditing
+                ? t('pages.adminContestForm.slugHintEditing')
+                : t('pages.adminContestForm.slugHint')}
+            </p>
           </div>
 
           <div>
