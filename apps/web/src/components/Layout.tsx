@@ -5,6 +5,7 @@ import logo from '../assets/logo.svg';
 import type { RouteHandle } from '../routes';
 import InstallButton from './InstallButton';
 import MobileNav from './MobileNav';
+import InstalledNotice from './InstalledNotice';
 import OfflineBanner from './OfflineBanner';
 import UpdatePrompt from './UpdatePrompt';
 import LanguageSwitcher from './ui/LanguageSwitcher';
@@ -72,6 +73,7 @@ const Layout = () => {
       </header>
 
       <UpdatePrompt />
+      <InstalledNotice />
       <OfflineBanner />
 
       <MobileNav isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} items={NAV_ITEMS} />

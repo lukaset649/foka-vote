@@ -313,6 +313,9 @@
       "addToHomeScreen": "Wybierz „Do ekranu początkowego”.",
       "confirm": "Potwierdź, stukając „Dodaj”."
     },
+    "installedNotice": {
+      "message": "Aplikacja FOKA Vote została zainstalowana. Znajdziesz ją na ekranie głównym lub w menu aplikacji."
+    },
     "offlineBanner": {
       "message": "Brak połączenia z internetem. Wyświetlane dane mogą pochodzić z pamięci urządzenia i być nieaktualne. Wysyłanie jest niedostępne."
     },

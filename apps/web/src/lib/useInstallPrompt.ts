@@ -6,6 +6,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 let deferredPrompt: BeforeInstallPromptEvent | null = null;
+let justInstalled = false;
 const listeners = new Set<() => void>();
 
 const notify = () => {
@@ -20,6 +21,7 @@ window.addEventListener('beforeinstallprompt', (event) => {
 
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
+  justInstalled = true;
   notify();
 });
 
@@ -31,6 +33,7 @@ const subscribe = (listener: () => void) => {
 };
 
 const getSnapshot = () => deferredPrompt;
+const getJustInstalledSnapshot = () => justInstalled;
 
 const isStandalone = () =>
   window.matchMedia('(display-mode: standalone)').matches ||
@@ -42,6 +45,7 @@ const isIos = () =>
 
 const useInstallPrompt = () => {
   const prompt = useSyncExternalStore(subscribe, getSnapshot);
+  const isJustInstalled = useSyncExternalStore(subscribe, getJustInstalledSnapshot);
   const standalone = isStandalone();
 
   const canPrompt = !standalone && prompt !== null;
@@ -57,7 +61,18 @@ const useInstallPrompt = () => {
     notify();
   };
 
-  return { canPrompt, needsIosInstructions, promptInstall };
+  const dismissInstalled = () => {
+    justInstalled = false;
+    notify();
+  };
+
+  return {
+    canPrompt,
+    needsIosInstructions,
+    promptInstall,
+    justInstalled: isJustInstalled,
+    dismissInstalled,
+  };
 };
 
 export default useInstallPrompt;
