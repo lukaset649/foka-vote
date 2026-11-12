@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { slugify } from '../../src/lib/slugify.js';
+import { slugify } from '@foka-vote/shared';
 
 describe('slugify', () => {
   it.each([
