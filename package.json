@@ -16,6 +16,7 @@
     "typecheck:api": "npm run typecheck -w apps/api",
     "typecheck:web": "npm run typecheck -w apps/web",
     "typecheck": "npm run typecheck:shared && npm run typecheck:api && npm run typecheck:web",
+    "test": "npm run test -w apps/api",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",

@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 type NodeEnv = 'development' | 'production' | 'test';
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -10,6 +12,7 @@ interface Env {
   readonly DATABASE_URL: string;
   readonly ADMIN_PASSWORD_HASH: string;
   readonly COOKIE_SECRET: string;
+  readonly UPLOADS_DIR: string;
 }
 
 function readEnum<T extends string>(name: string, allowed: readonly T[], defaultValue: T): T {
@@ -75,6 +78,7 @@ export const env: Env = Object.freeze({
   DATABASE_URL: readRequiredString('DATABASE_URL'),
   ADMIN_PASSWORD_HASH: readRequiredString('ADMIN_PASSWORD_HASH'),
   COOKIE_SECRET: readRequiredString('COOKIE_SECRET', 32),
+  UPLOADS_DIR: readString('UPLOADS_DIR', path.join(process.cwd(), 'uploads')),
 });
 
 export const isProduction = env.NODE_ENV === 'production';

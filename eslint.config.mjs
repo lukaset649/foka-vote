@@ -49,7 +49,11 @@ export default [
         ...globals.es2022,
       },
       parserOptions: {
-        project: ['./apps/*/tsconfig.json', './packages/*/tsconfig.json'],
+        project: [
+          './apps/*/tsconfig.json',
+          './apps/api/tsconfig.test.json',
+          './packages/*/tsconfig.json',
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },
