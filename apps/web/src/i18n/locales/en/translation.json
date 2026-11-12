@@ -303,8 +303,11 @@
       "addToHomeScreen": "Choose “Add to Home Screen”.",
       "confirm": "Confirm by tapping “Add”."
     },
+    "installedNotice": {
+      "message": "FOKA Vote has been installed. You can find it on your home screen or in your apps menu."
+    },
     "offlineBanner": {
-      "message": "No internet connection. You can browse pages that are already loaded, but sending is unavailable."
+      "message": "No internet connection. Data shown may come from this device's storage and be out of date. Sending is unavailable."
     },
     "updatePrompt": {
       "message": "A new version of the app is available.",

@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import type { GalleryAlbumDto, PaginatedDto } from '@foka-vote/shared';
 import { fetchGalleryAlbums } from '../../services/gallery';
 import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import AlbumCard from '../../components/AlbumCard';
 import ListToolbar from '../../components/ListToolbar';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import EmptyState from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
 import Pagination from '../../components/ui/Pagination';
@@ -16,7 +17,7 @@ const GalleryAlbumsPage = () => {
   const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
     useListSearchParams();
   const [albums, setAlbums] = useState<PaginatedDto<GalleryAlbumDto> | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,12 +26,12 @@ const GalleryAlbumsPage = () => {
       .then((data) => {
         if (!cancelled) {
           setAlbums(data);
-          setError(false);
+          setError(null);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(loadErrorFrom(err));
         }
       });
 
@@ -43,7 +44,7 @@ const GalleryAlbumsPage = () => {
   useClampedPage(query.page, totalPages, setPage);
 
   if (error && albums === null) {
-    return <Alert variant="error">{t('pages.galleryAlbums.failedToLoad')}</Alert>;
+    return <LoadErrorAlert error={error} message={t('pages.galleryAlbums.failedToLoad')} />;
   }
 
   const isSearching = query.q !== undefined;
@@ -53,9 +54,11 @@ const GalleryAlbumsPage = () => {
       <PageHeader title={t('pages.galleryAlbums.title')} />
 
       {error && (
-        <Alert variant="error" className="mb-4">
-          {t('pages.galleryAlbums.failedToLoad')}
-        </Alert>
+        <LoadErrorAlert
+          error={error}
+          message={t('pages.galleryAlbums.failedToLoad')}
+          className="mb-4"
+        />
       )}
 
       {albums === null ? (

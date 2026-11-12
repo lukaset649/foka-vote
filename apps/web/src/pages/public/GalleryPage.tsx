@@ -5,9 +5,10 @@ import type { ContestDto, SubmissionDto } from '@foka-vote/shared';
 import { mediaUrl } from '../../services/apiClient';
 import { fetchContest, isGalleryVisible } from '../../services/contests';
 import { fetchSubmissions, submissionDisplayName } from '../../services/submissions';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import EmptyState from '../../components/ui/EmptyState';
 import Spinner from '../../components/ui/Spinner';
 import ArtworkLightbox from '../../components/ArtworkLightbox';
@@ -46,7 +47,7 @@ const GalleryPage = () => {
   const [searchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionDto[] | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<LoadError | null>(null);
   const [lightbox, setLightbox] = useState<OpenLightbox | null>(null);
   const [description, setDescription] = useState<OpenDescription | null>(null);
 
@@ -74,9 +75,9 @@ const GalleryPage = () => {
           setSubmissions(submissionsData);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(loadErrorFrom(err));
         }
       });
 
@@ -86,7 +87,7 @@ const GalleryPage = () => {
   }, [slug, navigate, currentPath]);
 
   if (error) {
-    return <Alert variant="error">{t('pages.gallery.failedToLoad')}</Alert>;
+    return <LoadErrorAlert error={error} message={t('pages.gallery.failedToLoad')} />;
   }
 
   if (submissions === null || contest === null) {

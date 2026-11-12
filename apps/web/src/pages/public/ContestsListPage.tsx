@@ -4,10 +4,11 @@ import { Link } from 'react-router';
 import type { ContestDto, PublicContestListDto } from '@foka-vote/shared';
 import { fetchContests, isGalleryVisible } from '../../services/contests';
 import { useClampedPage, useListSearchParams } from '../../lib/useListSearchParams';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import ListToolbar from '../../components/ListToolbar';
 import Card from '../../components/ui/Card';
 import { ContestStatusBadge } from '../../components/ui/Badge';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import EmptyState from '../../components/ui/EmptyState';
 import LinkButton from '../../components/ui/LinkButton';
 import Pagination from '../../components/ui/Pagination';
@@ -93,7 +94,7 @@ const ContestsListPage = () => {
   const { query, searchInput, setSearchInput, sortOption, setSortOption, setPage } =
     useListSearchParams();
   const [contests, setContests] = useState<PublicContestListDto | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -102,12 +103,12 @@ const ContestsListPage = () => {
       .then((data) => {
         if (!cancelled) {
           setContests(data);
-          setError(false);
+          setError(null);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!cancelled) {
-          setError(true);
+          setError(loadErrorFrom(err));
         }
       });
 
@@ -121,7 +122,7 @@ const ContestsListPage = () => {
   useClampedPage(query.page, totalPages, setPage);
 
   if (error && contests === null) {
-    return <Alert variant="error">{t('pages.contestsList.failedToLoad')}</Alert>;
+    return <LoadErrorAlert error={error} message={t('pages.contestsList.failedToLoad')} />;
   }
 
   if (contests === null) {
@@ -139,9 +140,11 @@ const ContestsListPage = () => {
   return (
     <div>
       {error && (
-        <Alert variant="error" className="mb-4">
-          {t('pages.contestsList.failedToLoad')}
-        </Alert>
+        <LoadErrorAlert
+          error={error}
+          message={t('pages.contestsList.failedToLoad')}
+          className="mb-4"
+        />
       )}
       {current.length > 0 && (
         <section>

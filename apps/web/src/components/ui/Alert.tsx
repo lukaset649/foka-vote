@@ -5,7 +5,7 @@ type Variant = 'error' | 'info';
 interface AlertProps {
   variant: Variant;
   children: React.ReactNode;
-  className?: string;
+  className?: string | undefined;
 }
 
 const variantClasses: Record<Variant, string> = {

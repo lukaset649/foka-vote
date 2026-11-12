@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
 import type { ContestDto } from '@foka-vote/shared';
 import { fetchContest, isGalleryVisible, verifyContestAccessCode } from '../../services/contests';
+import { loadErrorFrom, type LoadError } from '../../lib/loadError';
 import ContestGalleryCard from '../../components/ContestGalleryCard';
 import ContestPhaseCard from '../../components/ContestPhaseCard';
 import ContestResultsCard from '../../components/ContestResultsCard';
 import { ContestStatusBadge } from '../../components/ui/Badge';
-import Alert from '../../components/ui/Alert';
+import LoadErrorAlert from '../../components/LoadErrorAlert';
 import Spinner from '../../components/ui/Spinner';
 import LinkButton from '../../components/ui/LinkButton';
 import PageHeader from '../../components/ui/PageHeader';
@@ -17,7 +18,7 @@ const ContestPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [contest, setContest] = useState<ContestDto | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<LoadError | null>(null);
 
   useEffect(() => {
     if (!slug) {
@@ -37,9 +38,9 @@ const ContestPage = () => {
         if (!cancelled) {
           setContest(data);
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) {
-          setError(true);
+          setError(loadErrorFrom(err));
         }
       }
     };
@@ -53,7 +54,7 @@ const ContestPage = () => {
   }, [slug]);
 
   if (error) {
-    return <Alert variant="error">{t('pages.contest.failedToLoad')}</Alert>;
+    return <LoadErrorAlert error={error} message={t('pages.contest.failedToLoad')} />;
   }
 
   if (!contest) {

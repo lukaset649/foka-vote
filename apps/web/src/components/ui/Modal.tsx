@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn';
 
 interface ModalProps {
@@ -42,7 +43,7 @@ const Modal = ({ open, onClose, children, className, ariaLabelledBy }: ModalProp
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/50 p-4"
       role="dialog"
@@ -56,7 +57,8 @@ const Modal = ({ open, onClose, children, className, ariaLabelledBy }: ModalProp
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
