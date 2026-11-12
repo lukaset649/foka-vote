@@ -2,7 +2,7 @@ import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { AdminContestDto, ErrorResponseBody, PaginatedDto } from '@foka-vote/shared';
 import type { Agent } from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../src/lib/prisma.js';
 import { TEST_UPLOADS_DIR } from '../env.js';
 import { createContest, createSubmission, createTopic, createVoteCard } from '../factories.js';
@@ -30,6 +30,10 @@ let admin: Agent;
 
 beforeEach(async () => {
   admin = await loginAsAdmin();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('POST /api/admin/contests', () => {
@@ -78,6 +82,37 @@ describe('POST /api/admin/contests', () => {
     });
   });
 
+  it('trims the description and access code', async () => {
+    const response = await admin
+      .post('/api/admin/contests')
+      .send(contestPayload({ description: '  Opis  ', accessCode: ' KOD ' }))
+      .expect(201);
+
+    expect(response.body).toMatchObject({ description: 'Opis', accessCode: 'KOD' });
+  });
+
+  it('stores a blank description and access code as null', async () => {
+    const response = await admin
+      .post('/api/admin/contests')
+      .send(contestPayload({ description: '   ', accessCode: '  ' }))
+      .expect(201);
+
+    expect(response.body).toMatchObject({
+      description: null,
+      accessCode: null,
+      hasAccessCode: false,
+    });
+  });
+
+  it('answers 409 when the slug is taken between the check and the insert', async () => {
+    await createContest({ slug: 'wiosna-2026' });
+    vi.spyOn(prisma.contest, 'findUnique').mockResolvedValueOnce(null);
+
+    const response = await admin.post('/api/admin/contests').send(contestPayload()).expect(409);
+
+    expect(errorCode(response)).toBe('CONFLICT');
+  });
+
   it('computes the status from the dates', async () => {
     const response = await admin
       .post('/api/admin/contests')
@@ -110,6 +145,7 @@ describe('POST /api/admin/contests', () => {
 
   it.each([
     ['an invalid date', { votingEnd: 'not-a-date' }],
+    ['an empty date', { votingEnd: '' }],
     ['a start equal to the deadline', { submissionDeadline: daysFromNow(1) }],
     ['a deadline after the voting start', { submissionDeadline: daysFromNow(3.5) }],
     ['a voting start equal to the voting end', { votingEnd: daysFromNow(3) }],
@@ -306,6 +342,28 @@ describe('PATCH /api/admin/contests/:id', () => {
     });
   });
 
+  it.each(['', '   '])('clears the access code with %j', async (accessCode) => {
+    const contest = await createContest({ accessCode: 'OLD' });
+
+    const response = await admin
+      .patch(`/api/admin/contests/${contest.id}`)
+      .send({ accessCode })
+      .expect(200);
+
+    expect(response.body).toMatchObject({ accessCode: null, hasAccessCode: false });
+  });
+
+  it('trims the description and access code', async () => {
+    const contest = await createContest();
+
+    const response = await admin
+      .patch(`/api/admin/contests/${contest.id}`)
+      .send({ description: ' Nowy opis ', accessCode: ' NEW ' })
+      .expect(200);
+
+    expect(response.body).toMatchObject({ description: 'Nowy opis', accessCode: 'NEW' });
+  });
+
   it('changes the slug and moves the contest to another phase', async () => {
     const contest = await createContest({ phase: 'DRAFT' });
 
@@ -334,6 +392,21 @@ describe('PATCH /api/admin/contests/:id', () => {
     expect((response.body as AdminContestDto).slug).toBe(contest.slug);
   });
 
+  it('answers 409 when the new slug is taken between the check and the update', async () => {
+    const taken = await createContest();
+    const contest = await createContest();
+    vi.spyOn(prisma.contest, 'findUnique')
+      .mockResolvedValueOnce(contest)
+      .mockResolvedValueOnce(null);
+
+    const response = await admin
+      .patch(`/api/admin/contests/${contest.id}`)
+      .send({ slug: taken.slug })
+      .expect(409);
+
+    expect(errorCode(response)).toBe('CONFLICT');
+  });
+
   it('rejects a slug used by another contest', async () => {
     const taken = await createContest();
     const contest = await createContest();
@@ -349,6 +422,7 @@ describe('PATCH /api/admin/contests/:id', () => {
   it.each([
     ['dates out of order combined with the stored ones', { votingEnd: daysFromNow(-10) }],
     ['an invalid date', { votingStart: 'not-a-date' }],
+    ['an empty date', { votingEnd: '' }],
     ['an artwork limit out of range', { maxArtworksPerSubmission: 0 }],
     ['an empty title', { title: '' }],
     ['a non-string title', { title: 123 }],
