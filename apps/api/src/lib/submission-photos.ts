@@ -1,20 +1,11 @@
 import { badRequest } from '../errors/app-error.js';
+import { parseOptionalText } from './request-body.js';
 
 /** One already uploaded photo of a submission, in the order it should appear. */
 export interface SubmissionPhotoInput {
   uploadId: string;
   title: string | null;
   description: string | null;
-}
-
-function optionalCaption(value: unknown, field: string): string | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  if (typeof value !== 'string') {
-    throw badRequest(`${field} must be a string`);
-  }
-  return value.length > 0 ? value : null;
 }
 
 export function parseSubmissionPhotos(raw: unknown, field: string): SubmissionPhotoInput[] {
@@ -32,8 +23,8 @@ export function parseSubmissionPhotos(raw: unknown, field: string): SubmissionPh
     }
     return {
       uploadId,
-      title: optionalCaption(title, 'title'),
-      description: optionalCaption(description, 'description'),
+      title: parseOptionalText(title, 'title') ?? null,
+      description: parseOptionalText(description, 'description') ?? null,
     };
   });
 }

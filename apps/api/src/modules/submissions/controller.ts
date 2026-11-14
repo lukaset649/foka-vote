@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { badRequest } from '../../errors/app-error.js';
+import { parseOptionalText } from '../../lib/request-body.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload } from '../../lib/upload.js';
 import { requireParam } from '../../lib/request-params.js';
@@ -63,7 +64,7 @@ export async function create(request: Request, response: Response): Promise<void
     throw badRequest('rulesAccepted must be accepted');
   }
 
-  const descriptionValue = optionalString(description);
+  const descriptionValue = parseOptionalText(description, 'description') ?? undefined;
   const reservationIdValue = optionalString(reservationId);
 
   const submission = await createSubmission(
