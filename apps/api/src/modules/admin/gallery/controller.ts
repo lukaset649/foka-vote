@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { CreateAlbumDto, UpdateAlbumDto, UpdateAlbumPhotoDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
+import { requireObjectBody } from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import {
   createAdminAlbum,
@@ -35,7 +36,7 @@ export async function getOne(request: Request, response: Response): Promise<void
 }
 
 function parseAlbumFields(body: unknown): UpdateAlbumDto {
-  const { title, description, accessCode } = (body ?? {}) as Record<string, unknown>;
+  const { title, description, accessCode } = requireObjectBody(body);
 
   if (title !== undefined && typeof title !== 'string') {
     throw badRequest('title must be a string');
@@ -97,7 +98,7 @@ export async function listPhotos(request: Request, response: Response): Promise<
 }
 
 export async function updatePhoto(request: Request, response: Response): Promise<void> {
-  const { title, description } = request.body as Record<string, unknown>;
+  const { title, description } = requireObjectBody(request.body);
 
   if (title !== undefined && typeof title !== 'string') {
     throw badRequest('title must be a string');
