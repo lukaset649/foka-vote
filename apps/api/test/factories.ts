@@ -5,6 +5,7 @@ import type {
   AlbumSubmission,
   Contest,
   ContestTopic,
+  PendingUpload,
   Submission,
   VoteCard,
 } from '../src/generated/prisma/client.js';
@@ -171,5 +172,24 @@ export function createAlbumSubmission(
 export function createTopic(title?: string): Promise<ContestTopic> {
   return prisma.contestTopic.create({
     data: { title: title ?? `Topic ${nextId()}` },
+  });
+}
+
+export function createPendingUpload(
+  target: { contestId: string } | { albumId: string },
+  overrides: { createdAt?: Date } = {},
+): Promise<PendingUpload> {
+  const id = nextId();
+
+  return prisma.pendingUpload.create({
+    data: {
+      ...target,
+      filePath: `originals/upload-${id}.jpg`,
+      previewPath: `variants/upload-${id}-preview.webp`,
+      thumbPath: `variants/upload-${id}-thumb.webp`,
+      width: 1200,
+      height: 900,
+      ...overrides,
+    },
   });
 }
