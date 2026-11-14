@@ -2,6 +2,11 @@ import type { Request, Response } from 'express';
 import { SLUG_PATTERN, type CreateContestDto, type UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
+import {
+  parseOptionalText,
+  parseRequiredText,
+  requireObjectBody,
+} from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import {
   createContest,
@@ -10,22 +15,6 @@ import {
   listContests,
   updateContest,
 } from './service.js';
-
-type Body = Record<string, unknown>;
-
-function requireObjectBody(body: unknown): Body {
-  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
-    throw badRequest('Request body must be a JSON object');
-  }
-  return body as Body;
-}
-
-function parseTitle(value: unknown): string {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw badRequest('title must be a non-empty string');
-  }
-  return value.trim();
-}
 
 function parseDate(value: unknown, field: string): string {
   if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
@@ -42,17 +31,6 @@ function parseSlug(value: unknown): string | undefined {
     throw badRequest('slug may contain only lowercase letters, digits and single hyphens');
   }
   return value;
-}
-
-function parseOptionalText(value: unknown, field: string): string | null | undefined {
-  if (value === undefined || value === null) {
-    return value;
-  }
-  if (typeof value !== 'string') {
-    throw badRequest(`${field} must be a string or null`);
-  }
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
 }
 
 function parseMaxArtworks(value: unknown): number | undefined {
@@ -74,7 +52,7 @@ function parseCreatePayload(rawBody: unknown): CreateContestDto {
   const maxArtworksPerSubmission = parseMaxArtworks(body.maxArtworksPerSubmission);
 
   return {
-    title: parseTitle(body.title),
+    title: parseRequiredText(body.title, 'title'),
     submissionStart: parseDate(body.submissionStart, 'submissionStart'),
     submissionDeadline: parseDate(body.submissionDeadline, 'submissionDeadline'),
     votingStart: parseDate(body.votingStart, 'votingStart'),
@@ -92,7 +70,7 @@ function parseUpdatePayload(rawBody: unknown): UpdateContestDto {
   const input: UpdateContestDto = {};
 
   if (body.title !== undefined) {
-    input.title = parseTitle(body.title);
+    input.title = parseRequiredText(body.title, 'title');
   }
   const slug = parseSlug(body.slug);
   if (slug !== undefined) {
