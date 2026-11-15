@@ -8,6 +8,21 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: foka
+          POSTGRES_PASSWORD: foka
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U foka"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://foka:foka@localhost:5432/foka_vote_test?schema=public
     steps:
       - uses: actions/checkout@v7
 
@@ -23,3 +38,4 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+      - run: npm test
