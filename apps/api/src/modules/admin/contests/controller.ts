@@ -40,6 +40,13 @@ function parseMaxArtworks(value: unknown): number | undefined {
   throw badRequest('maxArtworksPerSubmission must be a number');
 }
 
+function parseAccessCode(value: unknown): string | null | undefined {
+  if (typeof value === 'string' && value.length > 0 && value.trim().length === 0) {
+    throw badRequest('accessCode must not be blank');
+  }
+  return parseOptionalText(value, 'accessCode');
+}
+
 function parseCreatePayload(rawBody: unknown): CreateContestDto {
   const body = requireObjectBody(rawBody);
   if (body.topicId !== undefined && typeof body.topicId !== 'string') {
@@ -48,7 +55,7 @@ function parseCreatePayload(rawBody: unknown): CreateContestDto {
 
   const slug = parseSlug(body.slug);
   const description = parseOptionalText(body.description, 'description');
-  const accessCode = parseOptionalText(body.accessCode, 'accessCode');
+  const accessCode = parseAccessCode(body.accessCode);
   const maxArtworksPerSubmission = parseMaxArtworks(body.maxArtworksPerSubmission);
 
   return {
@@ -90,7 +97,7 @@ function parseUpdatePayload(rawBody: unknown): UpdateContestDto {
   if (description !== undefined) {
     input.description = description;
   }
-  const accessCode = parseOptionalText(body.accessCode, 'accessCode');
+  const accessCode = parseAccessCode(body.accessCode);
   if (accessCode !== undefined) {
     input.accessCode = accessCode;
   }

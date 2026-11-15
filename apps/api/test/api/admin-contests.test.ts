@@ -91,10 +91,10 @@ describe('POST /api/admin/contests', () => {
     expect(response.body).toMatchObject({ description: 'Opis', accessCode: 'KOD' });
   });
 
-  it('stores a blank description and access code as null', async () => {
+  it('stores a blank description and an empty access code as null', async () => {
     const response = await admin
       .post('/api/admin/contests')
-      .send(contestPayload({ description: '   ', accessCode: '  ' }))
+      .send(contestPayload({ description: '   ', accessCode: '' }))
       .expect(201);
 
     expect(response.body).toMatchObject({
@@ -160,6 +160,7 @@ describe('POST /api/admin/contests', () => {
     ['a slug that is not URL-safe', { slug: 'Hello World!' }],
     ['a non-string description', { description: 5 }],
     ['a non-string access code', { accessCode: 5 }],
+    ['a blank access code', { accessCode: '   ' }],
   ])('rejects %s', async (_case, overrides) => {
     const response = await admin
       .post('/api/admin/contests')
@@ -342,15 +343,29 @@ describe('PATCH /api/admin/contests/:id', () => {
     });
   });
 
-  it.each(['', '   '])('clears the access code with %j', async (accessCode) => {
+  it('clears the access code with an empty string', async () => {
     const contest = await createContest({ accessCode: 'OLD' });
 
     const response = await admin
       .patch(`/api/admin/contests/${contest.id}`)
-      .send({ accessCode })
+      .send({ accessCode: '' })
       .expect(200);
 
     expect(response.body).toMatchObject({ accessCode: null, hasAccessCode: false });
+  });
+
+  it('keeps the access code when a blank one is sent', async () => {
+    const contest = await createContest({ accessCode: 'OLD' });
+
+    const response = await admin
+      .patch(`/api/admin/contests/${contest.id}`)
+      .send({ accessCode: '   ' })
+      .expect(400);
+
+    expect(errorCode(response)).toBe('VALIDATION_FAILED');
+    expect(await prisma.contest.findUnique({ where: { id: contest.id } })).toMatchObject({
+      accessCode: 'OLD',
+    });
   });
 
   it('trims the description and access code', async () => {

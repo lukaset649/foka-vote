@@ -153,6 +153,10 @@ const AdminContestFormPage = () => {
       setError(invalidSlug);
       return;
     }
+    if (form.accessCode !== '' && form.accessCode.trim() === '') {
+      setError(t('pages.adminContestForm.accessCodeBlank'));
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
