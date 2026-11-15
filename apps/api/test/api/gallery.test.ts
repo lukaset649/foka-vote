@@ -188,6 +188,7 @@ describe('POST /api/gallery/albums/:slug/access', () => {
   it.each([
     ['a missing code', {}],
     ['an empty code', { code: '' }],
+    ['a blank code', { code: '   ' }],
   ])('rejects %s', async (_case, body) => {
     const album = await createAlbum({ accessCode: 'SECRET' });
 
@@ -195,6 +196,19 @@ describe('POST /api/gallery/albums/:slug/access', () => {
       .post(`${albumUrl(album)}/access`)
       .send(body)
       .expect(400);
+  });
+
+  it('accepts the code with surrounding whitespace', async () => {
+    const album = await createAlbum({ accessCode: 'SECRET' });
+    const visitor = agent();
+
+    await visitor
+      .post(`${albumUrl(album)}/access`)
+      .send({ code: ' SECRET ' })
+      .expect(204);
+    const response = await visitor.get(albumUrl(album)).expect(200);
+
+    expect(response.body).toMatchObject({ canUpload: true });
   });
 
   it('rejects a code for an album without one', async () => {

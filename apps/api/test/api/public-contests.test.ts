@@ -118,6 +118,7 @@ describe('POST /api/contests/:slug/access', () => {
   it.each([
     ['a missing code', {}],
     ['an empty code', { code: '' }],
+    ['a blank code', { code: '   ' }],
     ['a non-string code', { code: 1 }],
   ])('rejects %s', async (_case, body) => {
     const contest = await createContest({ accessCode: 'SECRET' });
@@ -194,6 +195,20 @@ describe('POST /api/contests/:slug/uploads', () => {
     const contest = await createContest({ accessCode: 'SECRET' });
     const visitor = agent();
     await visitor.post(`/api/contests/${contest.slug}/access`).send({ code: 'SECRET' }).expect(204);
+
+    await visitor
+      .post(`/api/contests/${contest.slug}/uploads`)
+      .attach('photo', await fixtureImage(), 'photo.jpg')
+      .expect(201);
+  });
+
+  it('accepts uploads after entering the access code with surrounding whitespace', async () => {
+    const contest = await createContest({ accessCode: 'SECRET' });
+    const visitor = agent();
+    await visitor
+      .post(`/api/contests/${contest.slug}/access`)
+      .send({ code: ' SECRET ' })
+      .expect(204);
 
     await visitor
       .post(`/api/contests/${contest.slug}/uploads`)
