@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { parseOptionalText } from '../../../lib/request-body.js';
+import { parseOptionalText, requireObjectBody } from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import { listVoteCards, unvoidVoteCard, voidVoteCard } from './service.js';
 
 function parseVoidReason(body: unknown): string | undefined {
-  const { reason } = (body ?? {}) as Record<string, unknown>;
+  const { reason } = body === undefined ? {} : requireObjectBody(body);
   return parseOptionalText(reason, 'reason') ?? undefined;
 }
 

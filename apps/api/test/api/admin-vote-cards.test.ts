@@ -110,8 +110,11 @@ describe('POST .../vote-cards/:cardId/void', () => {
     expect((response.body as VoteCardDto).voidReason).toBe('Second');
   });
 
-  it('rejects a non-string reason', async () => {
-    const response = await admin.post(cardUrl('void')).send({ reason: 1 }).expect(400);
+  it.each([
+    ['a non-string reason', { reason: 1 }],
+    ['an array body', ['spam']],
+  ])('rejects %s', async (_case, body) => {
+    const response = await admin.post(cardUrl('void')).send(body).expect(400);
 
     expect(errorCode(response)).toBe('VALIDATION_FAILED');
     expect((await prisma.voteCard.findUniqueOrThrow({ where: { id: card.id } })).isVoid).toBe(
