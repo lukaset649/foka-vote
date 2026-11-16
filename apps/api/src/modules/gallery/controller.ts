@@ -2,10 +2,10 @@ import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
 import { parseListQuery } from '../../lib/list-query.js';
-import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
-import { requireSingleUpload } from '../../lib/upload.js';
 import { parseRequiredText, requireObjectBody } from '../../lib/request-body.js';
 import { requireParam } from '../../lib/request-params.js';
+import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
+import { requireSingleUpload } from '../../lib/upload.js';
 import {
   addPendingAlbumUpload,
   ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
