@@ -45,10 +45,10 @@ export interface AliasReservationDto {
 export interface UpdateSubmissionDto {
   firstName?: string;
   lastName?: string;
-  description?: string;
+  description?: string | null;
 }
 
 export interface UpdateArtworkDto {
-  title?: string;
-  description?: string;
+  title?: string | null;
+  description?: string | null;
 }

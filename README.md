@@ -48,6 +48,7 @@ npm run dev:web           # terminal 2
 - `npm run dev:api` / `npm run dev:web`: start a single app in dev mode
 - `npm run build`: build all workspaces (`shared` → `api` → `web`)
 - `npm run typecheck`: typecheck all workspaces
+- `npm test`: API tests, needs the `db` container ([details](apps/api/README.md#tests))
 - `npm run lint` / `npm run lint:fix`: ESLint over the whole repo
 - `npm run format` / `npm run format:check`: Prettier over the whole repo
 
@@ -73,4 +74,7 @@ Copy `.env.example` to `.env` and adjust as needed. `.env` is git-ignored.
 | `DATABASE_URL`        | **yes**  | none                    | PostgreSQL connection string                                                                 |
 | `ADMIN_PASSWORD_HASH` | **yes**  | none                    | Admin password hash, generate with `npm run admin:hash-password -w apps/api -- '<password>'` |
 | `COOKIE_SECRET`       | **yes**  | none                    | Secret for signing session cookies, min. 32 characters                                       |
+| `UPLOADS_DIR`         | no       | `<api cwd>/uploads`     | Where uploaded photos are stored, see the warning below                                      |
 | `VITE_API_URL`        | no       | `http://localhost:3000` | API base URL used by the web app                                                             |
+
+> **`UPLOADS_DIR` in production:** nginx serves photos from a hardcoded path (`alias` in `location /media/` of `deploy/nginx.conf`, pointing at `apps/api/uploads/variants/`). Change that `alias` together with `UPLOADS_DIR`, or photos stop loading. Tests set it to a temporary directory.

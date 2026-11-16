@@ -1,17 +1,11 @@
 import type { Request, Response } from 'express';
-import { badRequest } from '../../../errors/app-error.js';
+import { parseOptionalText, requireObjectBody } from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import { listVoteCards, unvoidVoteCard, voidVoteCard } from './service.js';
 
 function parseVoidReason(body: unknown): string | undefined {
-  const input = (body ?? {}) as Record<string, unknown>;
-  if (input.reason === undefined) {
-    return undefined;
-  }
-  if (typeof input.reason !== 'string') {
-    throw badRequest('reason must be a string');
-  }
-  return input.reason;
+  const { reason } = body === undefined ? {} : requireObjectBody(body);
+  return parseOptionalText(reason, 'reason') ?? undefined;
 }
 
 export async function list(request: Request, response: Response): Promise<void> {

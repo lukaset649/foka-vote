@@ -222,6 +222,7 @@
       "slugHintEditing": "Małe litery, cyfry i pojedyncze myślniki, np. wiosna-2026. Puste pole: slug się nie zmieni.",
       "slugInvalid": "Slug może zawierać tylko małe litery, cyfry i pojedyncze myślniki, np. wiosna-2026.",
       "slugRequired": "Z tego tytułu nie da się utworzyć sluga. Wpisz slug ręcznie.",
+      "accessCodeBlank": "Kod dostępu nie może składać się z samych spacji. Wyczyść pole, aby usunąć kod.",
       "descriptionLabel": "Opis",
       "timeline": "Harmonogram",
       "submissionStartLabel": "Rozpoczęcie zgłoszeń",

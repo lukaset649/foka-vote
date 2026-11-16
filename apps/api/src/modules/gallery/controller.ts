@@ -2,9 +2,10 @@ import type { Request, Response } from 'express';
 import { isProduction } from '../../config/env.js';
 import { badRequest } from '../../errors/app-error.js';
 import { parseListQuery } from '../../lib/list-query.js';
+import { parseRequiredText, requireObjectBody } from '../../lib/request-body.js';
+import { requireParam } from '../../lib/request-params.js';
 import { parseSubmissionPhotos } from '../../lib/submission-photos.js';
 import { requireSingleUpload } from '../../lib/upload.js';
-import { requireParam } from '../../lib/request-params.js';
 import {
   addPendingAlbumUpload,
   ALBUM_ACCESS_COOKIE_MAX_AGE_MS,
@@ -31,11 +32,7 @@ export async function getOne(request: Request, response: Response): Promise<void
 
 export async function verifyAccess(request: Request, response: Response): Promise<void> {
   const slug = requireParam(request, 'slug');
-  const { code } = request.body as { code?: unknown };
-
-  if (typeof code !== 'string' || code.length === 0) {
-    throw badRequest('code is required');
-  }
+  const code = parseRequiredText(requireObjectBody(request.body).code, 'code');
 
   const { albumId } = await verifyAlbumAccessCode(slug, code);
 

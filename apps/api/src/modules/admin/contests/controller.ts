@@ -2,6 +2,11 @@ import type { Request, Response } from 'express';
 import { SLUG_PATTERN, type CreateContestDto, type UpdateContestDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
 import { parseListQuery } from '../../../lib/list-query.js';
+import {
+  parseOptionalText,
+  parseRequiredText,
+  requireObjectBody,
+} from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import {
   createContest,
@@ -11,25 +16,9 @@ import {
   updateContest,
 } from './service.js';
 
-type Body = Record<string, unknown>;
-
-function requireObjectBody(body: unknown): Body {
-  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
-    throw badRequest('Request body must be a JSON object');
-  }
-  return body as Body;
-}
-
-function parseTitle(value: unknown): string {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw badRequest('title must be a non-empty string');
-  }
-  return value.trim();
-}
-
 function parseDate(value: unknown, field: string): string {
-  if (typeof value !== 'string') {
-    throw badRequest(`${field} must be a date string`);
+  if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
+    throw badRequest(`${field} must be a valid date string`);
   }
   return value;
 }
@@ -44,18 +33,18 @@ function parseSlug(value: unknown): string | undefined {
   return value;
 }
 
-function parseNullableString(value: unknown, field: string): string | null | undefined {
-  if (value === undefined || value === null || typeof value === 'string') {
-    return value;
-  }
-  throw badRequest(`${field} must be a string or null`);
-}
-
 function parseMaxArtworks(value: unknown): number | undefined {
   if (value === undefined || typeof value === 'number') {
     return value;
   }
   throw badRequest('maxArtworksPerSubmission must be a number');
+}
+
+function parseAccessCode(value: unknown): string | null | undefined {
+  if (typeof value === 'string' && value.length > 0 && value.trim().length === 0) {
+    throw badRequest('accessCode must not be blank');
+  }
+  return parseOptionalText(value, 'accessCode');
 }
 
 function parseCreatePayload(rawBody: unknown): CreateContestDto {
@@ -65,12 +54,12 @@ function parseCreatePayload(rawBody: unknown): CreateContestDto {
   }
 
   const slug = parseSlug(body.slug);
-  const description = parseNullableString(body.description, 'description');
-  const accessCode = parseNullableString(body.accessCode, 'accessCode');
+  const description = parseOptionalText(body.description, 'description');
+  const accessCode = parseAccessCode(body.accessCode);
   const maxArtworksPerSubmission = parseMaxArtworks(body.maxArtworksPerSubmission);
 
   return {
-    title: parseTitle(body.title),
+    title: parseRequiredText(body.title, 'title'),
     submissionStart: parseDate(body.submissionStart, 'submissionStart'),
     submissionDeadline: parseDate(body.submissionDeadline, 'submissionDeadline'),
     votingStart: parseDate(body.votingStart, 'votingStart'),
@@ -88,7 +77,7 @@ function parseUpdatePayload(rawBody: unknown): UpdateContestDto {
   const input: UpdateContestDto = {};
 
   if (body.title !== undefined) {
-    input.title = parseTitle(body.title);
+    input.title = parseRequiredText(body.title, 'title');
   }
   const slug = parseSlug(body.slug);
   if (slug !== undefined) {
@@ -104,11 +93,11 @@ function parseUpdatePayload(rawBody: unknown): UpdateContestDto {
       input[field] = parseDate(body[field], field);
     }
   }
-  const description = parseNullableString(body.description, 'description');
+  const description = parseOptionalText(body.description, 'description');
   if (description !== undefined) {
     input.description = description;
   }
-  const accessCode = parseNullableString(body.accessCode, 'accessCode');
+  const accessCode = parseAccessCode(body.accessCode);
   if (accessCode !== undefined) {
     input.accessCode = accessCode;
   }

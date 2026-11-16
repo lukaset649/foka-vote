@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express';
 import type { UpdateArtworkDto, UpdateSubmissionDto } from '@foka-vote/shared';
 import { badRequest } from '../../../errors/app-error.js';
+import {
+  parseOptionalText,
+  parseRequiredText,
+  requireObjectBody,
+} from '../../../lib/request-body.js';
 import { requireParam } from '../../../lib/request-params.js';
 import {
   deleteArtwork,
@@ -13,47 +18,35 @@ import {
   updateSubmission,
 } from './service.js';
 
-function parseUpdateSubmissionBody(body: unknown): UpdateSubmissionDto {
-  const input = (body ?? {}) as Record<string, unknown>;
+function parseUpdateSubmissionBody(rawBody: unknown): UpdateSubmissionDto {
+  const body = requireObjectBody(rawBody);
   const result: UpdateSubmissionDto = {};
 
-  if (input.firstName !== undefined) {
-    if (typeof input.firstName !== 'string' || input.firstName.length === 0) {
-      throw badRequest('firstName must be a non-empty string');
-    }
-    result.firstName = input.firstName;
+  if (body.firstName !== undefined) {
+    result.firstName = parseRequiredText(body.firstName, 'firstName');
   }
-  if (input.lastName !== undefined) {
-    if (typeof input.lastName !== 'string' || input.lastName.length === 0) {
-      throw badRequest('lastName must be a non-empty string');
-    }
-    result.lastName = input.lastName;
+  if (body.lastName !== undefined) {
+    result.lastName = parseRequiredText(body.lastName, 'lastName');
   }
-  if (input.description !== undefined) {
-    if (typeof input.description !== 'string') {
-      throw badRequest('description must be a string');
-    }
-    result.description = input.description;
+  const description = parseOptionalText(body.description, 'description');
+  if (description !== undefined) {
+    result.description = description;
   }
 
   return result;
 }
 
-function parseUpdateArtworkBody(body: unknown): UpdateArtworkDto {
-  const input = (body ?? {}) as Record<string, unknown>;
+function parseUpdateArtworkBody(rawBody: unknown): UpdateArtworkDto {
+  const body = requireObjectBody(rawBody);
   const result: UpdateArtworkDto = {};
 
-  if (input.title !== undefined) {
-    if (typeof input.title !== 'string') {
-      throw badRequest('title must be a string');
-    }
-    result.title = input.title;
+  const title = parseOptionalText(body.title, 'title');
+  if (title !== undefined) {
+    result.title = title;
   }
-  if (input.description !== undefined) {
-    if (typeof input.description !== 'string') {
-      throw badRequest('description must be a string');
-    }
-    result.description = input.description;
+  const description = parseOptionalText(body.description, 'description');
+  if (description !== undefined) {
+    result.description = description;
   }
 
   return result;

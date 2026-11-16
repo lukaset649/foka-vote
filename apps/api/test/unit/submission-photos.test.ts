@@ -7,7 +7,7 @@ describe('parseSubmissionPhotos', () => {
     expect(
       parseSubmissionPhotos(
         [
-          { uploadId: 'b', title: 'Sunset', description: '' },
+          { uploadId: 'b', title: ' Sunset ', description: '   ' },
           { uploadId: 'a', title: null },
         ],
         'photos',

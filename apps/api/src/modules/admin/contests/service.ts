@@ -14,7 +14,7 @@ import { badRequest, conflict, notFound } from '../../../errors/app-error.js';
 import { computeContestStatus } from '../../../lib/contest-status.js';
 import type { ParsedListQuery } from '../../../lib/list-query.js';
 import { paginateKeys, titleSearchFilter } from '../../../lib/list-query.js';
-import { prisma } from '../../../lib/prisma.js';
+import { isUniqueConstraintError, prisma } from '../../../lib/prisma.js';
 import { pendingUploadPaths } from '../../../lib/pending-uploads.js';
 import { removeStoredFiles } from '../../../lib/storage.js';
 
@@ -75,10 +75,25 @@ function assertValidMaxArtworks(value: number): void {
   }
 }
 
+function slugInUse(slug: string) {
+  return conflict(`Slug "${slug}" is already in use`);
+}
+
 async function ensureUniqueSlug(slug: string, excludeId?: string): Promise<void> {
   const existing = await prisma.contest.findUnique({ where: { slug } });
   if (existing && existing.id !== excludeId) {
-    throw conflict(`Slug "${slug}" is already in use`);
+    throw slugInUse(slug);
+  }
+}
+
+async function writeWithUniqueSlug<T>(slug: string, write: () => Promise<T>): Promise<T> {
+  try {
+    return await write();
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      throw slugInUse(slug);
+    }
+    throw error;
   }
 }
 
@@ -113,14 +128,16 @@ export async function createContest(input: CreateContestDto): Promise<AdminConte
     },
   });
 
-  const contest = input.topicId
-    ? (
-        await prisma.$transaction([
-          createContestRow,
-          prisma.contestTopic.deleteMany({ where: { id: input.topicId } }),
-        ])
-      )[0]
-    : await createContestRow;
+  const contest = await writeWithUniqueSlug(slug, async () =>
+    input.topicId
+      ? (
+          await prisma.$transaction([
+            createContestRow,
+            prisma.contestTopic.deleteMany({ where: { id: input.topicId } }),
+          ])
+        )[0]
+      : await createContestRow,
+  );
 
   return toAdminContestDto(contest);
 }
@@ -168,20 +185,22 @@ export async function updateContest(id: string, input: UpdateContestDto): Promis
     slug = input.slug;
   }
 
-  const contest = await prisma.contest.update({
-    where: { id },
-    data: {
-      slug,
-      title: input.title ?? existing.title,
-      description: input.description !== undefined ? input.description : existing.description,
-      submissionStart,
-      submissionDeadline,
-      votingStart,
-      votingEnd,
-      maxArtworksPerSubmission,
-      accessCode: input.accessCode !== undefined ? input.accessCode : existing.accessCode,
-    },
-  });
+  const contest = await writeWithUniqueSlug(slug, () =>
+    prisma.contest.update({
+      where: { id },
+      data: {
+        slug,
+        title: input.title ?? existing.title,
+        description: input.description !== undefined ? input.description : existing.description,
+        submissionStart,
+        submissionDeadline,
+        votingStart,
+        votingEnd,
+        maxArtworksPerSubmission,
+        accessCode: input.accessCode !== undefined ? input.accessCode : existing.accessCode,
+      },
+    }),
+  );
 
   return toAdminContestDto(contest);
 }

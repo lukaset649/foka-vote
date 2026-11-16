@@ -146,10 +146,15 @@ const AdminContestFormPage = () => {
   };
 
   const submit = async () => {
-    const slug = form.slug.trim();
+    const trimmedSlug = form.slug.trim();
+    const slug = trimmedSlug === contest?.slug ? '' : trimmedSlug;
     const invalidSlug = slugError(slug);
     if (invalidSlug) {
       setError(invalidSlug);
+      return;
+    }
+    if (form.accessCode !== '' && form.accessCode.trim() === '') {
+      setError(t('pages.adminContestForm.accessCodeBlank'));
       return;
     }
 

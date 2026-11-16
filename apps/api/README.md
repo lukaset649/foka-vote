@@ -105,8 +105,9 @@ Sorting happens in `lib/list-query.ts` with a Polish collator, since the alpine 
 - `npm run dev`: `tsx watch src/index.ts`
 - `npm run build`: compiles to `dist/`
 - `npm run start`: `node dist/index.js`
-- `npm run typecheck`: `tsc --noEmit`
-- `npm run lint`: ESLint over `src/`
+- `npm run typecheck`: `tsc` over `src/` and `test/` (`tsconfig.test.json`, no emit)
+- `npm run lint`: ESLint over `src/` and `test/`
+- `npm test` / `npm run test:watch`: Vitest, see [Tests](#tests)
 - `npm run prisma:generate`: regenerate the Prisma Client after a schema change (required before typecheck/build; `prisma migrate dev` no longer runs it)
 - `npm run prisma:migrate`: create and apply a migration (`prisma migrate dev`)
 
@@ -116,3 +117,18 @@ Sorting happens in `lib/list-query.ts` with a Polish collator, since the alpine 
 - `docker-compose.yml` provides a local `db` service (`docker compose up -d db`).
 - `GET /api/health` reports `database: 'ok' | 'error'` based on a live connectivity check.
 - A destructive migration cannot be created non-interactively: write the SQL by hand under `prisma/migrations/<timestamp>_<name>/migration.sql` and apply it with `prisma migrate deploy`.
+
+## Tests
+
+Vitest with supertest, against a real Postgres (no Prisma mocks).
+
+```bash
+docker compose up -d db   # once
+npm test -w apps/api      # or `npm test` from the repo root
+```
+
+- Tests use the `foka_vote_test` database on `localhost:5433` (the `db` container exposes 5433 too, in case a native Postgres owns 5432). Override with `TEST_DATABASE_URL`; the database name must end with `_test`.
+- `test/global-setup.ts` runs `prisma migrate deploy` (creates the database if missing) and resets a temporary uploads directory. Every test starts from empty tables (`TRUNCATE ... CASCADE` in `test/setup.ts`); test files run one at a time.
+- `test/unit/`: pure functions from `src/lib`. `test/api/`: HTTP tests against `createApp()` without `listen()`.
+- `test/factories.ts`: create rows with Prisma directly (`createContest({ phase })` sets dates relative to now, no fake timers). `test/helpers/`: `api()`, `agent()` and `loginAsAdmin()` on a shared app, `fixtureImage()` (generated in memory with sharp), error `code` helpers, stored file checks.
+- API tests assert status, error `code` and response shape, not message text.
